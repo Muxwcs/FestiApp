@@ -35,7 +35,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <meta name="apple-mobile-web-app-title" content="Festiapp" />
         <link rel="apple-touch-icon" href="/icon-512x512.png" />
       </head>
-      <body>
+      <body className="flex flex-col min-h-screen w-full items-center bg-muted">
         <Providers>
           {children}
         </Providers>
