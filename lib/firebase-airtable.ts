@@ -49,19 +49,18 @@ export async function createUserInAirtable({ uid, email }: { uid: string, email:
   const record = created[0]
   return {
     id: record.id,
-    email: String(record.get("email")),
-    phone: undefined,
-    name: undefined,
-    surname: undefined,
-    role: String(record.get("role")),
-    availability: [],
-    assignedTasks: [],
-    status: String(record.get("status")), // default status
-    skills: [],
-    avatar: undefined,
-    notes: undefined,
-    createdAt: record.get("createdAt"),
-    modifiedAt: record.get("modifiedAt"),
-    // ...add other fields as needed
+    email: record.get("email") ? String(record.get("email")) : undefined,
+    phone: record.get("phone") ? String(record.get("phone")) : undefined,
+    name: record.get("name") ? String(record.get("name")) : undefined,
+    surname: record.get("surname") ? String(record.get("surname")) : undefined,
+    role: record.get("role") ? String(record.get("role")).toLowerCase() : "bénévole",
+    availability: record.get("availability") || null,
+    assignedTasks: record.get("assignedTasks") || [],
+    status: record.get("status") || null,
+    skills: record.get("skills") || [],
+    avatar: record.get("avatar") || null,
+    notes: record.get("notes") ? String(record.get("notes")) : undefined,
+    createdAt: record.get("createdAt") || null,
+    modifiedAt: record.get("modifiedAt") || null,
   }
 }
