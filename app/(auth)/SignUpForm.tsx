@@ -54,7 +54,6 @@ export function SignUpForm() {
       reset()
     } catch (err: unknown) {
       const error = err as Error
-      // toast.error(error.message || "Erreur d'inscription")
       toast.error("Erreur d'inscription")
       console.error("Login error:", error.message) // Don't expose full error to user
     } finally {

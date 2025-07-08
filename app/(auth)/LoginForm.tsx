@@ -54,8 +54,7 @@ export function LoginForm() {
       reset()
     } catch (err: unknown) {
       const error = err as Error
-      // toast.error(error.message || "Erreur de connexion")
-      toast.error("Authentication failed")
+      toast.error("Erreur de connexion")
       console.error("Login error:", error.message) // Don't expose full error to user
     } finally {
       setLoading(false)
