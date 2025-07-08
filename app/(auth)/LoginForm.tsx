@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { useState } from "react"
+import { validateInput, validateEmail } from "@/lib/security"
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false)
@@ -25,6 +26,19 @@ export function LoginForm() {
   })
 
   async function onSubmit(data: LoginFormValues) {
+    // Validate and sanitize inputs
+    const email = validateInput(data.email)
+    const password = validateInput(data.password)
+
+    if (!email || !password) {
+      toast.error("Invalid input data")
+      return
+    }
+
+    if (!validateEmail(email)) {
+      toast.error("Invalid email format")
+      return
+    }
     setLoading(true)
     try {
       const userCredential = await signInWithEmailAndPassword(firebaseAuth, data.email, data.password)
@@ -40,7 +54,9 @@ export function LoginForm() {
       reset()
     } catch (err: unknown) {
       const error = err as Error
-      toast.error(error.message || "Erreur de connexion")
+      // toast.error(error.message || "Erreur de connexion")
+      toast.error("Authentication failed")
+      console.error("Login error:", error.message) // Don't expose full error to user
     } finally {
       setLoading(false)
     }
