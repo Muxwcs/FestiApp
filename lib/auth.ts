@@ -1,6 +1,6 @@
+import { getUserByFirebaseUid, createUserInAirtable } from "./firebase-airtable"
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { getUserByFirebaseUid } from "./firebase-airtable"
 import { verifyIdToken } from "./firebase-server"
 
 export const authOptions: NextAuthOptions = {
@@ -16,18 +16,18 @@ export const authOptions: NextAuthOptions = {
         if (!decoded) return null
 
         const firebaseUid = decoded.uid
-        const user = await getUserByFirebaseUid(firebaseUid)
+        let user = await getUserByFirebaseUid(firebaseUid)
+        if (!user) {
+          // Create user in Airtable if not found
+          if (typeof decoded.email !== "string") return null
+          user = await createUserInAirtable({ uid: firebaseUid, email: decoded.email })
+        }
         if (!user) return null
-
         return {
-          // id: firebaseUid,
-          // email: user.email,
-          // name: user.name,
-          // role: user.role,
-          id: String(firebaseUid),
-          email: user.email ? String(user.email) : undefined,
-          name: user.name ? String(user.name) : undefined,
-          role: user.role ? String(user.role) : undefined,
+          id: firebaseUid,
+          email: user.email,
+          name: user.name,
+          role: user.role,
         }
       },
     }),
@@ -35,12 +35,14 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        token.id = user.id
         token.role = user.role
       }
       return token
     },
     async session({ session, token }) {
       if (token && session.user) {
+        session.user.id = token.id as string
         session.user.role = token.role
       }
       return session
