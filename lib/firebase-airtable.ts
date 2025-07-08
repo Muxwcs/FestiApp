@@ -1,5 +1,10 @@
 import Airtable from "airtable"
 
+type AirtableRecord = {
+  id: string
+  get(field: string): unknown
+}
+
 export const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID!)
 
 export async function getUserByFirebaseUid(uid: string) {
@@ -12,7 +17,7 @@ export async function getUserByFirebaseUid(uid: string) {
 
   if (records.length === 0) return null
 
-  const record: Airtable.Record<any> = records[0]
+  const record: AirtableRecord = records[0]
   return {
     id: record.id,
     email: record.get("email") ? String(record.get("email")) : undefined,
@@ -23,7 +28,7 @@ export async function getUserByFirebaseUid(uid: string) {
     availability: record.get("availability"),
     assignedTasks: record.get("assignedTasks"),
     status: record.get("status"),
-    skills: record.get("skills") ? (record.get("skills") as any[]).map(skill => String(skill)) : [],
+    skills: record.get("skills") ? record.get("skills") : [],
     avatar: record.get("avatar"),
     notes: record.get("notes") ? String(record.get("notes")) : undefined,
     createdAt: record.get("createdAt"),
