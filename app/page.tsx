@@ -1,134 +1,53 @@
 "use client"
 
+import HomeTopbar from "@/components/layout/home-topbar"
+import Timeline from "@/components/timeline"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth"
-import { signIn } from "next-auth/react"
-import { firebaseAuth } from "@/lib/firebase-client"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { toast } from "sonner"
 
-const authSchema = z.object({
-  email: z.string().email({ message: "Email invalide" }),
-  password: z.string().min(6, { message: "6 caractères minimum" }),
-})
-type AuthFormValues = z.infer<typeof authSchema>
+const array = [
+  {
+    status: "Ouverture des portes",
+    comment: "Les portes du festival s'ouvrent à 10h00.",
+    createdAt: "19h00",
+  },
+  {
+    status: "Concert de l'artiste A",
+    comment: "Le concert de l'artiste A commence à 11h00.",
+    createdAt: "20h00",
+  },
+  {
+    status: "Concert de l'artiste B",
+    comment: "Le concert de l'artiste B commence à 21h00.",
+    createdAt: "21h00",
+  },
+]
 
 export default function AuthPage() {
-  const [mode, setMode] = useState<"login" | "register">("login")
-  const [loading, setLoading] = useState(false)
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, touchedFields },
-    reset,
-  } = useForm<AuthFormValues>({
-    resolver: zodResolver(authSchema),
-    mode: "onTouched",
-  })
-
-  async function onSubmit(data: AuthFormValues) {
-    setLoading(true)
-    try {
-      let userCredential
-      if (mode === "register") {
-        userCredential = await createUserWithEmailAndPassword(firebaseAuth, data.email, data.password)
-      } else {
-        userCredential = await signInWithEmailAndPassword(firebaseAuth, data.email, data.password)
-      }
-      const token = await userCredential.user.getIdToken()
-      const result = await signIn("credentials", {
-        token,
-        redirect: true,
-        callbackUrl: "/dashboard",
-      })
-      if (result?.error) {
-        toast.error(result.error)
-      }
-      reset()
-    } catch (err: unknown) {
-      const error = err as Error
-      toast.error(error.message || "Erreur d'authentification")
-    } finally {
-      setLoading(false)
-    }
-  }
-
+  const [mode, setMode] = useState<"vendredi" | "samedi">("vendredi")
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-muted">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Connexion / Inscription</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={mode} onValueChange={v => setMode(v as "login" | "register")}>
-            <TabsList className="grid grid-cols-2 mb-4">
-              <TabsTrigger value="login">Connexion</TabsTrigger>
-              <TabsTrigger value="register">Inscription</TabsTrigger>
-            </TabsList>
-            <TabsContent value="login">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  autoComplete="email"
-                  {...register("email")}
-                  aria-invalid={!!errors.email}
-                />
-                {touchedFields.email && errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
-                )}
-                <Input
-                  type="password"
-                  placeholder="Mot de passe"
-                  autoComplete="current-password"
-                  {...register("password")}
-                  aria-invalid={!!errors.password}
-                />
-                {touchedFields.password && errors.password && (
-                  <p className="text-sm text-red-500">{errors.password.message}</p>
-                )}
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Connexion..." : "Se connecter"}
-                </Button>
-              </form>
-            </TabsContent>
-            <TabsContent value="register">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  autoComplete="email"
-                  {...register("email")}
-                  aria-invalid={!!errors.email}
-                />
-                {touchedFields.email && errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
-                )}
-                <Input
-                  type="password"
-                  placeholder="Mot de passe"
-                  autoComplete="new-password"
-                  {...register("password")}
-                  aria-invalid={!!errors.password}
-                />
-                {touchedFields.password && errors.password && (
-                  <p className="text-sm text-red-500">{errors.password.message}</p>
-                )}
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Inscription..." : "S'inscrire"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+    <div className="w-full flex flex-col bg-muted min-h-screen">
+      <HomeTopbar />
+      <h2 className="text-center text-2xl font-bold mt-10">
+        Programmation
+      </h2>
+      <div className="w-full flex flex-col items-center justify-center mt-10 px-4">
+        <Tabs value={mode} onValueChange={v => setMode(v as "vendredi" | "samedi")}>
+          <TabsList className="grid grid-cols-2 mb-4">
+            <TabsTrigger value="vendredi">Agorrilak 1 Août</TabsTrigger>
+            <TabsTrigger value="samedi">Agorrilak 2 Août</TabsTrigger>
+          </TabsList>
+          <TabsContent value="vendredi" className="relative">
+            <h3 className="text-lg font-semibold mb-4">Vendredi 1 Août</h3>
+            <p className="mb-4">Programme de la journée du vendredi...</p>
+            <Timeline array={array} />
+          </TabsContent>
+          <TabsContent value="samedi">
+            <h3 className="text-lg font-semibold mb-4">Samedi 2 Août</h3>
+            <p className="mb-4">Programme de la journée du samedi...</p>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   )
 }
