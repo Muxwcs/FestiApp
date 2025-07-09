@@ -7,10 +7,12 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Image from "next/image"
 
 interface SidebarProps {
   role: "admin" | "bénévole"
@@ -28,7 +30,7 @@ const AppSidebar = ({ role, className }: SidebarProps) => {
   ]
 
   const benevoleLinks = [
-    { href: "/benevole/dashboard", label: "Mon Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard", label: "Mon Dashboard", icon: LayoutDashboard },
   ]
 
   const navLinks = [...commonLinks, ...(role === "admin" ? adminLinks : benevoleLinks)]
@@ -36,6 +38,12 @@ const AppSidebar = ({ role, className }: SidebarProps) => {
   return (
     <Sidebar className={className}>
       <SidebarContent>
+        <SidebarHeader>
+          <div className="flex items-center gap-2">
+            <Image src="/icon-192x192.png" width={64} height={64} alt="FestiApp Logo" className="rounded-full" />
+            <span className="text-3xl font-semibold">FestiApp</span>
+          </div>
+        </SidebarHeader>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
