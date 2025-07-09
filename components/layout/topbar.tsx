@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { SidebarTrigger } from "../ui/sidebar"
+import { DarkModeToggle } from "../darkmode-toggle"
+import { signOut } from "next-auth/react"
 
 export default function Topbar() {
   return (
@@ -24,15 +26,14 @@ export default function Topbar() {
         <SidebarTrigger />
         <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
       </div>
-
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="rounded-full">
           <Bell className="h-5 w-5" />
         </Button>
-
+        <DarkModeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button variant="outline" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="" alt="Utilisateur" />
                 <AvatarFallback>U</AvatarFallback>
@@ -48,7 +49,7 @@ export default function Topbar() {
             </DropdownMenuItem>
             <DropdownMenuItem>
               <LogOut className="mr-2 h-4 w-4" />
-              <span>Se déconnecter</span>
+              <span onClick={() => signOut()}>Se déconnecter</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
