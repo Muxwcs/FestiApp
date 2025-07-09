@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { useState } from "react"
+import { validateInput, validateEmail } from "@/lib/security"
 
 export function SignUpForm() {
   const [loading, setLoading] = useState(false)
@@ -25,6 +26,19 @@ export function SignUpForm() {
   })
 
   async function onSubmit(data: RegisterFormValues) {
+    // Validate and sanitize inputs
+    const email = validateInput(data.email)
+    const password = validateInput(data.password)
+
+    if (!email || !password) {
+      toast.error("Invalid input data")
+      return
+    }
+
+    if (!validateEmail(email)) {
+      toast.error("Invalid email format")
+      return
+    }
     setLoading(true)
     try {
       const userCredential = await createUserWithEmailAndPassword(firebaseAuth, data.email, data.password)
@@ -40,7 +54,8 @@ export function SignUpForm() {
       reset()
     } catch (err: unknown) {
       const error = err as Error
-      toast.error(error.message || "Erreur d'inscription")
+      toast.error("Erreur d'inscription")
+      console.error("Login error:", error.message) // Don't expose full error to user
     } finally {
       setLoading(false)
     }
