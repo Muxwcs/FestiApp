@@ -12,9 +12,9 @@ const Dashboard = () => {
     <>
       <div>Dashboard</div>
       <Suspense fallback={<div>Loading user data...</div>}>
-        <h1>Bienvenue, {user?.name}</h1>
+        <h1>Bienvenue, {user?.fields?.name}</h1>
         {/* <h2>{data?.user.role}</h2> */}
-        <p>Rôle: {user?.role}</p>
+        <p>Rôle: {user?.fields?.role}</p>
       </Suspense>
     </>
   )

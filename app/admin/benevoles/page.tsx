@@ -1,72 +1,3 @@
-// "use client"
-
-// import { useSession } from "next-auth/react"
-// import { useEffect, useState } from "react"
-// import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-// import Link from "next/link"
-
-// type Volunteer = {
-//   id: string
-//   name: string
-//   email: string
-//   role: string
-// }
-
-// const Volunteers = () => {
-//   const { data: session } = useSession()
-//   const [volunteers, setVolunteers] = useState<Volunteer[]>([])
-//   const [loading, setLoading] = useState(true)
-
-//   useEffect(() => {
-//     fetch("/api/volunteers")
-//       .then(res => res.json())
-//       .then(data => setVolunteers(data))
-//       .finally(() => setLoading(false))
-//   }, [])
-
-//   return (
-//     <div className="space-y-6">
-//       <Card>
-//         <CardHeader>
-//           <CardTitle>Bienvenue, {session?.user?.name} ({session?.user?.role})</CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           <h2 className="text-lg font-semibold mb-4">Liste des bénévoles</h2>
-//           {loading ? (
-//             <div>Chargement...</div>
-//           ) : (
-//             <table className="min-w-full text-sm">
-//               <thead>
-//                 <tr>
-//                   <th className="text-left p-2">Nom</th>
-//                   <th className="text-left p-2">Email</th>
-//                   <th className="text-left p-2">Rôle</th>
-//                   <th className="text-left p-2">Actions</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {volunteers.map(v => (
-//                   <tr key={v.id}>
-//                     <td className="p-2">{v.name}</td>
-//                     <td className="p-2">{v.email}</td>
-//                     <td className="p-2">{v.role}</td>
-//                     <td className="p-2">
-//                       <Link className="text-blue-600 hover:underline" href={`/admin/benevoles/${v.id}`}>Voir</Link>
-//                       <button className="text-red-600 hover:underline ml-2">Supprimer</button>
-//                     </td>
-//                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-//           )}
-//         </CardContent>
-//       </Card>
-//     </div>
-//   )
-// }
-
-// export default Volunteers
-
 "use client"
 
 import { useSession } from "next-auth/react"
@@ -77,19 +8,11 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Eye, Trash2 } from "lucide-react"
 import { toast } from "sonner"
-
-type Volunteer = {
-  id: string
-  name?: string
-  surname?: string
-  email?: string
-  role?: string
-  status?: string
-}
+import { VolunteerRecord } from "@/types/user.interface"
 
 const Volunteers = () => {
   const { data: session } = useSession()
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([])
+  const [volunteers, setVolunteers] = useState<VolunteerRecord[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -132,11 +55,11 @@ const Volunteers = () => {
     }
   }
 
-  const getDisplayName = (volunteer: Volunteer) => {
-    if (volunteer.name || volunteer.surname) {
-      return `${volunteer.name || ""} ${volunteer.surname || ""}`.trim()
+  const getDisplayName = (volunteer: VolunteerRecord) => {
+    if (volunteer.fields.name || volunteer.fields.surname) {
+      return `${volunteer.fields.name || ""} ${volunteer.fields.surname || ""}`.trim()
     }
-    return volunteer.email || "Sans nom"
+    return volunteer.fields.email || "Sans nom"
   }
 
   return (
@@ -175,23 +98,23 @@ const Volunteers = () => {
                 </thead>
                 <tbody>
                   {volunteers.map((volunteer) => (
-                    <tr key={volunteer.id} className="border-b hover:bg-muted/50">
+                    <tr key={volunteer.fields.id} className="border-b hover:bg-muted/50">
                       <td className="p-2">{getDisplayName(volunteer)}</td>
-                      <td className="p-2">{volunteer.email || "Non renseigné"}</td>
+                      <td className="p-2">{volunteer.fields.email || "Non renseigné"}</td>
                       <td className="p-2">
-                        <Badge variant={volunteer.role === "admin" ? "destructive" : "secondary"}>
-                          {volunteer.role || "bénévole"}
+                        <Badge variant={volunteer.fields.role === "admin" ? "destructive" : "secondary"}>
+                          {volunteer.fields.role || "bénévole"}
                         </Badge>
                       </td>
                       <td className="p-2">
                         <Badge
                           variant={
-                            volunteer.status === "actif" ? "default" :
-                              volunteer.status === "inactif" ? "secondary" :
+                            volunteer.fields.status === "actif" ? "default" :
+                              volunteer.fields.status === "inactif" ? "secondary" :
                                 "outline"
                           }
                         >
-                          {volunteer.status || "Non défini"}
+                          {volunteer.fields.status || "Non défini"}
                         </Badge>
                       </td>
                       <td className="p-2">

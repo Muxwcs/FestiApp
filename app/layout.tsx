@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import "./globals.css"
 
 import { Providers } from "./providers"
+import { Toaster } from "sonner"
 
 export const metadata: Metadata = {
   title: "Festiapp",
@@ -38,6 +39,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <body className="flex flex-col min-h-screen w-full items-center bg-muted">
         <Providers>
           {children}
+          <Toaster position="top-center" />
         </Providers>
       </body>
     </html>
