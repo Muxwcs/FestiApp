@@ -3,6 +3,7 @@ export interface User {
   email?: string | null
   phone?: string | null
   name?: string | null
+  firstname?: string | null // Added for clarity
   surname?: string | null
   role?: "admin" | "bénévole" // Use specific roles
   availability?: string[] // Array of availability strings

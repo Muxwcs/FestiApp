@@ -39,8 +39,19 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <body className="flex flex-col min-h-screen w-full items-center bg-muted">
         <Providers>
           {children}
-          <Toaster position="top-center" />
         </Providers>
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          toastOptions={{
+            className: "bg-muted text-muted-foreground",
+            style: {
+              backgroundColor: "var(--background)",
+              color: "var(--foreground)",
+            },
+          }}
+        />
       </body>
     </html>
   )

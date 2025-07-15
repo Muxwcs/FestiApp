@@ -32,16 +32,6 @@ const sanitizeFields = (fields: Record<string, unknown>, allowedFields: string[]
   return sanitized
 }
 
-// const handleAirtableError = (error: any, operation: string, tableName: string): never => {
-//   logger.error(`Airtable ${operation} failed for ${tableName}`, error)
-
-//   if (error.error && error.message && error.statusCode) {
-//     throw error // Already formatted Airtable error
-//   }
-
-//   throw new Error(`${operation} failed: ${error.message || 'Unknown error'}`)
-// }
-
 const handleAirtableError = (error: unknown, operation: string, tableName: string): never => {
   logger.error(`Airtable ${operation} failed for ${tableName}`, error)
 
@@ -165,36 +155,6 @@ export const airtableCreate = async (
     return []
   }
 }
-
-// export const airtableUpdate = async (
-//   tableName: string,
-//   data: UpdateData[],
-//   allowedFields: string[] = []
-// ): Promise<AirtableRecord[] | undefined> => {
-//   try {
-//     const sanitizedData = data.map(record => ({
-//       id: record.id,
-//       fields: sanitizeFields(record.fields, allowedFields) as Partial<FieldSet>
-//     }))
-
-//     logger.info(`Updating ${data.length} records in ${tableName}`)
-
-//     // Use type assertion for dynamic updates
-//     const updatedRecords = await (base(tableName) as any).update(sanitizedData)
-
-//     const formattedRecords = updatedRecords.map((record: any) => ({
-//       id: record.id,
-//       createdTime: record.get('createdTime') as string,
-//       ...record.fields, // Spread fields directly at root level
-//     }))
-
-//     logger.info(`Updated ${formattedRecords.length} records in ${tableName}`)
-//     return formattedRecords
-//   } catch (error) {
-//     console.error('airtableUpdate error:', error)
-//     handleAirtableError(error, 'UPDATE', tableName)
-//   }
-// }
 
 export const airtableUpdate = async (
   tableName: string,

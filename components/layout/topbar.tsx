@@ -21,7 +21,7 @@ import { signOut } from "next-auth/react"
 
 export default function Topbar() {
   return (
-    <header className="flex items-center justify-between px-4 py-3 border-b bg-background">
+    <header className="flex items-center justify-between px-4 py-3 border-b bg-background sticky top-0 z-50">
       <div className="flex items-center gap-4">
         <SidebarTrigger />
         <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
