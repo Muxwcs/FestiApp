@@ -23,6 +23,9 @@ export const useUserStore = create<UserState>()(
         partialize: (state) => ({ role: state.role, user: state.user }), // only persist these fields
       }
     ),
-    { name: "UserStore" }
+    {
+      name: "UserStore",
+      enabled: process.env.NODE_ENV === 'development', // Only in development 
+    }
   )
 )

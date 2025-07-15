@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -12,51 +12,50 @@ import { toast } from "sonner"
 import { ArrowLeft, Edit, Save, X, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { VolunteerRecord } from "@/types/user.interface"
+import { useVolunteersStore } from "@/stores/volunteersStore"
 
 const VolunteerPage = () => {
   const params = useParams()
   const router = useRouter()
   const volunteerId = params.benevole as string
 
-  const [volunteer, setVolunteer] = useState<VolunteerRecord | null>(null)
-  const [loading, setLoading] = useState(true)
+  const {
+    getVolunteerById,
+    updateVolunteer,
+    fetchVolunteers,
+    deleteVolunteer
+  } = useVolunteersStore()
+
+  const [volunteer, setVolunteer] = useState(() => getVolunteerById(volunteerId))
+  const [loading, setLoading] = useState(!volunteer)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [editData, setEditData] = useState<Partial<VolunteerRecord>>({})
 
-  // Wrap fetchVolunteer in useCallback to prevent infinite re-renders
-  const fetchVolunteer = useCallback(async () => {
-    if (!volunteerId) return // Early return if no volunteerId
-
-    try {
-      const response = await fetch(`/api/volunteers/${volunteerId}`)
-      if (!response.ok) {
-        if (response.status === 404) {
+  // Fetch volunteer data if not in store
+  useEffect(() => {
+    if (!volunteer) {
+      setLoading(true)
+      fetchVolunteers().then(() => {
+        const foundVolunteer = getVolunteerById(volunteerId)
+        if (foundVolunteer) {
+          setVolunteer(foundVolunteer)
+          setEditData(foundVolunteer)
+        } else {
           toast.error("Bénévole non trouvé")
           router.push("/admin/benevoles")
-          return
         }
-        throw new Error("Erreur lors du chargement")
-      }
-      const data = await response.json()
-      setVolunteer(data)
-      setEditData(data)
-    } catch (error) {
-      console.error("Error fetching volunteer:", error)
-      toast.error("Erreur lors du chargement du bénévole")
-    } finally {
-      setLoading(false)
+        setLoading(false)
+      })
+    } else {
+      setEditData(volunteer)
     }
-  }, [volunteerId, router]) // Dependencies: volunteerId and router
+  }, [volunteer, volunteerId, fetchVolunteers, getVolunteerById, router])
 
-  useEffect(() => {
-    fetchVolunteer()
-  }, [fetchVolunteer]) // Now fetchVolunteer is memoized and safe to use as dependency
-
+  // Handle save with store update
   const handleSave = async () => {
     setSaving(true)
     try {
-      // Send only the fields, not the whole editData object
       const fieldsToUpdate = editData.fields || {}
 
       const response = await fetch(`/api/volunteers/${volunteerId}`, {
@@ -64,22 +63,27 @@ const VolunteerPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(fieldsToUpdate), // Send only fields
+        body: JSON.stringify(fieldsToUpdate),
       })
 
       if (!response.ok) {
         throw new Error("Erreur lors de la sauvegarde")
       }
 
-      const updatedVolunteer = await response.json()
+      const updatedData = await response.json()
 
-      // Transform response back to your expected format if needed
-      const transformedVolunteer = {
-        id: updatedVolunteer.id,
-        fields: updatedVolunteer.fields || updatedVolunteer
+      // Update store
+      updateVolunteer(volunteerId, {
+        fields: updatedData.fields || updatedData
+      })
+
+      // Update local state
+      const updatedVolunteer = getVolunteerById(volunteerId)
+      if (updatedVolunteer) {
+        setVolunteer(updatedVolunteer)
+        setEditData(updatedVolunteer)
       }
 
-      setVolunteer(transformedVolunteer)
       setEditing(false)
       toast.success("Bénévole mis à jour avec succès")
     } catch (error) {
@@ -94,14 +98,7 @@ const VolunteerPage = () => {
     if (!confirm("Êtes-vous sûr de vouloir supprimer ce bénévole ?")) return
 
     try {
-      const response = await fetch(`/api/volunteers/${volunteerId}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la suppression")
-      }
-
+      await deleteVolunteer(volunteerId)
       toast.success("Bénévole supprimé avec succès")
       router.push("/admin/benevoles")
     } catch (error) {

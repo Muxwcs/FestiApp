@@ -1,67 +1,74 @@
 "use client"
 
+import { useCallback, useEffect, useMemo } from "react"
 import { useSession } from "next-auth/react"
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { RefreshCw, Users, Plus, AlertCircle } from "lucide-react"
+
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
-import { VolunteerRecord } from "@/types/user.interface"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+
+import { useVolunteersStore } from "@/stores/volunteersStore"
+
 import { DataTable } from "./data-table"
 import { createColumns } from "./columns"
-import { Plus, RefreshCw, Users } from "lucide-react"
 
 const Volunteers = () => {
   const { data: session } = useSession()
-  const [volunteers, setVolunteers] = useState<VolunteerRecord[]>([])
-  const [loading, setLoading] = useState(true)
+  const isHydrated = useVolunteersStore()
+  // Use Zustand store
+  const {
+    volunteers,
+    loading,
+    error,
+    fetchVolunteers,
+    deleteVolunteer,
+    forceRefresh,
+    clearError
+  } = useVolunteersStore()
 
-  const fetchVolunteers = useCallback(async () => {
-    try {
-      const response = await fetch("/api/volunteers")
-      if (!response.ok) {
-        throw new Error("Erreur lors du chargement")
-      }
-      const data = await response.json()
-      setVolunteers(data)
-    } catch (error) {
-      console.error("Error fetching volunteers:", error)
-      toast.error("Erreur lors du chargement des bénévoles")
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
+  // Fetch volunteers after hydration
   useEffect(() => {
-    fetchVolunteers()
-  }, [fetchVolunteers])
+    if (isHydrated) {
+      fetchVolunteers()
+    }
+  }, [isHydrated, fetchVolunteers])
 
+  // Handle delete with optimistic updates
   const handleDelete = useCallback(async (volunteerId: string) => {
     if (!confirm("Êtes-vous sûr de vouloir supprimer ce bénévole ?")) return
 
     try {
-      const response = await fetch(`/api/volunteers/${volunteerId}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la suppression")
-      }
-
-      toast.success("Bénévole supprimé avec succès")
-      fetchVolunteers() // Refresh the list
+      await deleteVolunteer(volunteerId)
     } catch (error) {
-      console.error("Error deleting volunteer:", error)
-      toast.error("Erreur lors de la suppression")
+      console.error('Delete failed:', error)
     }
-  }, [fetchVolunteers])
+  }, [deleteVolunteer])
 
-  // Memoize columns to prevent recreation on every render
+  // Handle manual refresh
+  const handleRefresh = useCallback(async () => {
+    await forceRefresh()
+  }, [forceRefresh])
+
+  // Memoize columns
   const columns = useMemo(() => createColumns(handleDelete), [handleDelete])
 
+  // Show loading until hydrated
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+          <p className="text-muted-foreground">Initialisation...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen space-y-6">
-      {/* Header Card - Responsive */}
-      <Card className="w-full">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6">
+      {/* Header Card */}
+      <Card className="w-full overflow-x-scroll">
         <CardHeader className="pb-4">
           <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div className="space-y-1">
@@ -77,7 +84,7 @@ const Volunteers = () => {
               </p>
             </div>
 
-            {/* Stats Badge - Hidden on very small screens */}
+            {/* Stats Badge */}
             <div className="hidden sm:flex items-center space-x-2 bg-primary/10 text-primary px-3 py-2 rounded-lg">
               <Users className="h-4 w-4" />
               <span className="text-sm font-medium">
@@ -87,6 +94,24 @@ const Volunteers = () => {
           </div>
         </CardHeader>
       </Card>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            <span>Erreur: {error}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearError}
+              className="ml-2"
+            >
+              Fermer
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Main Content Card */}
       <Card className="w-full">
@@ -101,20 +126,21 @@ const Volunteers = () => {
               </div>
             </div>
 
-            {/* Action Buttons - Responsive */}
+            {/* Action Buttons */}
             <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
               <Button
-                onClick={fetchVolunteers}
+                onClick={handleRefresh}
                 variant="outline"
                 disabled={loading}
                 className="w-full sm:w-auto"
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 <span className="sm:hidden">Actualiser</span>
-                <span className="hidden sm:inline">Actualiser la liste</span>
+                <span className="hidden sm:inline">
+                  {loading ? 'Actualisation...' : 'Actualiser la liste'}
+                </span>
               </Button>
 
-              {/* Add Volunteer Button - Optional */}
               <Button className="w-full sm:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 <span className="sm:hidden">Ajouter</span>
@@ -125,7 +151,7 @@ const Volunteers = () => {
         </CardHeader>
 
         <CardContent className="px-4 sm:px-6">
-          {loading ? (
+          {loading && volunteers.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 space-y-4">
               <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
               <div className="text-center">
@@ -144,21 +170,26 @@ const Volunteers = () => {
                   Il n&apos;y a actuellement aucun bénévole enregistré dans le système.
                 </p>
               </div>
-              <Button onClick={fetchVolunteers} variant="outline" className="mt-4">
+              <Button onClick={handleRefresh} variant="outline" className="mt-4">
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Réessayer
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Table Container - Responsive */}
+              {/* Loading indicator when refreshing */}
+              {loading && (
+                <div className="flex items-center justify-center py-2">
+                  <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                  <span className="text-sm text-muted-foreground">Actualisation...</span>
+                </div>
+              )}
+
               <div className="w-full">
-                {/* Mobile: Show count */}
                 <div className="sm:hidden mb-4 text-sm text-muted-foreground">
                   {volunteers.length} bénévole{volunteers.length !== 1 ? 's' : ''} trouvé{volunteers.length !== 1 ? 's' : ''}
                 </div>
 
-                {/* Horizontal scroll wrapper for table */}
                 <div className="overflow-x-auto -mx-4 sm:mx-0">
                   <div className="min-w-full px-4 sm:px-0">
                     <DataTable columns={columns} data={volunteers} />
