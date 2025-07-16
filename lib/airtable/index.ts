@@ -1,9 +1,11 @@
 import { base } from './base'
 import { events } from './events'
+import { sectors } from './sectors'
 import { tasks } from './tasks'
 import { volunteers } from './volunteers'
 
 // Re-export everything from individual services
+export { sectors } from './sectors'
 export { volunteers } from './volunteers'
 export { events } from './events'
 export { tasks } from './tasks'
@@ -31,6 +33,7 @@ export {
 // Assign object to a variable before exporting as module default
 const airtableServices = {
   volunteers,
+  sectors,
   events,
   tasks,
   base
