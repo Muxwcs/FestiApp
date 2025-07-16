@@ -9,11 +9,11 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
-import { ArrowLeft, Edit, Save, X, Trash2, Car } from "lucide-react"
+import { ArrowLeft, Edit, Save, X, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useSectorsStore } from "@/stores/sectorsStore"
 import { SectorRecord } from "@/types/sector.interface"
-import { VolunteersList } from "@/components/volunteers-list"
+import { VolunteersList } from "@/components/volunteers/volunteers-list"
 
 const TxandPage = () => {
   const params = useParams()

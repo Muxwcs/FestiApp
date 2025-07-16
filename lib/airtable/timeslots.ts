@@ -1,18 +1,7 @@
-import { airtableGet, airtableCreate, airtableUpdate, airtableDelete } from './base'
+import { airtableGet } from './base'
 import type { AirtableRecord, QueryOptions } from './types'
 
 const TABLE_NAME = 'Creneaux' // Your actual table name
-
-const ALLOWED_FIELDS = [
-  'name',
-  'start_time',
-  'end_time',
-  'date',
-  'description',
-  'createdAt',
-  'modifiedAt',
-  'modifiedBy'
-]
 
 export const timeslots = {
   // Get all timeslots
