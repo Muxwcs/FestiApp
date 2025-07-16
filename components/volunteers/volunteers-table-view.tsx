@@ -2,9 +2,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Clock, Mail, Phone, ExternalLink, Users } from "lucide-react"
+import { Clock, Mail, Phone, ExternalLink, Users, Calendar } from "lucide-react"
 import Link from "next/link"
 import { VolunteerViewProps } from "./type"
+import { formatDate, getTimeRange } from "@/lib/utils"
 
 export const VolunteersTableView = ({
   timeslotGroups,
@@ -12,21 +13,43 @@ export const VolunteersTableView = ({
   allTimeslots,
   timeslotDetails
 }: VolunteerViewProps) => {
+
   // Use allTimeslots and timeslotDetails for enhanced display
   console.log('All timeslots:', allTimeslots)
   console.log('Detailed timeslots:', timeslotDetails)
+
   return (
     <div className="space-y-6">
       {timeslotGroups.map((group) => (
         <Card key={group.timeslot} className="w-full">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base font-semibold flex items-center">
-                <Clock className="h-4 w-4 mr-2 text-blue-600" />
-                {group.timeslot}
-              </CardTitle>
+              <div className="flex flex-col space-y-1">
+
+                <CardTitle className="text-base font-semibold flex items-center">
+                  <Clock className="h-4 w-4 mr-2 text-blue-600" />
+                  {group.timeslot}
+                </CardTitle>
+                {/* Date and Time Information */}
+                <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                  {group.dateStart && (
+                    <div className="flex items-center space-x-1">
+                      <Calendar className="h-3 w-3" />
+                      <span>{formatDate(group.dateStart)}</span>
+                    </div>
+                  )}
+                  {getTimeRange(group.dateStart, group.dateEnd) && (
+                    <div className="flex items-center space-x-1">
+                      <Clock className="h-3 w-3" />
+                      <span className="font-medium text-primary">
+                        {getTimeRange(group.dateStart, group.dateEnd)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
               <Badge variant={group.count > 0 ? "default" : "secondary"} className="text-xs">
-                {group.count} bénévole{group.count !== 1 ? 's' : ''}
+                {group.count} / {group.totalVolunteers} bénévole{group.count !== 1 ? 's' : ''}
               </Badge>
             </div>
           </CardHeader>
