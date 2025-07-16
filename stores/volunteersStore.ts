@@ -146,42 +146,6 @@ export const useVolunteersStore = create<VolunteersState>()(
           volunteers: state.volunteers,
           lastFetch: state.lastFetch,
         }),
-        // // Custom serializer for Date objects
-        // serialize: (state) => {
-        //   return JSON.stringify({
-        //     ...state,
-        //     state: {
-        //       ...state.state,
-        //       // Convert Date to timestamp for storage
-        //       lastFetch: state.state.lastFetch instanceof Date ? state.state.lastFetch.getTime() : state.state.lastFetch
-        //     }
-        //   })
-        // },
-        // // Custom deserializer for Date objects
-        // deserialize: (str) => {
-        //   const parsed = JSON.parse(str)
-        //   return {
-        //     ...parsed,
-        //     state: {
-        //       ...parsed.state,
-        //       // Convert timestamp back to Date object
-        //       lastFetch: parsed.state.lastFetch ? new Date(parsed.state.lastFetch) : null
-        //     }
-        //   }
-        // },
-        // // Increase version to force cache refresh
-        // version: 2,
-        // // Migrate function for version changes
-        // migrate: (persistedState: any, version: number) => {
-        //   if (version < 2) {
-        //     // Clear old cache to avoid Date parsing issues
-        //     return {
-        //       volunteers: [],
-        //       lastFetch: null,
-        //     }
-        //   }
-        //   return persistedState
-        // },
       }
     ),
     {
