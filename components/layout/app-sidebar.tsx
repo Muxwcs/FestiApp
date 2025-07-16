@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Home, Users, LayoutDashboard } from "lucide-react"
+import { Home, Users, LayoutDashboard, CalendarSync, SquareKanban } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -30,10 +30,11 @@ const AppSidebar = ({ role, className }: SidebarProps) => {
   const adminLinks = [
     { href: "/admin/dashboard", label: "Dashboard Admin", icon: LayoutDashboard },
     { href: "/admin/benevoles", label: "Gestion Bénévoles", icon: Users },
+    { href: "/admin/txands", label: "Gestion Txands", icon: CalendarSync },
   ]
 
   const benevoleLinks = [
-    { href: "/dashboard", label: "Mon Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard", label: "Mon Dashboard", icon: SquareKanban },
   ]
 
   // Admins get all routes: common + benevole + admin
