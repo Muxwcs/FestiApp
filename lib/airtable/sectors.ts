@@ -13,7 +13,7 @@ const ALLOWED_FIELDS = [
   'totalNeeds',
   'totalVolunteers',
   'createdAt',
-  'ModifiedAt',
+  'modifiedAt',
   'modifiedBy'
 ]
 

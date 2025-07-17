@@ -1,9 +1,9 @@
 "use client"
 
 import { useDrop } from "react-dnd"
-import { parseISO, differenceInMilliseconds } from "date-fns"
+import { parseISO } from "date-fns"
 
-import { useUpdateEvent } from "@/hooks/use-update-event"
+// import { useUpdateEvent } from "@/hooks/use-update-event"
 
 import { cn } from "@/lib/utils"
 import { ItemTypes } from "./draggable-event"
@@ -16,7 +16,7 @@ interface DroppableDayCellProps {
 }
 
 export function DroppableDayCell({ cell, children }: DroppableDayCellProps) {
-  const { updateEvent } = useUpdateEvent()
+  // const { updateEvent } = useUpdateEvent()
 
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
@@ -25,19 +25,19 @@ export function DroppableDayCell({ cell, children }: DroppableDayCellProps) {
         const droppedEvent = item.event
 
         const eventStartDate = parseISO(droppedEvent.startDate)
-        const eventEndDate = parseISO(droppedEvent.endDate)
+        // const eventEndDate = parseISO(droppedEvent.endDate)
 
-        const eventDurationMs = differenceInMilliseconds(eventEndDate, eventStartDate)
+        // const eventDurationMs = differenceInMilliseconds(eventEndDate, eventStartDate)
 
         const newStartDate = new Date(cell.date)
         newStartDate.setHours(eventStartDate.getHours(), eventStartDate.getMinutes(), eventStartDate.getSeconds(), eventStartDate.getMilliseconds())
-        const newEndDate = new Date(newStartDate.getTime() + eventDurationMs)
+        // const newEndDate = new Date(newStartDate.getTime() + eventDurationMs)
 
-        updateEvent({
-          ...droppedEvent,
-          startDate: newStartDate.toISOString(),
-          endDate: newEndDate.toISOString(),
-        })
+        // updateEvent({
+        //   ...droppedEvent,
+        //   startDate: newStartDate.toISOString(),
+        //   endDate: newEndDate.toISOString(),
+        // })
 
         return { moved: true }
       },
@@ -46,7 +46,7 @@ export function DroppableDayCell({ cell, children }: DroppableDayCellProps) {
         canDrop: monitor.canDrop(),
       }),
     }),
-    [cell.date, updateEvent]
+    [cell.date]
   )
 
   return (

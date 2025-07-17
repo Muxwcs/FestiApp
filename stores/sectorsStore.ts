@@ -144,7 +144,7 @@ export const useSectorsStore = create<SectorsState>()(
       }
     ),
     {
-      name: 'VolunteersStore', // DevTools name
+      name: 'SectorsStore', // DevTools name
       enabled: process.env.NODE_ENV === 'development', // Only in development
     }
   )

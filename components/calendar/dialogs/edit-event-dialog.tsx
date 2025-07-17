@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { useDisclosure } from "@/hooks/use-disclosure"
-import { useUpdateEvent } from "@/hooks/use-update-event"
+// import { useUpdateEvent } from "@/hooks/use-update-event"
 import { useCalendar } from "../context/calendar-context"
 
 import { Input } from "@/components/ui/input"
@@ -32,7 +32,7 @@ export function EditEventDialog({ children, event }: IProps) {
 
   const { users } = useCalendar()
 
-  const { updateEvent } = useUpdateEvent()
+  // const { updateEvent } = useUpdateEvent()
 
   const form = useForm<TEventFormData>({
     resolver: zodResolver(eventSchema),
@@ -59,7 +59,7 @@ export function EditEventDialog({ children, event }: IProps) {
     const endDateTime = new Date(values.endDate)
     endDateTime.setHours(values.endTime.hour, values.endTime.minute)
 
-    updateEvent({
+    console.log({
       ...event,
       user,
       title: values.title,
