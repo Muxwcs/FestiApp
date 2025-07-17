@@ -1,6 +1,6 @@
 "use client"
 
-import { LogOut } from "lucide-react"
+import { LayoutDashboard, LogOut } from "lucide-react"
 import Image from 'next/image'
 import {
   Avatar,
@@ -17,8 +17,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { DarkModeToggle } from "../darkmode-toggle"
+import { useUserStore } from "@/stores/userStore"
 
 export default function HomeTopbar() {
+  const user = useUserStore(state => state.user)
   return (
     <header className="flex items-center justify-between px-4 py-3 border-b bg-background">
       <div className="flex items-center gap-4">
@@ -33,6 +36,7 @@ export default function HomeTopbar() {
         </Link>
       </div>
       <div className="flex items-center gap-4">
+        <DarkModeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
@@ -45,10 +49,17 @@ export default function HomeTopbar() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut className="mr-2 h-4 w-4" />
-              <Link href={"/login"}>Se Connecter</Link>
-            </DropdownMenuItem>
+            {user !== null ? (
+              <DropdownMenuItem>
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <Link href={"/dashboard"}>Dashboard</Link>
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem>
+                <LogOut className="mr-2 h-4 w-4" />
+                <Link href={"/login"}>Se Connecter</Link>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
