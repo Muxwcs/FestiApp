@@ -22,6 +22,7 @@ interface ICalendarContext {
   setVisibleHours: Dispatch<SetStateAction<TVisibleHours>>
   events: CalendarEvent[]
   setEvents: (events: CalendarEvent[]) => void
+  setLocalEvents: (events: CalendarEvent[]) => void // ✅ Add this missing property
   // setLocalEvents: Dispatch<SetStateAction<IEvent[]>>
   view: "year" | "month" | "week" | "day" | "agenda"
   setView: Dispatch<SetStateAction<"year" | "month" | "week" | "day" | "agenda">>
@@ -79,6 +80,11 @@ export function CalendarProvider({ children, users, initialEvents = [], initialV
     setSelectedDate(date)
   }
 
+  // ✅ Add setLocalEvents function
+  const setLocalEvents = (newEvents: CalendarEvent[]) => {
+    setEvents(newEvents)
+  }
+
   // Get volunteer calendar data
   const {
     volunteerEvents,
@@ -116,6 +122,7 @@ export function CalendarProvider({ children, users, initialEvents = [], initialV
         setWorkingHours,
         events: allEvents, // Combined events
         setEvents,
+        setLocalEvents, // ✅ Provide the setLocalEvents function
         view,
         setView,
         volunteerEvents,
