@@ -21,3 +21,26 @@ export interface ICalendarCell {
   currentMonth: boolean
   date: Date
 }
+
+// Add to existing CalendarEvent interface:
+export interface CalendarEvent {
+  id: string
+  title: string
+  description?: string
+  startDate: string
+  endDate: string
+  user: {
+    id: string
+    name: string
+    email: string
+    avatar?: string
+  }
+  color?: string
+  variant?: "default" | "dot"
+  // New volunteer-specific fields
+  isVolunteerTimeslot?: boolean
+  sectorName?: string
+  status?: "Validé" | "En attente" | "Refusé" | "Annulé"
+  role?: string
+  capacity?: string // "5/10" format
+}

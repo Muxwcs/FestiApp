@@ -41,18 +41,32 @@ export function AddEventDialog({ children, startDate, startTime }: IProps) {
     },
   })
 
-  const onSubmit = (_values: TEventFormData) => {
+  const onSubmit = () => {
+    // const onSubmit = (_values: TEventFormData) => {
     // TO DO: Create use-add-event hook
     onClose()
     form.reset()
   }
 
+  // useEffect(() => {
+  //   form.reset({
+  //     startDate,
+  //     startTime,
+  //   })
+  // }, [startDate, startTime, form.reset])
+
+  // ✅ Fix: Use form.reset directly without dependency array issues
   useEffect(() => {
-    form.reset({
-      startDate,
-      startTime,
-    })
-  }, [startDate, startTime, form.reset])
+    if (isOpen) {
+      // Only reset when dialog opens with new props
+      form.reset({
+        title: "",
+        description: "",
+        startDate,
+        startTime,
+      })
+    }
+  }, [isOpen, startDate, startTime]) // Remove form.reset from dependencies
 
   return (
     <Dialog open={isOpen} onOpenChange={onToggle}>
