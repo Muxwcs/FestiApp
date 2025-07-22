@@ -1,66 +1,68 @@
-import Airtable from "airtable"
-
-type AirtableRecord = {
-  id: string
-  get(field: string): unknown
-}
-
-export const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID!)
+import { volunteers, base } from "./airtable"
 
 export async function getUserByFirebaseUid(uid: string) {
-  const records = await base("Membres")
-    .select({
-      filterByFormula: `{firebaseUid} = '${uid}'`,
-      maxRecords: 1,
-    })
-    .firstPage()
+  try {
+    const record = await volunteers.getByFirebaseUid(uid)
+    if (!record) return null
 
-  if (records.length === 0) return null
+    return {
+      id: record.fields.id,
+      email: record.fields.email ? String(record.fields.email) : undefined,
+      phone: record.fields.phone ? String(record.fields.phone) : undefined,
+      name: record.fields.name ? String(record.fields.name) : undefined,
+      surname: record.fields.surname ? String(record.fields.surname) : undefined,
+      role: record.fields.role ? String(record.fields.role).toLowerCase() : "bénévole", // Default to "benevole" if not set
+      availability: record.fields.availability,
+      assignedTasks: record.fields.assignedTasks,
+      status: record.fields.status,
+      skills: record.fields.skills ? record.fields.skills : [],
+      avatar: record.fields.avatar,
+      notes: record.fields.notes ? String(record.fields.notes) : undefined,
+      createdAt: record.fields.createdAt,
+      modifiedAt: record.fields.modifiedAt,
+    }
 
-  const record: AirtableRecord = records[0]
-  return {
-    id: record.id,
-    email: record.get("email") ? String(record.get("email")) : undefined,
-    phone: record.get("phone") ? String(record.get("phone")) : undefined,
-    name: record.get("name") ? String(record.get("name")) : undefined,
-    surname: record.get("surname") ? String(record.get("surname")) : undefined,
-    role: record.get("role") ? String(record.get("role")).toLowerCase() : "bénévole", // Default to "benevole" if not set
-    availability: record.get("availability"),
-    assignedTasks: record.get("assignedTasks"),
-    status: record.get("status"),
-    skills: record.get("skills") ? record.get("skills") : [],
-    avatar: record.get("avatar"),
-    notes: record.get("notes") ? String(record.get("notes")) : undefined,
-    createdAt: record.get("createdAt"),
-    modifiedAt: record.get("modifiedAt"),
+  } catch (error) {
+    console.error('Error fetching user by Firebase UID:', error)
+    return null
   }
 }
 
 export async function createUserInAirtable({ uid, email }: { uid: string, email: string }) {
-  const created = await base("Membres").create([
-    {
-      fields: {
-        firebaseUid: uid,
-        email,
-        role: "Bénévole", // default role
+  try {
+
+    const created = await volunteers.createOne(
+      {
+        fields: {
+          firebaseUid: uid,
+          email,
+          role: "Bénévole", // default role
+        },
       },
-    },
-  ])
-  const record = created[0]
-  return {
-    id: record.id,
-    email: record.get("email") ? String(record.get("email")) : undefined,
-    phone: record.get("phone") ? String(record.get("phone")) : undefined,
-    name: record.get("name") ? String(record.get("name")) : undefined,
-    surname: record.get("surname") ? String(record.get("surname")) : undefined,
-    role: record.get("role") ? String(record.get("role")).toLowerCase() : "bénévole",
-    availability: record.get("availability") || null,
-    assignedTasks: record.get("assignedTasks") || [],
-    status: record.get("status") || null,
-    skills: record.get("skills") || [],
-    avatar: record.get("avatar") || null,
-    notes: record.get("notes") ? String(record.get("notes")) : undefined,
-    createdAt: record.get("createdAt") || null,
-    modifiedAt: record.get("modifiedAt") || null,
+    )
+    if (!created) {
+      throw new Error("Failed to create user in Airtable")
+    }
+    return {
+      id: created.id,
+      email: created.fields.email ? String(created.fields.email) : undefined,
+      phone: created.fields.phone ? String(created.fields.phone) : undefined,
+      name: created.fields.name ? String(created.fields.name) : undefined,
+      surname: created.fields.surname ? String(created.fields.surname) : undefined,
+      role: created.fields.role ? String(created.fields.role).toLowerCase() : "bénévole",
+      availability: created.fields.availability || null,
+      assignedTasks: created.fields.assignedTasks || [],
+      status: created.fields.status || null,
+      skills: created.fields.skills || [],
+      avatar: created.fields.avatar || null,
+      notes: created.fields.notes ? String(created.fields.notes) : undefined,
+      createdAt: created.fields.createdAt || null,
+      modifiedAt: created.fields.modifiedAt || null,
+    }
+  } catch (error) {
+    console.error('Error creating user in Airtable:', error)
+    throw error
   }
 }
+
+export { base }

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import "./globals.css"
 
 import { Providers } from "./providers"
+import { Toaster } from "sonner"
 
 export const metadata: Metadata = {
   title: "Festiapp",
@@ -39,6 +40,18 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <Providers>
           {children}
         </Providers>
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          toastOptions={{
+            className: "bg-muted text-muted-foreground",
+            style: {
+              backgroundColor: "var(--background)",
+              color: "var(--foreground)",
+            },
+          }}
+        />
       </body>
     </html>
   )
