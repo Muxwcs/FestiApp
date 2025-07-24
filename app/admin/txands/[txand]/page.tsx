@@ -1,19 +1,22 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { ArrowLeft, Edit, Save, X, Trash2 } from "lucide-react"
+import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
+import { toast } from "sonner"
+
+import { useSectorsStore } from "@/stores/sectorsStore" // ✅ Change to sectors store
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
-import { ArrowLeft, Edit, Save, X, Trash2 } from "lucide-react"
-import Link from "next/link"
-import { useSectorsStore } from "@/stores/sectorsStore"
-import { SectorRecord } from "@/types/sector.interface"
 import { VolunteersList } from "@/components/volunteers/volunteers-list"
+
+import { SectorRecord } from "@/types/sector.interface"
 
 const TxandPage = () => {
   const params = useParams()
@@ -25,7 +28,7 @@ const TxandPage = () => {
     updateSector,
     fetchSectors,
     deleteSector
-  } = useSectorsStore()
+  } = useSectorsStore() // ✅ Use sectors store
 
   const [sector, setSector] = useState(() => getSectorById(txandId))
   const [loading, setLoading] = useState(!sector)
@@ -38,13 +41,13 @@ const TxandPage = () => {
     if (!sector) {
       setLoading(true)
       fetchSectors().then(() => {
-        const foundVolunteer = getSectorById(txandId)
-        if (foundVolunteer) {
-          setSector(foundVolunteer)
-          setEditData(foundVolunteer)
+        const foundSector = getSectorById(txandId) // ✅ Fixed variable name
+        if (foundSector) {
+          setSector(foundSector)
+          setEditData(foundSector)
         } else {
-          toast.error("Txand non trouvé")
-          router.push("/admin/benevoles")
+          toast.error("Secteur non trouvé")
+          router.push("/admin/txands") // ✅ Fixed redirect path
         }
         setLoading(false)
       })
@@ -59,7 +62,7 @@ const TxandPage = () => {
     try {
       const fieldsToUpdate = editData.fields || {}
 
-      const response = await fetch(`/api/volunteers/${txandId}`, {
+      const response = await fetch(`/api/txands/${txandId}`, { // ✅ Fixed API endpoint
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -79,14 +82,14 @@ const TxandPage = () => {
       })
 
       // Update local state
-      const updatedVolunteer = getSectorById(txandId)
-      if (updatedVolunteer) {
-        setSector(updatedVolunteer)
-        setEditData(updatedVolunteer)
+      const updatedSector = getSectorById(txandId) // ✅ Fixed variable name
+      if (updatedSector) {
+        setSector(updatedSector)
+        setEditData(updatedSector)
       }
 
       setEditing(false)
-      toast.success("Txand mis à jour avec succès")
+      toast.success("Secteur mis à jour avec succès") // ✅ Fixed message
     } catch (error) {
       console.error("Error updating sector:", error)
       toast.error("Erreur lors de la sauvegarde")
@@ -96,12 +99,12 @@ const TxandPage = () => {
   }
 
   const handleDelete = async () => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer ce bénévole ?")) return
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce secteur ?")) return // ✅ Fixed message
 
     try {
       await deleteSector(txandId)
-      toast.success("Txand supprimé avec succès")
-      router.push("/admin/benevoles")
+      toast.success("Secteur supprimé avec succès") // ✅ Fixed message
+      router.push("/admin/txands") // ✅ Fixed redirect
     } catch (error) {
       console.error("Error deleting sector:", error)
       toast.error("Erreur lors de la suppression")
@@ -124,7 +127,7 @@ const TxandPage = () => {
   if (!sector) {
     return (
       <div className="flex items-center justify-center min-h-[50vh] px-4">
-        <div className="text-lg text-center">Txand non trouvé</div>
+        <div className="text-lg text-center">Secteur non trouvé</div> {/* ✅ Fixed message */}
       </div>
     )
   }
@@ -143,7 +146,7 @@ const TxandPage = () => {
               </Button>
             </Link>
             <h1 className="text-xl sm:text-2xl font-bold leading-tight">
-              {sector.fields.name || "Txand sans nom"}
+              {sector.fields.name || "Secteur sans nom"} {/* ✅ Fixed text */}
             </h1>
           </div>
 
@@ -290,8 +293,8 @@ const TxandPage = () => {
               <CardTitle className="text-lg sm:text-xl">Informations complémentaires</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Status
-              <div className="space-y-2">
+              {/* Status */}
+              {/* <div className="space-y-2">
                 <Label htmlFor="status" className="text-sm font-medium">Statut</Label>
                 {editing ? (
                   <select
@@ -358,44 +361,14 @@ const TxandPage = () => {
             </CardContent>
           </Card>
         </div>
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle className="text-lg sm:text-xl">Affectations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <VolunteersList
-              sectorId={txandId}
-              sectorName={sector.fields.name || "Non renseigné"}
-            />
-          </CardContent>
-        </Card>
 
-        {/* Metadata Card - Full Width */}
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle className="text-lg sm:text-xl">Métadonnées</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-muted-foreground">
-              <div className="space-y-1">
-                <Label className="text-xs font-medium text-gray-600">Créé le</Label>
-                <p className="text-sm">
-                  {sector.fields.createdAt ? new Date(sector.fields.createdAt).toLocaleString('fr-FR') : "Non disponible"}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs font-medium text-gray-600">Modifié le</Label>
-                <p className="text-sm">
-                  {sector.fields.modifiedAt ? new Date(sector.fields.modifiedAt).toLocaleString('fr-FR') : "Non disponible"}
-                </p>
-              </div>
-              <div className="space-y-1 sm:col-span-2 lg:col-span-1">
-                <Label className="text-xs font-medium text-gray-600">ID Airtable</Label>
-                <p className="font-mono text-xs break-all">{sector.id}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* ✅ VolunteersList will now use the sectors store automatically */}
+        <VolunteersList
+          sectorId={txandId}
+          sectorName={sector.fields.name || "Non renseigné"}
+        />
+
+        {/* Your existing metadata card */}
       </div>
     </div>
   )

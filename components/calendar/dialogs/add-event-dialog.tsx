@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useCallback, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -48,25 +48,22 @@ export function AddEventDialog({ children, startDate, startTime }: IProps) {
     form.reset()
   }
 
-  // useEffect(() => {
-  //   form.reset({
-  //     startDate,
-  //     startTime,
-  //   })
-  // }, [startDate, startTime, form.reset])
+  const resetForm = useCallback(() => {
+    form.reset({
+      title: "",
+      description: "",
+      startDate,
+      startTime,
+    })
+  }, [startDate, startTime, form])
 
   // ✅ Fix: Use form.reset directly without dependency array issues
   useEffect(() => {
     if (isOpen) {
       // Only reset when dialog opens with new props
-      form.reset({
-        title: "",
-        description: "",
-        startDate,
-        startTime,
-      })
+      resetForm()
     }
-  }, [isOpen, startDate, startTime]) // Remove form.reset from dependencies
+  }, [isOpen, resetForm]) // Remove form.reset from dependencies
 
   return (
     <Dialog open={isOpen} onOpenChange={onToggle}>

@@ -4,18 +4,266 @@ import { logger } from "@/lib/logger"
 import { createSecureHeaders } from "@/lib/security"
 import { sectors, volunteers, affectations, timeslots } from "@/lib/airtable"
 import { TimeslotDetails } from "@/components/volunteers/type"
+import { VolunteerRecord } from "@/types/user.interface"
+import { TimeslotRecord } from "@/types/timeslot.interface"
+
+// ✅ Proper TypeScript interfaces
+interface CacheEntry<T> {
+  data: T
+  timestamp: number
+}
+
+interface BulkData {
+  allTimeslots: TimeslotRecord[]
+  allAffectations: AffectationRecord[]
+  allVolunteers: VolunteerRecord[]
+}
+
+interface ProcessedResult {
+  volunteers: EnrichedVolunteer[]
+  timeslots: Record<string, string>
+  allSectorTimeslots: Record<string, TimeslotDetails>
+  timeslotDetails: Record<string, TimeslotDetails>
+  totalTimeslots: number
+}
+
+interface AffectationRecord {
+  id: string
+  fields: {
+    volunteer?: string | string[]
+    txand?: string | string[]
+  }
+}
+
+interface EnrichedVolunteer extends VolunteerRecord {
+  affectations: EnrichedAffectation[]
+}
+
+interface EnrichedAffectation extends AffectationRecord {
+  timeslotNames: string[]
+}
+
+// ✅ Request deduplication with proper typing
+const pendingRequests = new Map<string, Promise<ProcessedResult>>()
+
+// ✅ Multi-level cache system with proper typing
+const cache = new Map<string, CacheEntry<ProcessedResult>>()
+const bulkDataCache: CacheEntry<BulkData | null> = { data: null, timestamp: 0 }
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+const BULK_CACHE_TTL = 2 * 60 * 1000 // 2 minutes for bulk data
+
+function getCacheKey(sectorId: string): string {
+  return `sector-volunteers-${sectorId}`
+}
+
+function getFromCache(key: string): ProcessedResult | null {
+  const cached = cache.get(key)
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data
+  }
+  cache.delete(key)
+  return null
+}
+
+function setCache(key: string, data: ProcessedResult): void {
+  cache.set(key, { data, timestamp: Date.now() })
+
+  // ✅ More efficient cache cleanup
+  if (cache.size > 100) {
+    const now = Date.now()
+    for (const [cacheKey, entry] of cache.entries()) {
+      if (now - entry.timestamp > CACHE_TTL) {
+        cache.delete(cacheKey)
+      }
+    }
+  }
+}
+
+// ✅ Cached bulk data fetching with proper typing
+async function getCachedBulkData(): Promise<BulkData> {
+  const now = Date.now()
+
+  if (bulkDataCache.data && now - bulkDataCache.timestamp < BULK_CACHE_TTL) {
+    logger.info('Using cached bulk data')
+    return bulkDataCache.data
+  }
+
+  logger.info('Fetching fresh bulk data')
+  const [allTimeslots, allAffectations, allVolunteers] = await Promise.all([
+    timeslots.getAll() as Promise<TimeslotRecord[]>,
+    affectations.getAll() as Promise<AffectationRecord[]>,
+    volunteers.getAll() as Promise<VolunteerRecord[]>
+  ])
+
+  const data: BulkData = { allTimeslots, allAffectations, allVolunteers }
+  bulkDataCache.data = data
+  bulkDataCache.timestamp = now
+
+  return data
+}
+
+// ✅ Type-safe helper functions
+function isTimeslotInSector(timeslotSectors: string | string[] | undefined, sectorId: string): boolean {
+  if (!timeslotSectors) return false
+  return Array.isArray(timeslotSectors)
+    ? timeslotSectors.includes(sectorId)
+    : timeslotSectors === sectorId
+}
+
+function extractTimeslotIds(txandField: string | string[] | undefined): string[] {
+  if (!txandField) return []
+  return Array.isArray(txandField) ? txandField : [txandField]
+}
+
+function extractVolunteerIds(volunteerField: string | string[] | undefined): string[] {
+  if (!volunteerField) return []
+  if (Array.isArray(volunteerField)) {
+    return volunteerField.filter((id): id is string => typeof id === 'string' && id.trim() !== '')
+  }
+  return typeof volunteerField === 'string' && volunteerField.trim() ? [volunteerField.trim()] : []
+}
+
+function isVolunteerInAffectation(volunteerField: string | string[] | undefined, volunteerId: string): boolean {
+  if (!volunteerField) return false
+  return Array.isArray(volunteerField)
+    ? volunteerField.includes(volunteerId)
+    : volunteerField === volunteerId
+}
+
+// ✅ Optimized data processing with proper types
+function processVolunteersForSector(
+  sectorId: string,
+  { allTimeslots, allAffectations, allVolunteers }: BulkData
+): ProcessedResult {
+  // ✅ Early return optimizations
+  const sectorTimeslots = allTimeslots.filter(timeslot =>
+    isTimeslotInSector(timeslot.fields.sector, sectorId)
+  )
+
+  if (sectorTimeslots.length === 0) {
+    return {
+      volunteers: [],
+      timeslots: {},
+      allSectorTimeslots: {},
+      timeslotDetails: {},
+      totalTimeslots: 0
+    }
+  }
+
+  // ✅ Use Sets for O(1) lookups
+  const sectorTimeslotIds = new Set(sectorTimeslots.map(ts => ts.id))
+
+  // ✅ Build maps for efficient lookups
+  const allSectorTimeslotsMap = new Map<string, TimeslotDetails>()
+  const volunteerMap = new Map<string, VolunteerRecord>()
+
+  // ✅ Single pass to build volunteer map
+  allVolunteers.forEach(volunteer => {
+    volunteerMap.set(volunteer.id, volunteer)
+  })
+
+  // ✅ Single pass to build timeslot details
+  sectorTimeslots.forEach(timeslot => {
+    const details: TimeslotDetails = {
+      id: timeslot.id,
+      name: (typeof timeslot.fields.name === "string" && timeslot.fields.name.trim())
+        ? timeslot.fields.name
+        : `Créneau ${timeslot.id.slice(-6)}`,
+      dateStart: timeslot.fields.dateStart,
+      dateEnd: timeslot.fields.dateEnd,
+      totalVolunteers: timeslot.fields.totalVolunteers
+    }
+    allSectorTimeslotsMap.set(timeslot.id, details)
+  })
+
+  // ✅ Optimized affectation filtering
+  const sectorAffectations = allAffectations.filter(affectation => {
+    const timeslotIds = extractTimeslotIds(affectation.fields.txand)
+    return timeslotIds.some(id => sectorTimeslotIds.has(id))
+  })
+
+  if (sectorAffectations.length === 0) {
+    return {
+      volunteers: [],
+      timeslots: {},
+      allSectorTimeslots: Object.fromEntries(allSectorTimeslotsMap),
+      timeslotDetails: {},
+      totalTimeslots: sectorTimeslots.length
+    }
+  }
+
+  // ✅ Efficient volunteer ID extraction
+  const volunteerIds = new Set<string>()
+  sectorAffectations.forEach(affectation => {
+    const ids = extractVolunteerIds(affectation.fields.volunteer)
+    ids.forEach(id => volunteerIds.add(id))
+  })
+
+  // ✅ Build volunteers with their affectations
+  const sectorVolunteers: EnrichedVolunteer[] = Array.from(volunteerIds)
+    .map(volunteerId => {
+      const volunteer = volunteerMap.get(volunteerId)
+      if (!volunteer) return null
+
+      const volunteerAffectations: EnrichedAffectation[] = sectorAffectations
+        .filter(aff => isVolunteerInAffectation(aff.fields.volunteer, volunteerId))
+        .map(aff => ({
+          ...aff,
+          timeslotNames: extractTimeslotIds(aff.fields.txand)
+            .filter(id => sectorTimeslotIds.has(id))
+            .map(id => {
+              const details = allSectorTimeslotsMap.get(id)
+              return details ? details.name : `Créneau ${id.slice(-6)}`
+            })
+        }))
+
+      return {
+        ...volunteer,
+        affectations: volunteerAffectations
+      }
+    })
+    .filter((volunteer): volunteer is EnrichedVolunteer => volunteer !== null)
+
+  // ✅ Build timeslots with volunteers
+  const timeslotsWithVolunteers = new Map<string, TimeslotDetails>()
+  const timeslotsWithAffectations = new Set<string>()
+
+  sectorAffectations.forEach(affectation => {
+    const timeslotIds = extractTimeslotIds(affectation.fields.txand)
+    timeslotIds.forEach(timeslotId => {
+      if (sectorTimeslotIds.has(timeslotId)) {
+        timeslotsWithAffectations.add(timeslotId)
+      }
+    })
+  })
+
+  timeslotsWithAffectations.forEach(timeslotId => {
+    const details = allSectorTimeslotsMap.get(timeslotId)
+    if (details) {
+      timeslotsWithVolunteers.set(timeslotId, details)
+    }
+  })
+
+  return {
+    volunteers: sectorVolunteers,
+    timeslots: Object.fromEntries(
+      Array.from(timeslotsWithVolunteers.entries()).map(([id, details]) => [id, details.name])
+    ),
+    allSectorTimeslots: Object.fromEntries(allSectorTimeslotsMap),
+    timeslotDetails: Object.fromEntries(timeslotsWithVolunteers),
+    totalTimeslots: sectorTimeslots.length
+  }
+}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ txand: string }> }
-) {
+): Promise<NextResponse> {
   const headers = createSecureHeaders()
 
   try {
     const { token, error } = await requireAdmin(request)
-    if (error) {
-      return error
-    }
+    if (error) return error
 
     const resolvedParams = await params
     const sectorId = resolvedParams.txand
@@ -27,240 +275,128 @@ export async function GET(
       )
     }
 
-    // Get the sector first to verify it exists
-    const sector = await sectors.getById(sectorId)
-    if (!sector) {
-      logger.warn(`Sector not found: ${sectorId}`)
-      return NextResponse.json(
-        { error: "Sector not found" },
-        { status: 404, headers }
-      )
+    // ✅ Check cache first
+    const cacheKey = getCacheKey(sectorId)
+    const cached = getFromCache(cacheKey)
+    if (cached) {
+      logger.info(`Cache hit for sector volunteers: ${sectorId}`)
+      return NextResponse.json(cached, { headers })
     }
 
-    console.log('Looking for sector ID:', sectorId)
-    console.log('Sector name:', sector.fields.name)
-
-    // Log the access
-    logger.info(`Sector volunteers accessed by admin: ${token.email}`, {
-      sectorId,
-      sectorName: sector.fields.name
-    })
-
-    // 1. Get ALL timeslots that belong to this specific sector using direct filtering
-    const allTimeslots = await timeslots.getAll()
-    const sectorTimeslots = allTimeslots.filter(timeslot => {
-      const timeslotSectors = timeslot.fields.sector
-
-      if (Array.isArray(timeslotSectors)) {
-        return timeslotSectors.includes(sectorId)
-      } else if (typeof timeslotSectors === 'string') {
-        return timeslotSectors === sectorId
-      }
-
-      return false
-    })
-
-    console.log(`All sector timeslots for ${sectorId}:`, sectorTimeslots.length)
-    console.log('Sector timeslot names:', sectorTimeslots.map(ts => ts.fields.name))
-
-    if (sectorTimeslots.length === 0) {
-      logger.info(`No timeslots found for sector: ${sectorId}`)
-      return NextResponse.json({
-        volunteers: [],
-        timeslots: {},
-        allSectorTimeslots: {},
-        totalTimeslots: 0
-      }, { headers })
+    // ✅ Request deduplication
+    const requestKey = `fetch-${sectorId}`
+    if (pendingRequests.has(requestKey)) {
+      logger.info(`Deduplicating request for sector: ${sectorId}`)
+      const result = await pendingRequests.get(requestKey)!
+      return NextResponse.json(result, { headers })
     }
 
-    // 2. Get all affectations and filter by sector's timeslots
-    const allAffectations = await affectations.getAll()
-    const sectorTimeslotIds = sectorTimeslots.map(ts => ts.id)
-
-    // Filter affectations that use this sector's timeslots
-    const sectorAffectations = allAffectations.filter(affectation => {
-      const txandField = affectation.fields.txand
-
-      if (Array.isArray(txandField)) {
-        // Check if any of the affectation's timeslots belong to our sector
-        return txandField.some(timeslotId => sectorTimeslotIds.includes(timeslotId))
-      } else if (typeof txandField === 'string') {
-        // Single timeslot reference
-        return sectorTimeslotIds.includes(txandField)
-      }
-
-      return false
-    })
-
-    console.log(`Found ${sectorAffectations.length} affectations for sector timeslots`)
-
-    if (sectorAffectations.length === 0) {
-      // No affectations, but still return all sector timeslots for display
-      const allSectorTimeslotsMap = new Map<string, string>()
-      sectorTimeslots.forEach(timeslot => {
-        const name = typeof timeslot.fields.name === "string" && timeslot.fields.name.trim()
-          ? timeslot.fields.name
-          : `Créneau ${timeslot.id.slice(-6)}`
-        allSectorTimeslotsMap.set(timeslot.id, name as string)
-      })
-
-      logger.info(`No affectations found for sector: ${sectorId}, returning empty volunteers list`)
-      return NextResponse.json({
-        volunteers: [],
-        timeslots: {},
-        allSectorTimeslots: Object.fromEntries(allSectorTimeslotsMap),
-        totalTimeslots: sectorTimeslots.length
-      }, { headers })
-    }
-
-    // 3. Create timeslot maps with full details
-    const timeslotMap = new Map<string, TimeslotDetails>()
-    const allSectorTimeslotsMap = new Map<string, TimeslotDetails>()
-
-    // Map all sector timeslots (for empty display) with full details
-    sectorTimeslots.forEach(timeslot => {
-      const details: TimeslotDetails = {
-        id: timeslot.id,
-        name: typeof timeslot.fields.name === "string" && timeslot.fields.name.trim()
-          ? timeslot.fields.name
-          : `Créneau ${timeslot.id.slice(-6)}`,
-        dateStart: typeof timeslot.fields.dateStart === "string" ? timeslot.fields.dateStart : undefined,
-        dateEnd: typeof timeslot.fields.dateEnd === "string" ? timeslot.fields.dateEnd : undefined,
-        totalVolunteers: typeof timeslot.fields.totalVolunteers === "number" ? timeslot.fields.totalVolunteers : undefined
-      }
-      allSectorTimeslotsMap.set(timeslot.id, details)
-    })
-
-    // Map timeslots that have affectations with full details
-    const timeslotsWithAffectations = new Set<string>()
-    sectorAffectations.forEach(affectation => {
-      const txandField = affectation.fields.txand
-
-      if (Array.isArray(txandField)) {
-        txandField.forEach(timeslotId => {
-          if (sectorTimeslotIds.includes(timeslotId)) {
-            timeslotsWithAffectations.add(timeslotId)
-          }
-        })
-      } else if (typeof txandField === 'string' && sectorTimeslotIds.includes(txandField)) {
-        timeslotsWithAffectations.add(txandField)
-      }
-    })
-
-    // Add timeslots with affectations to the map
-    timeslotsWithAffectations.forEach(timeslotId => {
-      const timeslot = sectorTimeslots.find(ts => ts.id === timeslotId)
-      if (timeslot) {
-        const details: TimeslotDetails = {
-          id: timeslot.id,
-          name: typeof timeslot.fields.name === "string" && timeslot.fields.name.trim()
-            ? timeslot.fields.name
-            : `Créneau ${timeslotId.slice(-6)}`,
-          dateStart: typeof timeslot.fields.dateStart === "string" ? timeslot.fields.dateStart : undefined,
-          dateEnd: typeof timeslot.fields.dateEnd === "string" ? timeslot.fields.dateEnd : undefined,
-          totalVolunteers: typeof timeslot.fields.totalVolunteers === "number" ? timeslot.fields.totalVolunteers : undefined
-        }
-        timeslotMap.set(timeslotId, details)
-      }
-    })
-
-    console.log(`Timeslots with affectations: ${timeslotMap.size}`)
-
-    // 4. Extract unique volunteer IDs from sector affectations
-    const volunteerIds = new Set<string>()
-    sectorAffectations.forEach(affectation => {
-      if (affectation.fields.volunteer) {
-        const volunteerField = affectation.fields.volunteer
-
-        if (Array.isArray(volunteerField)) {
-          volunteerField.forEach(id => {
-            if (typeof id === 'string' && id.trim()) {
-              volunteerIds.add(id.trim())
-            }
-          })
-        } else if (typeof volunteerField === 'string' && volunteerField.trim()) {
-          volunteerIds.add(volunteerField.trim())
-        }
-      }
-    })
-
-    console.log('Unique volunteer IDs to fetch:', Array.from(volunteerIds))
-
-    // 5. Get volunteer details with enhanced affectation info
-    const sectorVolunteers = []
-    for (const volunteerId of volunteerIds) {
+    // ✅ Create deduplication promise
+    const requestPromise = (async (): Promise<ProcessedResult> => {
       try {
-        const volunteer = await volunteers.getById(volunteerId)
-        if (volunteer) {
-          console.log('Found volunteer:', volunteer.fields.name || volunteer.fields.firstname)
-
-          // Get affectations for this volunteer within this sector only
-          const volunteerAffectations = sectorAffectations
-            .filter(aff => {
-              const volunteerField = aff.fields.volunteer
-
-              if (Array.isArray(volunteerField)) {
-                return volunteerField.includes(volunteerId)
-              } else if (typeof volunteerField === 'string') {
-                return volunteerField === volunteerId
-              }
-
-              return false
-            })
-            .map(aff => ({
-              ...aff,
-              // Add timeslot names to the affectation - only for sector timeslots
-              timeslotNames: (() => {
-                const txandField = aff.fields.txand
-                const timeslotIds = Array.isArray(txandField) ? txandField : [txandField]
-
-                return timeslotIds
-                  .filter(id => typeof id === 'string' && sectorTimeslotIds.includes(id))
-                  .map(id => {
-                    const details = allSectorTimeslotsMap.get(id)
-                    return details ? details.name : id
-                  })
-              })()
-            }))
-
-          sectorVolunteers.push({
-            ...volunteer,
-            affectations: volunteerAffectations
-          })
-        } else {
-          console.log('Volunteer not found:', volunteerId)
+        // ✅ Verify sector exists
+        const sector = await sectors.getById(sectorId)
+        if (!sector) {
+          throw new Error(`Sector not found: ${sectorId}`)
         }
-      } catch (err) {
-        console.log('Error fetching volunteer:', volunteerId, err)
-        logger.warn(`Failed to fetch volunteer ${volunteerId}`, err)
+
+        logger.info(`Processing volunteers for sector: ${token.email}`, {
+          sectorId,
+          sectorName: sector.fields.name
+        })
+
+        // ✅ Get bulk data (cached separately)
+        const bulkData = await getCachedBulkData()
+
+        logger.info(`Bulk data ready: ${bulkData.allTimeslots.length} timeslots, ${bulkData.allAffectations.length} affectations, ${bulkData.allVolunteers.length} volunteers`)
+
+        // ✅ Process data efficiently
+        const result = processVolunteersForSector(sectorId, bulkData)
+
+        // ✅ Cache the result
+        setCache(cacheKey, result)
+
+        logger.info(`Retrieved ${result.volunteers.length} volunteers for sector: ${sectorId}`, {
+          adminEmail: token.email,
+          sectorName: sector.fields.name,
+          volunteerCount: result.volunteers.length,
+          timeslotCount: result.totalTimeslots,
+          cacheKey
+        })
+
+        return result
+
+      } finally {
+        // ✅ Always clean up pending request
+        pendingRequests.delete(requestKey)
       }
-    }
+    })()
 
-    console.log('Final result:', sectorVolunteers.length, 'volunteers')
+    // ✅ Store pending request
+    pendingRequests.set(requestKey, requestPromise)
+    const result = await requestPromise
 
-    // Log the successful response
-    logger.info(`Retrieved ${sectorVolunteers.length} volunteers for sector: ${sectorId}`, {
-      adminEmail: token.email,
-      sectorName: sector.fields.name,
-      volunteerCount: sectorVolunteers.length,
-      timeslotCount: sectorTimeslots.length
-    })
-
-    // Return enhanced data with full timeslot details
-    return NextResponse.json({
-      volunteers: sectorVolunteers,
-      timeslots: Object.fromEntries(Array.from(timeslotMap.entries()).map(([id, details]) => [id, details.name])), // Keep backward compatibility
-      allSectorTimeslots: Object.fromEntries(allSectorTimeslotsMap), // Full details
-      timeslotDetails: Object.fromEntries(timeslotMap), // Full details for timeslots with volunteers
-      totalTimeslots: sectorTimeslots.length
-    }, { headers })
+    return NextResponse.json(result, { headers })
 
   } catch (err: unknown) {
-    console.error("API Error:", err)
     logger.error("Error fetching sector volunteers", err)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500, headers }
     )
   }
+}
+
+// ✅ Enhanced cache management
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ txand: string }> }
+): Promise<NextResponse> {
+  const headers = createSecureHeaders()
+
+  try {
+    const { error } = await requireAdmin(request)
+    if (error) return error
+
+    const resolvedParams = await params
+    const sectorId = resolvedParams.txand
+
+    if (sectorId === 'all') {
+      // Clear all caches
+      cache.clear()
+      bulkDataCache.data = null
+      bulkDataCache.timestamp = 0
+      pendingRequests.clear()
+      logger.info('All caches cleared')
+    } else {
+      // Clear specific sector cache
+      const cacheKey = getCacheKey(sectorId)
+      cache.delete(cacheKey)
+      const requestKey = `fetch-${sectorId}`
+      pendingRequests.delete(requestKey)
+      logger.info(`Cache cleared for sector: ${sectorId}`)
+    }
+
+    return NextResponse.json({ message: "Cache cleared" }, { headers })
+  } catch (err: unknown) {
+    logger.error("Error clearing cache", err)
+    return NextResponse.json({ error: "Failed to clear cache" }, { status: 500, headers })
+  }
+}
+
+// ✅ Health check endpoint with proper typing
+export async function HEAD(): Promise<NextResponse> {
+  const headers = createSecureHeaders()
+
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      ...headers,
+      'X-Cache-Size': cache.size.toString(),
+      'X-Pending-Requests': pendingRequests.size.toString(),
+      'X-Bulk-Cache-Age': bulkDataCache.data
+        ? Math.floor((Date.now() - bulkDataCache.timestamp) / 1000).toString()
+        : '0'
+    }
+  })
 }

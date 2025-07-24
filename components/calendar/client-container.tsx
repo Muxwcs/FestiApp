@@ -14,35 +14,24 @@ import { CalendarAgendaView } from "./agenda-view/calendar-agenda-view"
 import { CalendarDayView } from "./week-and-day-view/calendar-day-view"
 import { CalendarWeekView } from "./week-and-day-view/calendar-week-view"
 
-import { TCalendarView } from "./types"
+import { TCalendarView, TEventColor } from "./types"
 
 interface IProps {
   view: TCalendarView
 }
 
-// // ✅ Add proper interface for the converted event
-// interface IEvent {
-//   id: number
-//   originalId: string
-//   title: string
-//   description?: string
-//   startDate: string
-//   endDate: string
-//   user: {
-//     id: number
-//     originalId: string
-//     name: string
-//     email: string
-//     avatar?: string
-//   }
-//   color?: string
-//   variant?: "default" | "dot"
-//   isVolunteerTimeslot?: boolean
-//   sectorName?: string
-//   status?: "Validé" | "En attente" | "Refusé" | "Annulé"
-//   role?: string
-//   capacity?: string
-// }
+// ✅ Add proper interface for the converted event
+import type { IEvent as CalendarIEvent } from "./interfaces"
+
+interface IEvent extends CalendarIEvent {
+  originalId: string
+  variant?: "default" | "dot"
+  isVolunteerTimeslot?: boolean
+  sectorName?: string
+  status?: "Validé" | "En attente" | "Refusé" | "Annulé"
+  role?: string
+  capacity?: string
+}
 
 export function ClientContainer({ view }: IProps) {
   const {
@@ -157,20 +146,69 @@ export function ClientContainer({ view }: IProps) {
     })
   }
 
-  // Simpler version - just use a counter
-  function convertToIEvent<T extends { id: string; user: { id: string } }>(events: T[]): any[] {
-    return events.map((event, index) => ({
-      ...event,
-      id: index + 1, // Simple incremental ID
+  // // Simpler version - just use a counter
+  // function convertToIEvent<T extends { id: string; user: { id: string } }>(events: T[]): IEvent[] {
+  //   return events.map((event, index) => ({
+  //     ...event,
+  //     id: index + 1, // Simple incremental ID
+  //     originalId: event.id,
+  //     user: {
+  //       ...event.user,
+  //       id: parseInt(event.user.id, 10) || (index + 1000), // User ID with offset
+  //       originalId: event.user.id,
+  //     },
+  //   })) as IEvent[]
+  // }
+
+  // ✅ Alternative without type assertion
+  // function convertToIEvent<T extends { 
+  //   id: string; 
+  //   user: { id: string; name: string; email: string; avatar?: string };
+  //   title: string;
+  //   startDate: string;
+  //   endDate: string;
+  // }>(events: T[]): IEvent[] {
+  //   return events.map((event, index): IEvent => ({
+  //     id: index + 1,
+  //     originalId: event.id,
+  //     title: event.title,
+  //     description: 'description' in event ? (event.description as string | undefined) : undefined,
+  //     startDate: event.startDate,
+  //     endDate: event.endDate,
+  //     user: {
+  //       id: parseInt(event.user.id, 10) || (index + 1000),
+  //       originalId: event.user.id,
+  //       name: event.user.name,
+  //       email: event.user.email,
+  function convertToIEvent<T extends {
+    id: string
+    user: { id: string; name: string; email: string; avatar?: string }
+    title: string
+    startDate: string
+    endDate: string
+    color?: TEventColor | string
+  }>(events: T[]): IEvent[] {
+    return events.map((event, index): IEvent => ({
+      id: index + 1,
       originalId: event.id,
+      title: event.title,
+      description: 'description' in event ? (event.description as string) ?? "" : "",
+      startDate: event.startDate,
+      endDate: event.endDate,
       user: {
-        ...event.user,
-        id: parseInt(event.user.id, 10) || (index + 1000), // User ID with offset
-        originalId: event.user.id,
+        id: event.user.id ? String(event.user.id) : String(index + 1000),
+        name: event.user.name,
+
       },
+      color: (('color' in event && event.color) ? event.color : "default") as TEventColor,
+      variant: 'variant' in event ? (event.variant as "default" | "dot" | undefined) : undefined,
+      isVolunteerTimeslot: 'isVolunteerTimeslot' in event ? (event.isVolunteerTimeslot as boolean | undefined) : undefined,
+      sectorName: 'sectorName' in event ? (event.sectorName as string | undefined) : undefined,
+      status: 'status' in event ? (event.status as "Validé" | "En attente" | "Refusé" | "Annulé" | undefined) : undefined,
+      role: 'role' in event ? (event.role as string | undefined) : undefined,
+      capacity: 'capacity' in event ? (event.capacity as string | undefined) : undefined,
     }))
   }
-
   // ✅ Debug: Log ID conversions in development
   if (process.env.NODE_ENV === 'development') {
     const convertedEvents = convertToIEvent(filteredEvents)
@@ -184,11 +222,9 @@ export function ClientContainer({ view }: IProps) {
       )
     }
   }
-
   return (
     <div className="overflow-hidden rounded-xl border w-full">
       <CalendarHeader view={view} events={convertToIEvent(filteredEvents)} />
-
       <DndProviderWrapper>
         {view === "day" && (
           <CalendarDayView

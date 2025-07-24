@@ -1,10 +1,13 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { SectorRecord } from "@/types/sector.interface"
+import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Eye, Trash2 } from "lucide-react"
-import Link from "next/link"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+
+import { SectorRecord } from "@/types/sector.interface"
 
 export const createColumns = (handleDelete: (id: string) => void): ColumnDef<SectorRecord>[] => [
   {
@@ -24,21 +27,30 @@ export const createColumns = (handleDelete: (id: string) => void): ColumnDef<Sec
   },
   {
     accessorKey: "fields.totalNeeds",
-    header: "Besoins",
+    header: "Ninjas manquant(s)",
     cell: ({ row }) => {
       return <span className="text-muted-foreground">{row.getValue("fields_totalNeeds")}</span>
     },
   },
   {
     accessorKey: "fields.totalVolunteers",
-    header: "Tél",
+    header: "Besoin(s) en ninjas",
     cell: ({ row }) => {
       return <span className="text-muted-foreground">{row.getValue("fields_totalVolunteers")}</span>
     },
   },
   {
-    accessorKey: "fields.role",
-    header: "Rôle",
+    accessorKey: "fields.skills",
+    header: "Compétences",
+    cell: ({ row }) => {
+      const skills = row.getValue("fields_skills") as string[]
+      return skills.map((skill, index) => (
+        <Badge key={index} className="mr-1 mb-1">
+          {skill}
+        </Badge>
+      ))
+
+    },
   },
   {
     id: "actions",
