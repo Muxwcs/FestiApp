@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useSession } from "next-auth/react"
 import { RefreshCw, Users, Plus, AlertCircle } from "lucide-react"
 
@@ -8,31 +8,23 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
-import { useVolunteersStore } from "@/stores/volunteersStore"
+import { useVolunteers } from "@/stores/volunteersStore"
 
 import { DataTable } from "./data-table"
 import { createColumns } from "./columns"
 
 const Volunteers = () => {
   const { data: session } = useSession()
-  const isHydrated = useVolunteersStore()
+  const isHydrated = useVolunteers()
   // Use Zustand store
   const {
     volunteers,
-    loading,
+    isLoading,
     error,
-    fetchVolunteers,
     deleteVolunteer,
-    forceRefresh,
-    clearError
-  } = useVolunteersStore()
-
-  // Fetch volunteers after hydration
-  useEffect(() => {
-    if (isHydrated) {
-      fetchVolunteers()
-    }
-  }, [isHydrated, fetchVolunteers])
+    refetch,
+    clearError,
+  } = useVolunteers()
 
   // Handle delete with optimistic updates
   const handleDelete = useCallback(async (volunteerId: string) => {
@@ -47,13 +39,13 @@ const Volunteers = () => {
 
   // Handle manual refresh
   const handleRefresh = useCallback(async () => {
-    await forceRefresh()
-  }, [forceRefresh])
+    await refetch()
+  }, [refetch])
 
   // Memoize columns
   const columns = useMemo(() => createColumns(handleDelete), [handleDelete])
 
-  // Show loading until hydrated
+  // Show isLoading until hydrated
   if (!isHydrated) {
     return (
       <div className="min-h-screen p-4 sm:p-6 lg:p-8 flex items-center justify-center">
@@ -100,7 +92,7 @@ const Volunteers = () => {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="flex items-center justify-between">
-            <span>Erreur: {error}</span>
+            <span>Erreur: {typeof error === "string" ? error : error?.message}</span>
             <Button
               variant="outline"
               size="sm"
@@ -131,13 +123,13 @@ const Volunteers = () => {
               <Button
                 onClick={handleRefresh}
                 variant="outline"
-                disabled={loading}
+                disabled={isLoading}
                 className="w-full sm:w-auto"
               >
-                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 <span className="sm:hidden">Actualiser</span>
                 <span className="hidden sm:inline">
-                  {loading ? 'Actualisation...' : 'Actualiser la liste'}
+                  {isLoading ? 'Actualisation...' : 'Actualiser la liste'}
                 </span>
               </Button>
 
@@ -151,7 +143,7 @@ const Volunteers = () => {
         </CardHeader>
 
         <CardContent className="px-4 sm:px-6">
-          {loading && volunteers.length === 0 ? (
+          {isLoading && volunteers.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 space-y-4">
               <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
               <div className="text-center">
@@ -178,7 +170,7 @@ const Volunteers = () => {
           ) : (
             <div className="space-y-4">
               {/* Loading indicator when refreshing */}
-              {loading && (
+              {isLoading && (
                 <div className="flex items-center justify-center py-2">
                   <RefreshCw className="h-4 w-4 animate-spin mr-2" />
                   <span className="text-sm text-muted-foreground">Actualisation...</span>

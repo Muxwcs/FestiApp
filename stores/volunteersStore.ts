@@ -2,97 +2,65 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { devtools } from 'zustand/middleware'
 import { VolunteerRecord } from '@/types/user.interface'
-import { toast } from 'sonner'
 import { useEffect, useState } from 'react'
+import { useVolunteersQuery } from '@/hooks/use-volunteers'
 
 interface VolunteersState {
-  // State
   volunteers: VolunteerRecord[]
   loading: boolean
   error: string | null
   lastFetch: Date | null
 
-  // Actions
-  fetchVolunteers: () => Promise<void>
+  setVolunteers: (volunteers: VolunteerRecord[]) => void
+  setLoading: (loading: boolean) => void
+  setError: (error: string | null) => void
   addVolunteer: (volunteer: VolunteerRecord) => void
-  updateVolunteer: (id: string, updates: Partial<VolunteerRecord>) => void
-  deleteVolunteer: (id: string) => Promise<void>
+  updateVolunteerInStore: (id: string, updates: Partial<VolunteerRecord>) => void
+  removeVolunteer: (id: string) => void
   getVolunteerById: (id: string) => VolunteerRecord | undefined
   clearError: () => void
-  forceRefresh: () => Promise<void>
 }
 
 export const useVolunteersStore = create<VolunteersState>()(
   devtools(
     persist(
       (set, get) => ({
-        // Initial state
         volunteers: [],
         loading: false,
         error: null,
         lastFetch: null,
 
-        // Fetch volunteers with caching
-        fetchVolunteers: async () => {
-          const { lastFetch, loading } = get()
+        setVolunteers: (volunteers) => {
+          set({
+            volunteers,
+            lastFetch: new Date(),
+            error: null
+          }, false, 'volunteers/setVolunteers')
+        },
 
-          // Prevent multiple simultaneous requests
-          if (loading) return
-
-          // Safe check for lastFetch - handle both Date and string
-          const lastFetchTime = lastFetch ? (lastFetch instanceof Date ? lastFetch.getTime() : new Date(lastFetch).getTime()) : 0
-
-          // Cache for 5 minutes - avoid unnecessary refetches
-          if (lastFetchTime && Date.now() - lastFetchTime < 5 * 60 * 1000) {
-            console.log('📋 Using cached volunteers data')
-            return
-          }
-
-          console.log('🔄 Fetching volunteers from API...')
-          set({ loading: true, error: null }, false, 'volunteers/fetchStart')
-
-          try {
-            const response = await fetch('/api/volunteers')
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`)
-            }
-
-            const data = await response.json()
-            set({
-              volunteers: data,
-              loading: false,
-              lastFetch: new Date(),
-              error: null
-            }, false, 'volunteers/fetchSuccess')
-            console.log(`✅ Fetched ${data.length} volunteers`)
-          } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-            console.error('❌ Failed to fetch volunteers:', error)
-            set({
-              loading: false,
-              error: errorMessage
-            }, false, 'volunteers/fetchError')
-            toast.error('Erreur lors du chargement des bénévoles')
+        setLoading: (loading) => {
+          // ✅ Only update if actually different
+          const currentLoading = get().loading
+          if (currentLoading !== loading) {
+            set({ loading }, false, 'volunteers/setLoading')
           }
         },
 
-        // Force refresh (bypass cache)
-        forceRefresh: async () => {
-          console.log('🔄 Force refreshing volunteers...')
-          set({ lastFetch: null }, false, 'volunteers/forceRefresh')
-          await get().fetchVolunteers()
+        setError: (error) => {
+          // ✅ Only update if actually different
+          const currentError = get().error
+          if (currentError !== error) {
+            set({ error }, false, 'volunteers/setError')
+          }
         },
 
-        // Add new volunteer
         addVolunteer: (volunteer) => {
           set((state) => ({
             volunteers: [...state.volunteers, volunteer]
           }), false, 'volunteers/add')
-          console.log('✅ Added volunteer to store:', volunteer.id)
         },
 
-        // Update existing volunteer
-        updateVolunteer: (id, updates) => {
+        updateVolunteerInStore: (id, updates) => {
           set((state) => ({
             volunteers: state.volunteers.map(volunteer =>
               volunteer.id === id
@@ -100,62 +68,89 @@ export const useVolunteersStore = create<VolunteersState>()(
                 : volunteer
             )
           }), false, `volunteers/update/${id}`)
-          console.log('✅ Updated volunteer in store:', id)
         },
 
-        // Delete volunteer
-        deleteVolunteer: async (id) => {
-          console.log('🗑️ Deleting volunteer:', id)
-
-          try {
-            const response = await fetch(`/api/volunteers/${id}`, {
-              method: 'DELETE'
-            })
-
-            if (!response.ok) {
-              throw new Error(`Failed to delete volunteer: ${response.status}`)
-            }
-
-            // Remove from store
-            set((state) => ({
-              volunteers: state.volunteers.filter(volunteer => volunteer.id !== id)
-            }), false, `volunteers/delete/${id}`)
-
-            console.log('✅ Deleted volunteer from store:', id)
-            toast.success('Bénévole supprimé avec succès')
-          } catch (error) {
-            console.error('❌ Failed to delete volunteer:', error)
-            toast.error('Erreur lors de la suppression')
-            throw error // Re-throw so calling component can handle it
-          }
+        removeVolunteer: (id) => {
+          set((state) => ({
+            volunteers: state.volunteers.filter(volunteer => volunteer.id !== id)
+          }), false, `volunteers/delete/${id}`)
         },
 
-        // Get volunteer by ID
         getVolunteerById: (id) => {
           return get().volunteers.find(volunteer => volunteer.id === id)
         },
 
-        // Clear error state
         clearError: () => set({ error: null }, false, 'volunteers/clearError')
       }),
       {
-        name: 'volunteers-store', // Storage key name
-        storage: createJSONStorage(() => localStorage), // Use localStorage
+        name: 'volunteers-store',
+        storage: createJSONStorage(() => localStorage),
         partialize: (state) => ({
-          // Only persist these fields (exclude loading and error states)
+          // Don't persist loading states
           volunteers: state.volunteers,
           lastFetch: state.lastFetch,
         }),
       }
     ),
     {
-      name: 'VolunteersStore', // DevTools name
-      enabled: process.env.NODE_ENV === 'development', // Only in development
+      name: 'VolunteersStore',
+      enabled: process.env.NODE_ENV === 'development',
     }
   )
 )
 
-// Export a hook to check if store is hydrated (useful for SSR)
+// ✅ Simplified composite hook - no infinite loops
+export function useVolunteers() {
+  const store = useVolunteersStore()
+  const query = useVolunteersQuery()
+
+  // ✅ Use a ref to track if we've synced to prevent loops
+  const [hasSynced, setHasSynced] = useState(false)
+
+  // ✅ Only sync once when data first arrives
+  useEffect(() => {
+    if (query.data && query.data.length > 0 && !hasSynced) {
+      store.setVolunteers(query.data)
+      setHasSynced(true)
+      console.log('✅ Synced volunteers from API to store:', query.data.length)
+    }
+  }, [query.data, hasSynced, store])
+
+  // ✅ Sync loading state only when it changes
+  useEffect(() => {
+    store.setLoading(query.isLoading)
+  }, [query.isLoading, store])
+
+  // ✅ Sync error state only when it changes
+  useEffect(() => {
+    store.setError(query.error?.message || null)
+  }, [query.error, store])
+
+  return {
+    // Data from React Query (with caching)
+    volunteers: query.volunteers || [],
+    isLoading: query.isLoading,
+    error: query.error,
+
+    // Actions from React Query
+    deleteVolunteer: query.deleteVolunteer,
+    updateVolunteer: query.updateVolunteer,
+    refetch: () => {
+      setHasSynced(false) // Reset sync flag
+      return query.refetch()
+    },
+
+    // Local state from Zustand
+    getVolunteerById: store.getVolunteerById,
+    clearError: store.clearError,
+
+    // Loading states
+    isDeleting: query.isDeleting,
+    isUpdating: query.isUpdating,
+  }
+}
+
+// ✅ Hydration hook
 export const useVolunteersStoreHydrated = () => {
   const [hydrated, setHydrated] = useState(false)
 
@@ -164,7 +159,6 @@ export const useVolunteersStoreHydrated = () => {
       setHydrated(true)
     })
 
-    // If already hydrated, set immediately
     if (useVolunteersStore.persist.hasHydrated()) {
       setHydrated(true)
     }
@@ -173,10 +167,4 @@ export const useVolunteersStoreHydrated = () => {
   }, [])
 
   return hydrated
-}
-
-// Helper to manually clear persisted data
-export const clearVolunteersStorage = () => {
-  useVolunteersStore.persist.clearStorage()
-  console.log('🗑️ Cleared volunteers storage')
 }

@@ -19,6 +19,7 @@ export function DroppableTimeBlock({ date, hour, minute, children }: DroppableTi
     () => ({
       accept: ItemTypes.EVENT,
       drop: (item: { event: IEvent }) => {
+        console.log('Dropped event:', item.event)
         const newStartDate = new Date(date)
         newStartDate.setHours(hour, minute, 0, 0)
 

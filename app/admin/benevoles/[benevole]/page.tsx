@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -8,122 +8,148 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
-import { ArrowLeft, Edit, Save, X, Trash2 } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ArrowLeft, Edit, Save, X, Trash2, RefreshCw, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { VolunteerRecord } from "@/types/user.interface"
-import { useVolunteersStore } from "@/stores/volunteersStore"
+import { useVolunteer } from "@/hooks/use-volunteer" // ✅ New hook
 
 const VolunteerPage = () => {
   const params = useParams()
   const router = useRouter()
   const volunteerId = params.benevole as string
 
+  // ✅ Use React Query hook instead of store
   const {
-    getVolunteerById,
+    volunteer,
+    isLoading,
+    error,
     updateVolunteer,
-    fetchVolunteers,
-    deleteVolunteer
-  } = useVolunteersStore()
+    deleteVolunteer,
+    refetch,
+    isUpdating,
+    isDeleting,
+    isNotFound
+  } = useVolunteer(volunteerId)
 
-  const [volunteer, setVolunteer] = useState(() => getVolunteerById(volunteerId))
-  const [loading, setLoading] = useState(!volunteer)
+  // ✅ Simplified local state
   const [editing, setEditing] = useState(false)
-  const [saving, setSaving] = useState(false)
   const [editData, setEditData] = useState<Partial<VolunteerRecord>>({})
 
-  // Fetch volunteer data if not in store
-  useEffect(() => {
-    if (!volunteer) {
-      setLoading(true)
-      fetchVolunteers().then(() => {
-        const foundVolunteer = getVolunteerById(volunteerId)
-        if (foundVolunteer) {
-          setVolunteer(foundVolunteer)
-          setEditData(foundVolunteer)
-        } else {
-          toast.error("Bénévole non trouvé")
-          router.push("/admin/benevoles")
-        }
-        setLoading(false)
-      })
-    } else {
+  // ✅ Initialize edit data when volunteer loads
+  useState(() => {
+    if (volunteer && !editing) {
       setEditData(volunteer)
     }
-  }, [volunteer, volunteerId, fetchVolunteers, getVolunteerById, router])
+  })
 
-  // Handle save with store update
+  console.log("Volunteer data:", volunteer)
+
+  // ✅ Handle save with React Query
   const handleSave = async () => {
-    setSaving(true)
-    try {
-      const fieldsToUpdate = editData.fields || {}
+    if (!editData.fields) return
 
-      const response = await fetch(`/api/volunteers/${volunteerId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(fieldsToUpdate),
-      })
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la sauvegarde")
+    updateVolunteer(
+      { id: volunteerId, updates: editData },
+      {
+        onSuccess: () => {
+          setEditing(false)
+          // editData will be updated automatically via React Query
+        }
       }
-
-      const updatedData = await response.json()
-
-      // Update store
-      updateVolunteer(volunteerId, {
-        fields: updatedData.fields || updatedData
-      })
-
-      // Update local state
-      const updatedVolunteer = getVolunteerById(volunteerId)
-      if (updatedVolunteer) {
-        setVolunteer(updatedVolunteer)
-        setEditData(updatedVolunteer)
-      }
-
-      setEditing(false)
-      toast.success("Bénévole mis à jour avec succès")
-    } catch (error) {
-      console.error("Error updating volunteer:", error)
-      toast.error("Erreur lors de la sauvegarde")
-    } finally {
-      setSaving(false)
-    }
+    )
   }
 
+  // ✅ Handle delete with React Query
   const handleDelete = async () => {
     if (!confirm("Êtes-vous sûr de vouloir supprimer ce bénévole ?")) return
 
-    try {
-      await deleteVolunteer(volunteerId)
-      toast.success("Bénévole supprimé avec succès")
-      router.push("/admin/benevoles")
-    } catch (error) {
-      console.error("Error deleting volunteer:", error)
-      toast.error("Erreur lors de la suppression")
-    }
+    deleteVolunteer(volunteerId, {
+      onSuccess: () => {
+        router.push("/admin/benevoles")
+      }
+    })
   }
 
+  // ✅ Handle cancel
   const handleCancel = () => {
     setEditData(volunteer || {})
     setEditing(false)
   }
 
-  if (loading) {
+  // ✅ Start editing
+  const handleEdit = () => {
+    setEditData(volunteer || {})
+    setEditing(true)
+  }
+
+  // ✅ Loading state
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh] px-4">
-        <div className="text-lg">Chargement...</div>
+        <div className="flex items-center gap-2">
+          <RefreshCw className="h-5 w-5 animate-spin" />
+          <span className="text-lg">Chargement...</span>
+        </div>
       </div>
     )
   }
 
+  // ✅ Not found state
+  if (isNotFound) {
+    return (
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
+            <AlertCircle className="h-12 w-12 text-muted-foreground" />
+            <div className="text-center">
+              <h1 className="text-xl font-semibold">Bénévole non trouvé</h1>
+              <p className="text-muted-foreground">Le bénévole avec l&apos;ID {volunteerId} n&apos;existe pas.</p>
+            </div>
+            <Link href="/admin/benevoles">
+              <Button variant="outline">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Retour à la liste
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ✅ Error state
+  if (error && !isNotFound) {
+    return (
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <Link href="/admin/benevoles">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Button>
+          </Link>
+
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="flex items-center justify-between">
+              <span>Erreur: {error.message}</span>
+              <Button onClick={() => refetch()} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Réessayer
+              </Button>
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    )
+  }
+
+  // ✅ No volunteer data
   if (!volunteer) {
     return (
       <div className="flex items-center justify-center min-h-[50vh] px-4">
-        <div className="text-lg text-center">Bénévole non trouvé</div>
+        <div className="text-lg text-center">Aucune donnée disponible</div>
       </div>
     )
   }
@@ -155,15 +181,16 @@ const VolunteerPage = () => {
               <>
                 <Button
                   onClick={handleSave}
-                  disabled={saving}
+                  disabled={isUpdating}
                   className="w-full sm:w-auto"
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  {saving ? "Sauvegarde..." : "Sauvegarder"}
+                  {isUpdating ? "Sauvegarde..." : "Sauvegarder"}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handleCancel}
+                  disabled={isUpdating}
                   className="w-full sm:w-auto"
                 >
                   <X className="h-4 w-4 mr-2" />
@@ -173,7 +200,7 @@ const VolunteerPage = () => {
             ) : (
               <>
                 <Button
-                  onClick={() => setEditing(true)}
+                  onClick={handleEdit}
                   className="w-full sm:w-auto"
                 >
                   <Edit className="h-4 w-4 mr-2" />
@@ -182,16 +209,29 @@ const VolunteerPage = () => {
                 <Button
                   variant="destructive"
                   onClick={handleDelete}
+                  disabled={isDeleting}
                   className="w-full sm:w-auto"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Supprimer
+                  {isDeleting ? "Suppression..." : "Supprimer"}
                 </Button>
               </>
             )}
           </div>
         </div>
 
+        {/* ✅ Debug info for development */}
+        {process.env.NODE_ENV === 'development' && (
+          <Alert>
+            <AlertDescription>
+              🔧 React Query: {isLoading ? 'Loading' : 'Loaded'} |
+              Cache: {volunteer ? 'Hit' : 'Miss'} |
+              Updating: {isUpdating ? 'Yes' : 'No'}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Rest of your existing JSX for the cards - keep exactly as is */}
         {/* Main Content - Responsive Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Personal Information Card */}
@@ -200,6 +240,7 @@ const VolunteerPage = () => {
               <CardTitle className="text-lg sm:text-xl">Informations personnelles</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Keep all your existing form fields exactly as they are */}
               {/* Name Fields - Mobile: Stack, Desktop: Side by side */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -286,12 +327,14 @@ const VolunteerPage = () => {
             </CardContent>
           </Card>
 
+          {/* Keep your second card exactly as is */}
           {/* Additional Information Card */}
           <Card className="w-full">
             <CardHeader>
               <CardTitle className="text-lg sm:text-xl">Informations complémentaires</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Keep all your existing fields */}
               {/* Status */}
               <div className="space-y-2">
                 <Label htmlFor="status" className="text-sm font-medium">Statut</Label>
@@ -361,6 +404,7 @@ const VolunteerPage = () => {
           </Card>
         </div>
 
+        {/* Keep your metadata card exactly as is */}
         {/* Metadata Card - Full Width */}
         <Card className="w-full">
           <CardHeader>
