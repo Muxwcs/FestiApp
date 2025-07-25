@@ -10,7 +10,6 @@ interface IProps {
 
 export function AgendaDayGroup({ date, events, multiDayEvents }: IProps) {
   const sortedEvents = [...events].sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-  console.log("Sorted events:", sortedEvents)
   return (
     <div className="space-y-4">
       <div className="sticky top-0 flex items-center gap-4 bg-background py-2">
