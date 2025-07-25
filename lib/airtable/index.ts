@@ -26,14 +26,6 @@ export {
   base
 } from './base'
 
-// // Default export with all services (optional)
-// export default {
-//   volunteers,
-//   events,
-//   tasks,
-//   base
-// }
-
 // Assign object to a variable before exporting as module default
 const airtableServices = {
   timeslots,
