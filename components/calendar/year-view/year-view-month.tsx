@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { format, isSameDay, parseISO, getDaysInMonth, startOfMonth } from "date-fns"
 
-import { useCalendar } from "../context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { YearViewDayCell } from "./year-view-day-cell"
 
@@ -15,7 +15,7 @@ interface IProps {
 
 export function YearViewMonth({ month, events }: IProps) {
   const { push } = useRouter()
-  const { setSelectedDate } = useCalendar()
+  const { setSelectedDate } = useCalendarStore()
 
   const monthName = format(month, "MMMM")
 

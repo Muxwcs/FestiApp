@@ -11,7 +11,7 @@ import { AddEventDialog } from "../dialogs/add-event-dialog"
 
 import { IEvent } from "../interfaces"
 import { TCalendarView } from "../types"
-import { useCalendar } from "../context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 interface IProps {
   view: TCalendarView
@@ -24,12 +24,12 @@ export function CalendarHeader({ view, events }: IProps) {
     isVolunteer,
     showVolunteerTimeslots,
     setShowVolunteerTimeslots,
-    volunteerEvents,
+    volunteerTimeslots,
     volunteerLoading,
     refreshVolunteerTimeslots
-  } = useCalendar()
+  } = useCalendarStore()
 
-  const volunteerTimeslotsCount = volunteerEvents?.length || 0
+  const volunteerTimeslotsCount = volunteerTimeslots?.length || 0
 
   return (
     <div className="border-b">

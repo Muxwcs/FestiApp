@@ -126,7 +126,7 @@ const mockGenerator = (numberOfEvents: number): IEvent[] => {
       endDate: new Date("2025-09-20T23:59:00-03:00").toISOString(),
       title: "My wedding :)",
       color: "red",
-      description: "Can't wait to see the most beautiful woman in that dress!",
+      sectorDescription: "Can't wait to see the most beautiful woman in that dress!",
       user: USERS_MOCK[0],
     },
   ]
@@ -149,7 +149,7 @@ const mockGenerator = (numberOfEvents: number): IEvent[] => {
     endDate: new Date(now.getTime() + 30 * 60000).toISOString(),
     title: EVENTS[Math.floor(Math.random() * EVENTS.length)],
     color: COLORS[Math.floor(Math.random() * COLORS.length)],
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    sectorDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     user: randomUser,
   }
 
@@ -213,7 +213,7 @@ const mockGenerator = (numberOfEvents: number): IEvent[] => {
       endDate: endDate.toISOString(),
       title: EVENTS[Math.floor(Math.random() * EVENTS.length)],
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      sectorDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
       user: USERS_MOCK[Math.floor(Math.random() * USERS_MOCK.length)],
     })
 

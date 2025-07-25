@@ -13,6 +13,7 @@ export interface IEvent {
   title: string
   color: TEventColor
   description: string
+  place: string
   user: IUser
 }
 

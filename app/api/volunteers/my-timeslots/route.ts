@@ -97,6 +97,7 @@ export async function GET() {
           dateStart: timeslot.fields.dateStart,
           dateEnd: timeslot.fields.dateEnd,
           sectorName: sector?.fields.name || 'Secteur inconnu',
+          sectorDescription: sector?.fields.description || 'Aucune description',
           status: affectation.fields.status || 'Non défini',
           role: affectation.fields.role,
           totalVolunteers: timeslot.fields.totalVolunteers,

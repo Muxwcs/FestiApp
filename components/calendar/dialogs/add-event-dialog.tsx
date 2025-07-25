@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { useDisclosure } from "@/hooks/use-disclosure"
-import { useCalendar } from "../context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -27,7 +27,7 @@ interface IProps {
 }
 
 export function AddEventDialog({ children, startDate, startTime }: IProps) {
-  const { users } = useCalendar()
+  const { users } = useCalendarStore()
 
   const { isOpen, onClose, onToggle } = useDisclosure()
 
@@ -96,7 +96,7 @@ export function AddEventDialog({ children, startDate, startTime }: IProps) {
                           <SelectItem key={user.id} value={user.id} className="flex-1">
                             <div className="flex items-center gap-2">
                               <Avatar key={user.id} className="size-6">
-                                <AvatarImage src={user.picturePath ?? undefined} alt={user.name} />
+                                {/* <AvatarImage src={user.picturePath ?? undefined} alt={user.name} /> */}
                                 <AvatarFallback className="text-xxs">{user.name[0]}</AvatarFallback>
                               </Avatar>
 

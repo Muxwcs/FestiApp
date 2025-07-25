@@ -142,7 +142,7 @@ export function CalendarProvider({ children, users, initialEvents = [], initialV
   )
 }
 
-export function useCalendar(): ICalendarContext {
+export function useCalendarStore(): ICalendarContext {
   const context = useContext(CalendarContext)
   if (!context) throw new Error("useCalendar must be used within a CalendarProvider.")
   return context

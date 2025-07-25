@@ -2,7 +2,7 @@ import { cva } from "class-variance-authority"
 import type { VariantProps } from "class-variance-authority"
 import { endOfDay, format, isSameDay, parseISO, startOfDay } from "date-fns"
 
-import { useCalendar } from "../context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { DraggableEvent } from "../dnd/draggable-event"
 import { EventDetailsDialog } from "../dialogs/event-details-dialog"
@@ -57,7 +57,7 @@ interface IProps extends Omit<VariantProps<typeof eventBadgeVariants>, "color" |
 }
 
 export function MonthEventBadge({ event, cellDate, eventCurrentDay, eventTotalDays, className, position: propPosition }: IProps) {
-  const { badgeVariant } = useCalendar()
+  const { badgeVariant } = useCalendarStore()
 
   const itemStart = startOfDay(parseISO(event.startDate))
   const itemEnd = endOfDay(parseISO(event.endDate))

@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 
 import { useDisclosure } from "@/hooks/use-disclosure"
 // import { useUpdateEvent } from "@/hooks/use-update-event"
-import { useCalendar } from "../context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -30,7 +30,7 @@ interface IProps {
 export function EditEventDialog({ children, event }: IProps) {
   const { isOpen, onClose, onToggle } = useDisclosure()
 
-  const { users } = useCalendar()
+  const { users } = useCalendarStore()
 
   // const { updateEvent } = useUpdateEvent()
 
@@ -103,7 +103,7 @@ export function EditEventDialog({ children, event }: IProps) {
                           <SelectItem key={user.id} value={user.id} className="flex-1">
                             <div className="flex items-center gap-2">
                               <Avatar key={user.id} className="size-6">
-                                <AvatarImage src={user.picturePath ?? undefined} alt={user.name} />
+                                {/* <AvatarImage src={user.picturePath ?? undefined} alt={user.name} /> */}
                                 <AvatarFallback className="text-xxs">{user.name[0]}</AvatarFallback>
                               </Avatar>
 

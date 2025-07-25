@@ -3,7 +3,7 @@ import { cva } from "class-variance-authority"
 import { format, differenceInMinutes, parseISO } from "date-fns"
 import type { VariantProps } from "class-variance-authority"
 
-import { useCalendar } from "../context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { DraggableEvent } from "../dnd/draggable-event"
 import { EventDetailsDialog } from "../dialogs/event-details-dialog"
@@ -47,7 +47,7 @@ interface IProps extends HTMLAttributes<HTMLDivElement>, Omit<VariantProps<typeo
 }
 
 export function EventBlock({ event, className }: IProps) {
-  const { badgeVariant } = useCalendar()
+  const { badgeVariant } = useCalendarStore()
 
   const start = parseISO(event.startDate)
   const end = parseISO(event.endDate)

@@ -4,12 +4,12 @@ import { format, parseISO } from "date-fns"
 import { cva } from "class-variance-authority"
 import { Clock, Text, User } from "lucide-react"
 
-import { useCalendar } from "../context/calendar-context"
 
 import { EventDetailsDialog } from "../dialogs/event-details-dialog"
 
 import type { VariantProps } from "class-variance-authority"
 import { IEvent } from "../interfaces"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 const agendaEventCardVariants = cva(
   "flex select-none items-center justify-between gap-3 rounded-md border p-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
@@ -48,7 +48,7 @@ interface IProps {
 }
 
 export function AgendaEventCard({ event, eventCurrentDay, eventTotalDays }: IProps) {
-  const { badgeVariant } = useCalendar()
+  const { badgeVariant } = useCalendarStore()
 
   const startDate = parseISO(event.startDate)
   const endDate = parseISO(event.endDate)
@@ -78,7 +78,7 @@ export function AgendaEventCard({ event, eventCurrentDay, eventTotalDays }: IPro
             <p className="font-medium">
               {eventCurrentDay && eventTotalDays && (
                 <span className="mr-1 text-xs">
-                  Day {eventCurrentDay} of {eventTotalDays} •{" "}
+                  Jour {eventCurrentDay} sur {eventTotalDays} •{" "}
                 </span>
               )}
               {event.title}

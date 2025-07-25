@@ -1,11 +1,11 @@
 "use client"
 
-import { useCalendar } from "./context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function ChangeBadgeVariantInput() {
-  const { badgeVariant, setBadgeVariant } = useCalendar()
+  const { badgeVariant, setBadgeVariant } = useCalendarStore()
 
   return (
     <div className="space-y-2">

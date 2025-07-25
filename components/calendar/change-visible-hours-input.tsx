@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Info } from "lucide-react"
 
-import { useCalendar } from "./context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { Button } from "@/components/ui/button"
 import { TimeInput } from "@/components/ui/time-input"
@@ -12,7 +12,7 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/comp
 import type { TimeValue } from "react-aria-components"
 
 export function ChangeVisibleHoursInput() {
-  const { visibleHours, setVisibleHours } = useCalendar()
+  const { visibleHours, setVisibleHours } = useCalendarStore()
 
   const [from, setFrom] = useState<{ hour: number; minute: number }>({ hour: visibleHours.from, minute: 0 })
   const [to, setTo] = useState<{ hour: number; minute: number }>({ hour: visibleHours.to, minute: 0 })

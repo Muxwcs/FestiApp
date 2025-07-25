@@ -1,7 +1,7 @@
 import { isToday } from "date-fns"
 import { useRouter } from "next/navigation"
 
-import { useCalendar } from "../context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { cn } from "@/lib/utils"
 
@@ -15,7 +15,7 @@ interface IProps {
 
 export function YearViewDayCell({ day, date, events }: IProps) {
   const { push } = useRouter()
-  const { setSelectedDate } = useCalendar()
+  const { setSelectedDate } = useCalendarStore()
 
   const maxIndicators = 3
   const eventCount = events.length
