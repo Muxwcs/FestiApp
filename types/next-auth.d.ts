@@ -6,18 +6,24 @@ declare module "next-auth" {
       id?: string | null
       name?: string | null
       email?: string | null
-      role?: string
+      role: string
       airtableId?: string | null,
+      isReferent: boolean
     }
   }
 
   interface User {
-    role?: string
+    id: string
+    name?: string | null
+    email?: string | null
+    role: string
+    isReferent: boolean // ✅ Add to user type
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    role?: string
+    role: string
+    isReferent: boolean // ✅ Add to JWT type
   }
 }

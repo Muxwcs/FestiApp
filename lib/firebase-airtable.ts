@@ -6,7 +6,7 @@ export async function getUserByFirebaseUid(uid: string) {
     if (!record) return null
 
     return {
-      id: record.fields.id,
+      id: record.id,
       email: record.fields.email ? String(record.fields.email) : undefined,
       phone: record.fields.phone ? String(record.fields.phone) : undefined,
       name: record.fields.name ? String(record.fields.name) : undefined,
@@ -14,6 +14,8 @@ export async function getUserByFirebaseUid(uid: string) {
       role: record.fields.role ? String(record.fields.role).toLowerCase() : "bénévole", // Default to "benevole" if not set
       availability: record.fields.availability,
       assignedTasks: record.fields.assignedTasks,
+      assignedTxands: record.fields.assignedTxands,
+      referent: record.fields.referent || [],
       status: record.fields.status,
       skills: record.fields.skills ? record.fields.skills : [],
       avatar: record.fields.avatar,
@@ -52,6 +54,8 @@ export async function createUserInAirtable({ uid, email }: { uid: string, email:
       role: created.fields.role ? String(created.fields.role).toLowerCase() : "bénévole",
       availability: created.fields.availability || null,
       assignedTasks: created.fields.assignedTasks || [],
+      assignedTxands: created.fields.assignedTxands || [],
+      referent: created.fields.referent || [],
       status: created.fields.status || null,
       skills: created.fields.skills || [],
       avatar: created.fields.avatar || null,

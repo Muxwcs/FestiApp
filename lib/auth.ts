@@ -23,11 +23,17 @@ export const authOptions: NextAuthOptions = {
           user = await createUserInAirtable({ uid: firebaseUid, email: decoded.email })
         }
         if (!user) return null
+
+        // ✅ ADD REFERENT LOGIC HERE
+        const referentField = user.referent || []
+        const isReferent = Array.isArray(referentField) ? referentField.length > 0 : false
+
         return {
           id: firebaseUid,
           email: user.email,
           name: user.name,
           role: user.role,
+          isReferent,
         }
       },
     }),
@@ -37,6 +43,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.role = user.role
+        token.isReferent = user.isReferent
       }
       return token
     },
@@ -44,6 +51,7 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         session.user.id = token.id as string
         session.user.role = token.role
+        session.user.isReferent = token.isReferent // ✅ Available in session
       }
       return session
     },

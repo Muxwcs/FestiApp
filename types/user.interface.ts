@@ -19,6 +19,7 @@ export interface User {
   skills?: string[] // Array of skills
   avatar?: string // URL to the user's avatar
   notes?: string // Additional notes about the user
+  referent?: string[] // Array of referent ids
   createdAt?: string // ISO date string
   modifiedAt?: string // ISO date string
   modifiedBy?: string // email of the user who last modified this record

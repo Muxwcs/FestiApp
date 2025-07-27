@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protected routes
-  const protectedPaths = ['/dashboard', '/admin']
+  const protectedPaths = ['/dashboard', '/admin', '/referent']
   const isProtectedPath = protectedPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   )
@@ -41,6 +41,13 @@ export async function middleware(request: NextRequest) {
     // Admin-only routes
     if (request.nextUrl.pathname.startsWith('/admin') && token.role !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+
+    // ✅ NEW: Referent-only routes
+    if (request.nextUrl.pathname.startsWith('/referent') && !token.isReferent) {
+      // Redirect admins to admin panel, others to dashboard
+      const redirectUrl = token.role === 'admin' ? '/admin' : '/dashboard'
+      return NextResponse.redirect(new URL(redirectUrl, request.url))
     }
   }
 

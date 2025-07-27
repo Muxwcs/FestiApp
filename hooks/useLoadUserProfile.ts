@@ -4,43 +4,38 @@ import { useEffect } from "react"
 import { useUserStore } from "@/stores/userStore"
 import { logger } from "@/lib/logger"
 
-// Fetch function for user profile
-async function fetchUserProfile() {
-  const response = await fetch("/api/me")
-  if (!response.ok) {
-    throw new Error(`Failed to fetch user profile: ${response.status}`)
-  }
-  return response.json()
-}
-
 export function useLoadUserProfile() {
   const { data: session, status } = useSession()
   const setUser = useUserStore((state) => state.setUser)
 
-  // ✅ Use React Query for caching
-  const { data: userData, error, isLoading } = useQuery({
-    queryKey: ['user-profile', session?.user?.email],
-    queryFn: fetchUserProfile,
+  const { data: userData, error, isLoading, isError } = useQuery({
+    queryKey: ['user-profile', session?.user?.id],
+    queryFn: async () => {
+      const response = await fetch("/api/me")
+      if (!response.ok) throw new Error('Failed to fetch profile')
+      return response.json()
+    },
     enabled: status === 'authenticated' && !!session?.user?.id,
-    staleTime: 10 * 60 * 1000, // 10 minutes - profile doesn't change often
-    gcTime: 30 * 60 * 1000,    // 30 minutes cache
-    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
-  // ✅ Update store when data changes
   useEffect(() => {
     if (userData) {
       logger.info(userData, 'data from hooks (cached)')
       setUser(userData)
-    } else if (error) {
+    } else if (isError) {
       setUser(null)
       logger.error("Failed to load user profile:", error)
     }
-  }, [userData, error, setUser])
+  }, [userData, setUser, error])
 
   return {
     userData,
     isLoading,
-    error
+    error,
+    // ✅ Easy access to computed values
+    isReferent: userData?.isReferent || false,
+    isAdmin: userData?.computed?.hasAdminRole || false,
+    referentCount: userData?.computed?.referentCount || 0,
   }
 }
