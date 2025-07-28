@@ -8,23 +8,26 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
-import { useVolunteers } from "@/stores/volunteersStore"
+import { useVolunteers, useVolunteersStoreHydrated } from "@/stores/volunteersStore"
 
 import { DataTable } from "./data-table"
 import { createColumns } from "./columns"
 
 const Volunteers = () => {
   const { data: session } = useSession()
-  const isHydrated = useVolunteers()
   // Use Zustand store
   const {
     volunteers,
     isLoading,
     error,
+    // pagination,
+    // summary,
     deleteVolunteer,
     refetch,
     clearError,
   } = useVolunteers()
+
+  const isHydrated = useVolunteersStoreHydrated()
 
   // Handle delete with optimistic updates
   const handleDelete = useCallback(async (volunteerId: string) => {

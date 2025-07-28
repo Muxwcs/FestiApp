@@ -98,7 +98,6 @@ interface CalendarActions {
   setShowVolunteerTimeslots: (show: boolean) => void
   setIsVolunteer: (isVolunteer: boolean) => void
   setVolunteerLoading: (loading: boolean) => void
-  refreshVolunteerTimeslots: () => Promise<void>
 
   // UI actions
   setBadgeVariant: (variant: BadgeVariant) => void
@@ -180,30 +179,6 @@ export const useCalendarStore = create<CalendarStore>()(
         setShowVolunteerTimeslots: (show) => set({ showVolunteerTimeslots: show }),
         setIsVolunteer: (isVolunteer) => set({ isVolunteer }),
         setVolunteerLoading: (loading) => set({ volunteerLoading: loading }),
-
-        refreshVolunteerTimeslots: async () => {
-          const { setVolunteerLoading, setVolunteerTimeslots, setError } = get()
-
-          try {
-            setVolunteerLoading(true)
-            setError(null)
-
-            const response = await fetch('/api/volunteers/my-timeslots')
-
-            if (!response.ok) {
-              throw new Error('Failed to fetch volunteer timeslots')
-            }
-
-            const data = await response.json()
-            setVolunteerTimeslots(data.timeslots || [])
-
-          } catch (error) {
-            console.error('Error fetching volunteer timeslots:', error)
-            setError(error instanceof Error ? error.message : 'Unknown error')
-          } finally {
-            setVolunteerLoading(false)
-          }
-        },
 
         // UI actions
         setBadgeVariant: (variant) => set({ badgeVariant: variant }),
@@ -348,14 +323,12 @@ export const useCalendarEvents = () => {
 export const useVolunteerTimeslots = () => {
   const timeslots = useCalendarStore(state => state.volunteerTimeslots)
   const loading = useCalendarStore(state => state.volunteerLoading)
-  const refresh = useCalendarStore(state => state.refreshVolunteerTimeslots)
   const showTimeslots = useCalendarStore(state => state.showVolunteerTimeslots)
   const setShowTimeslots = useCalendarStore(state => state.setShowVolunteerTimeslots)
 
   return {
     timeslots,
     loading,
-    refresh,
     showTimeslots,
     setShowTimeslots,
   }

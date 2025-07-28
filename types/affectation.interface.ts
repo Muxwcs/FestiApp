@@ -32,6 +32,8 @@ export interface EnrichedTimingInfo {
   isThisWeek: boolean
   startDate?: string // ISO string
   endDate?: string // ISO string
+  isPast: boolean
+  isUpcoming: boolean
 }
 
 export interface EnrichedTeamInfo {
@@ -57,6 +59,30 @@ export interface EnrichedAffectationData {
   timing: EnrichedTimingInfo | null
   team: EnrichedTeamInfo
   priority: EnrichedPriority
+}
+
+export interface EnrichedAssignment {
+  id: string
+  fields: Record<string, unknown>
+  createdAt: string
+  enriched: {
+    sector: EnrichedSector
+    timeslots: {
+      count: number
+      list: EnrichedTimeslot[]
+      next: EnrichedTimeslot | null
+    }
+    timing: EnrichedTimeslot | null
+    team: {
+      totalVolunteers: number
+      isTeamWork: boolean
+    }
+    priority: {
+      level: string
+      isHigh: boolean
+      isMedium: boolean
+    }
+  }
 }
 
 export interface AffectationRecord {

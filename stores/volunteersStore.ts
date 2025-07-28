@@ -7,11 +7,15 @@ import { useVolunteersQuery } from '@/hooks/use-volunteers'
 
 interface VolunteersState {
   volunteers: VolunteerRecord[]
+  pagination: any | null  // ✅ Add pagination data
+  summary: any | null     // ✅ Add summary data
   loading: boolean
   error: string | null
   lastFetch: Date | null
 
   setVolunteers: (volunteers: VolunteerRecord[]) => void
+  setPagination: (pagination: any) => void      // ✅ Add pagination setter
+  setSummary: (summary: any) => void            // ✅ Add summary setter
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
   addVolunteer: (volunteer: VolunteerRecord) => void
@@ -26,6 +30,8 @@ export const useVolunteersStore = create<VolunteersState>()(
     persist(
       (set, get) => ({
         volunteers: [],
+        pagination: null,     // ✅ Add pagination state
+        summary: null,        // ✅ Add summary state
         loading: false,
         error: null,
         lastFetch: null,
@@ -36,6 +42,16 @@ export const useVolunteersStore = create<VolunteersState>()(
             lastFetch: new Date(),
             error: null
           }, false, 'volunteers/setVolunteers')
+        },
+
+        // ✅ Add pagination setter
+        setPagination: (pagination) => {
+          set({ pagination }, false, 'volunteers/setPagination')
+        },
+
+        // ✅ Add summary setter
+        setSummary: (summary) => {
+          set({ summary }, false, 'volunteers/setSummary')
         },
 
         setLoading: (loading) => {
@@ -88,6 +104,8 @@ export const useVolunteersStore = create<VolunteersState>()(
         partialize: (state) => ({
           // Don't persist loading states
           volunteers: state.volunteers,
+          pagination: state.pagination,   // ✅ Persist pagination
+          summary: state.summary,         // ✅ Persist summary
           lastFetch: state.lastFetch,
         }),
       }
@@ -107,14 +125,19 @@ export function useVolunteers() {
   // ✅ Use a ref to track if we've synced to prevent loops
   const [hasSynced, setHasSynced] = useState(false)
 
-  // ✅ Only sync once when data first arrives
+  // ✅ Sync volunteers and rich data
   useEffect(() => {
-    if (query.data && query.data.length > 0 && !hasSynced) {
-      store.setVolunteers(query.data)
+    if (query.volunteers && query.volunteers.length > 0 && !hasSynced) {
+      store.setVolunteers(query.volunteers)
+
+      // ✅ Sync rich API data
+      if (query.pagination) store.setPagination(query.pagination)
+      if (query.summary) store.setSummary(query.summary)
+
       setHasSynced(true)
-      console.log('✅ Synced volunteers from API to store:', query.data.length)
+      console.log('✅ Synced volunteers + rich data from API to store:', query.volunteers.length)
     }
-  }, [query.data, hasSynced, store])
+  }, [query.volunteers, query.pagination, query.summary, hasSynced, store])
 
   // ✅ Sync loading state only when it changes
   useEffect(() => {
@@ -129,6 +152,9 @@ export function useVolunteers() {
   return {
     // Data from React Query (with caching)
     volunteers: query.volunteers || [],
+    pagination: query.pagination,     // ✅ Expose pagination
+    summary: query.summary,           // ✅ Expose summary
+
     isLoading: query.isLoading,
     error: query.error,
 

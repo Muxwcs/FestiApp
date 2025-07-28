@@ -17,3 +17,44 @@ export interface TimeslotRecord {
   id: string // Unique identifier for the timeslot record
   fields: Timeslot // Fields of the timeslot record cast to Timeslot type
 }
+
+// ✅ FIXED: Define proper interfaces that match your actual data structure
+export interface EnrichedTimeslot {
+  id: string
+  name: string
+  dateStart?: string
+  dateEnd?: string
+  sectorName: string
+  sectorDescription: string
+  sectorColor: string
+  status: string
+  role?: unknown
+  totalVolunteers?: unknown
+  currentVolunteers: number
+  affectationId: string
+  timing: {
+    daysUntilStart: number | null
+    hoursUntilStart: number | null
+    isToday: boolean
+    isTomorrow: boolean
+    isThisWeek: boolean
+    isPast: boolean
+    isUpcoming: boolean
+  }
+}
+
+export interface TimeslotsResult {
+  timeslots: EnrichedTimeslot[]
+  message?: string
+  volunteer?: {
+    id: string
+    name: string
+    email: unknown
+  }
+  debug?: {
+    affectationIdsFound: number
+    timeslotsFound: number
+    sectorsFound: number
+    cacheHit: boolean
+  }
+}

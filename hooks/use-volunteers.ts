@@ -1,59 +1,112 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { VolunteerRecord } from '@/types/user.interface'
-import { fetchVolunteers, deleteVolunteer, updateVolunteer, createVolunteer } from '@/lib/api/volunteers'
-import { toast } from 'sonner'
+
+interface VolunteersApiResponse {
+  volunteers: VolunteerRecord[]
+  pagination: {
+    currentPage: number
+    totalPages: number
+    totalCount: number
+    limit: number
+    hasNextPage: boolean
+    hasPrevPage: boolean
+    startIndex: number
+    endIndex: number
+  }
+  filters: {
+    search: string
+    status: string
+    sortBy: string
+    sortOrder: string
+    includeInactive: boolean
+  }
+  summary: {
+    activeVolunteers: number
+    totalVolunteers: number
+    referents: number
+    newVolunteers: number
+  }
+}
 
 export function useVolunteersQuery() {
   const queryClient = useQueryClient()
 
-  // ✅ Query for fetching volunteers
+  // ✅ Main volunteers query with new API structure
   const volunteersQuery = useQuery({
     queryKey: ['volunteers'],
-    queryFn: fetchVolunteers,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000,   // 10 minutes
+    queryFn: async (): Promise<VolunteersApiResponse> => {
+      const response = await fetch('/api/volunteers')
+      if (!response.ok) {
+        throw new Error(`Failed to fetch volunteers: ${response.statusText}`)
+      }
+      const data = await response.json()
+
+      return data
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes to match API cache
+    gcTime: 5 * 60 * 1000,   // 5 minutes for garbage collection
   })
 
-  // ✅ Mutation for deleting
+  // ✅ Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: deleteVolunteer,
-    onSuccess: (_, deletedId) => {
-      queryClient.setQueryData(['volunteers'], (old: VolunteerRecord[] = []) =>
-        old.filter(v => v.id !== deletedId)
-      )
-      toast.success('Bénévole supprimé avec succès')
+    mutationFn: async (volunteerId: string) => {
+      const response = await fetch(`/api/volunteers/${volunteerId}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to delete volunteer: ${response.statusText}`)
+      }
+      return response.json()
     },
-    onError: (error) => {
-      toast.error('Erreur lors de la suppression')
-      console.error('Delete failed:', error)
-    }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['volunteers'] })
+    },
   })
 
-  // ✅ Mutation for updating
+  // ✅ Update mutation
   const updateMutation = useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<VolunteerRecord> }) =>
-      updateVolunteer(id, updates),
-    onSuccess: (updatedVolunteer) => {
-      queryClient.setQueryData(['volunteers'], (old: VolunteerRecord[] = []) =>
-        old.map(v => v.id === updatedVolunteer.id ? updatedVolunteer : v)
-      )
-      toast.success('Bénévole mis à jour avec succès')
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const response = await fetch(`/api/volunteers/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to update volunteer: ${response.statusText}`)
+      }
+      return response.json()
     },
-    onError: (error) => {
-      toast.error('Erreur lors de la mise à jour')
-      console.error('Update failed:', error)
-    }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['volunteers'] })
+    },
   })
 
   return {
-    // Query data
-    ...volunteersQuery,
-    volunteers: volunteersQuery.data || [],
+    // ✅ Extract volunteers array from new API response structure
+    volunteers: volunteersQuery.data?.volunteers || [],
 
-    // Mutations
+    // ✅ Expose rich API response data
+    pagination: volunteersQuery.data?.pagination,
+    filters: volunteersQuery.data?.filters,
+    summary: volunteersQuery.data?.summary,
+
+    // ✅ Original response for backwards compatibility
+    data: volunteersQuery.data?.volunteers || [],
+
+    // Query states
+    isLoading: volunteersQuery.isLoading,
+    error: volunteersQuery.error,
+    isError: volunteersQuery.isError,
+
+    // Mutation functions
     deleteVolunteer: deleteMutation.mutate,
     updateVolunteer: updateMutation.mutate,
+
+    // Mutation states
     isDeleting: deleteMutation.isPending,
     isUpdating: updateMutation.isPending,
+
+    // Refetch function
+    refetch: volunteersQuery.refetch,
   }
 }

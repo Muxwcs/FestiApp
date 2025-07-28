@@ -7,7 +7,6 @@ export function useVolunteerMissions(volunteerId: string) {
     queryKey: ['volunteer-missions', volunteerId],
     queryFn: async () => {
       const response = await fetch(`/api/volunteers/${volunteerId}/missions`)
-      console.log('Response', response)
       if (!response.ok) throw new Error('Failed to fetch missions')
       return response.json() as Promise<MissionRecord[]>
     },
@@ -20,8 +19,6 @@ export function useVolunteerAssignments(volunteerId: string) {
     queryKey: ['volunteer-assignments', volunteerId],
     queryFn: async () => {
       const response = await fetch(`/api/volunteers/${volunteerId}/assignments`)
-      console.log('Response', response)
-
       if (!response.ok) throw new Error('Failed to fetch assignments')
       return response.json() as Promise<AffectationRecord[]>
     },
