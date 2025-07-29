@@ -16,3 +16,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   )
 }
+
+export const metadata = {
+  title: "Dashboard Admin",
+  description: "Page d'administration pour la gestion des bénévoles et des txands.",
+}

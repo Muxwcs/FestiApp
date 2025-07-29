@@ -28,7 +28,7 @@ const AppSidebar = ({ role, className }: SidebarProps) => {
   ]
 
   const adminLinks = [
-    { href: "/admin/dashboard", label: "Dashboard Admin", icon: LayoutDashboard },
+    { href: "/admin/", label: "Dashboard Admin", icon: LayoutDashboard },
     { href: "/admin/benevoles", label: "Gestion Bénévoles", icon: Users },
     { href: "/admin/txands", label: "Gestion Txands", icon: CalendarSync },
   ]

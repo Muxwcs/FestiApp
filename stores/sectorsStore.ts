@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist, devtools } from 'zustand/middleware'
 import { toast } from 'sonner'
-import { SectorRecord } from '@/types/sector.interface'
+import { cleanSectorData, CleanSectorRecord, SectorRecord } from '@/types/sector.interface'
 
 export interface EnhancedVolunteer {
   id: string
@@ -44,6 +44,7 @@ interface SectorsState {
   updateSector: (id: string, updates: Partial<SectorRecord>) => void
   deleteSector: (id: string) => Promise<void>
   getSectorById: (id: string) => SectorRecord | undefined
+  getCleanSectorById: (id: string) => CleanSectorRecord | undefined // ✅ Added clean version
 
   // Sector Volunteers Actions
   fetchSectorVolunteers: (sectorId: string, forceRefresh?: boolean) => Promise<void>
@@ -246,6 +247,12 @@ export const useSectorsStore = create<SectorsState>()(
         // Get sector by ID
         getSectorById: (id) => {
           return get().sectors.find(sector => sector.id === id)
+        },
+
+        // ✅ ADDED: Get clean sector by ID (nulls converted to undefined)
+        getCleanSectorById: (id) => {
+          const sector = get().sectors.find(sector => sector.id === id)
+          return sector ? cleanSectorData(sector) : undefined
         },
 
         // Force refresh all data
