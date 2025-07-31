@@ -34,20 +34,48 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedPath) {
     const token = await getToken({ req: request })
+
+    // ✅ TEMPORARY: Debug token contents
+    console.log("🔍 Full token debug:", {
+      hasToken: !!token,
+      role: token?.role,
+      isReferent: token?.isReferent,
+      email: token?.email,
+      id: token?.id,
+      airtableId: token?.airtableId,
+      allTokenKeys: token ? Object.keys(token) : 'no token'
+    })
+
     if (!token) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
 
+    // ✅ Debug logging
+    console.log("🔍 Middleware check:", {
+      path: request.nextUrl.pathname,
+      role: token.role,
+      isReferent: token.isReferent,
+      email: token.email
+    })
+
     // Admin-only routes
     if (request.nextUrl.pathname.startsWith('/admin') && token.role !== 'admin') {
+      console.log("🚫 Redirecting non-admin from /admin")
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
-    // ✅ NEW: Referent-only routes
-    if (request.nextUrl.pathname.startsWith('/referent') && !token.isReferent) {
-      // Redirect admins to admin panel, others to dashboard
-      const redirectUrl = token.role === 'admin' ? '/admin' : '/dashboard'
-      return NextResponse.redirect(new URL(redirectUrl, request.url))
+    // ✅ FIXED: Referent routes - allow both referents AND admins
+    if (request.nextUrl.pathname.startsWith('/referent')) {
+      const isAdmin = token.role === 'admin'
+      const isReferent = token.isReferent
+
+      // ✅ Block only if user is NEITHER admin NOR referent
+      if (!isAdmin && !isReferent) {
+        console.log("🚫 Redirecting non-referent/non-admin from /referent")
+        return NextResponse.redirect(new URL('/dashboard', request.url))
+      }
+
+      console.log("✅ Allowing access to /referent:", { isAdmin, isReferent })
     }
   }
 

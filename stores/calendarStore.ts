@@ -98,6 +98,7 @@ interface CalendarActions {
   setShowVolunteerTimeslots: (show: boolean) => void
   setIsVolunteer: (isVolunteer: boolean) => void
   setVolunteerLoading: (loading: boolean) => void
+  refreshVolunteerTimeslots: () => Promise<void> // ✅ ADD: Missing method
 
   // UI actions
   setBadgeVariant: (variant: BadgeVariant) => void
@@ -179,6 +180,55 @@ export const useCalendarStore = create<CalendarStore>()(
         setShowVolunteerTimeslots: (show) => set({ showVolunteerTimeslots: show }),
         setIsVolunteer: (isVolunteer) => set({ isVolunteer }),
         setVolunteerLoading: (loading) => set({ volunteerLoading: loading }),
+
+        // ✅ ADD: refreshVolunteerTimeslots method
+        refreshVolunteerTimeslots: async () => {
+          const state = get()
+
+          // Don't refresh if not a volunteer or already loading
+          if (!state.isVolunteer || state.volunteerLoading) {
+            return
+          }
+
+          try {
+            set({ volunteerLoading: true, error: null })
+
+            // ✅ ADD: Your API call logic here
+            // Example implementation:
+            const response = await fetch('/api/volunteer/timeslots', {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                // Add authentication headers if needed
+                // 'Authorization': `Bearer ${token}`,
+              },
+            })
+
+            if (!response.ok) {
+              throw new Error(`Failed to fetch volunteer timeslots: ${response.status}`)
+            }
+
+            const data = await response.json()
+
+            // ✅ Transform API response to VolunteerTimeslot format
+            const timeslots: VolunteerTimeslot[] = data.timeslots || data || []
+
+            set({
+              volunteerTimeslots: timeslots,
+              volunteerLoading: false
+            })
+
+            console.log('✅ Volunteer timeslots refreshed:', timeslots.length, 'timeslots')
+
+          } catch (error) {
+            console.error('❌ Error refreshing volunteer timeslots:', error)
+
+            set({
+              error: error instanceof Error ? error.message : 'Failed to refresh timeslots',
+              volunteerLoading: false
+            })
+          }
+        },
 
         // UI actions
         setBadgeVariant: (variant) => set({ badgeVariant: variant }),

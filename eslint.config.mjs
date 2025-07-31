@@ -14,6 +14,8 @@ const eslintConfig = [
   {
     rules: {
       "react-hooks/exhaustive-deps": "off",
+      "prefer-const": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
 ];

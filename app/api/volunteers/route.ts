@@ -3,6 +3,8 @@ import { requireAdmin } from "@/lib/auth-helpers"
 import { logger } from "@/lib/logger"
 import { createSecureHeaders, validateInput, validateQueryParams } from "@/lib/security"
 import { volunteers } from "@/lib/airtable"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 // ✅ FIXED: Define proper TypeScript interfaces
 interface EnrichedVolunteer {
@@ -112,13 +114,43 @@ export async function GET(req: NextRequest) {
   const headers = createSecureHeaders()
 
   try {
-    const { token, error } = await requireAdmin(req)
-    if (error) {
-      logger.warn("Unauthorized access attempt to /api/volunteers", {
-        ip: req.headers.get('x-forwarded-for') || 'unknown'
-      })
-      return error
+    // ✅ Get session (no admin requirement)
+    const session = await getServerSession(authOptions)
+
+    if (!session?.user?.id) {
+      logger.warn("Unauthorized access attempt to /api/volunteers")
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401, headers }
+      )
     }
+
+    // ✅ Check if user is referent or admin
+    const isAdmin = session.user.role === 'admin'
+    // const isReferent = session.user.isReferent || isAdmin
+    const isReferent = session.user.isReferent || isAdmin // ✅ FIXED: Use isReferent directly from session
+
+    if (!isAdmin && !isReferent) {
+      logger.warn(`Non-admin and non-referent access attempt by: ${session.user.email}`, {
+        isAdmin,
+        isReferent: session.user.isReferent,
+        role: session.user.role
+      })
+      return NextResponse.json(
+        { error: "Referent access required" },
+        { status: 403, headers }
+      )
+    }
+
+    // ✅ Add debug logging
+    console.log("🔍 Volunteers access:", {
+      email: session.user.email,
+      role: session.user.role,
+      isReferent: session.user.isReferent,
+      isAdmin,
+      finalIsReferent: isReferent,
+      accessGranted: isAdmin || isReferent
+    })
 
     // ✅ PERFORMANCE: Parse and validate query parameters
     const { searchParams } = new URL(req.url)
@@ -143,7 +175,7 @@ export async function GET(req: NextRequest) {
       })
     } catch (validationError) {
       logger.warn(`Invalid query parameters in volunteers list`, {
-        adminEmail: token.email,
+        adminEmail: session.user.email,
         params: { page, limit, search, status, sortBy, sortOrder },
         error: validationError
       })
@@ -158,7 +190,7 @@ export async function GET(req: NextRequest) {
     const cached = getFromCache<VolunteersListResponse>(cacheKey)
     if (cached) {
       logger.info(`Cache hit for volunteers list`, {
-        adminEmail: token.email,
+        adminEmail: session.user.email,
         cacheKey: cacheKey.substring(0, 50) + '...'
       })
       return NextResponse.json(cached, { headers })
@@ -342,7 +374,7 @@ export async function GET(req: NextRequest) {
     // ✅ PERFORMANCE: Cache the result (2 minutes for list data)
     setCache(cacheKey, response, 2 * 60 * 1000)
 
-    logger.info(`Volunteers list accessed by admin: ${token.email}`, {
+    logger.info(`Volunteers list accessed by admin: ${session.user.email}`, {
       page,
       limit,
       totalCount,

@@ -34,16 +34,22 @@ interface SectorsState {
   // State
   sectors: SectorRecord[]
   sectorVolunteers: Record<string, SectorVolunteersData> // Key: sectorId
+  referentSectors: SectorRecord[]
   loading: boolean
   error: string | null
   lastFetch: Date | null
+  isHydrated: boolean // ✅ Added hydration state
 
   // Sector CRUD Actions
   fetchSectors: () => Promise<void>
+  fetchReferentSectors: () => Promise<void>
+  fetchReferentSector: (sectorId: string) => Promise<SectorRecord>
   addSector: (sector: SectorRecord) => void
   updateSector: (id: string, updates: Partial<SectorRecord>) => void
+  updateReferentSector: (sectorId: string, updates: Partial<SectorRecord['fields']>) => Promise<SectorRecord>
   deleteSector: (id: string) => Promise<void>
   getSectorById: (id: string) => SectorRecord | undefined
+  getReferentSectorById: (id: string) => SectorRecord | undefined
   getCleanSectorById: (id: string) => CleanSectorRecord | undefined // ✅ Added clean version
 
   // Sector Volunteers Actions
@@ -54,6 +60,7 @@ interface SectorsState {
   // Utility Actions
   clearError: () => void
   forceRefresh: () => Promise<void>
+  forceRefreshReferentSectors: () => Promise<void>
 }
 
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
@@ -65,9 +72,11 @@ export const useSectorsStore = create<SectorsState>()(
         // Initial state
         sectors: [],
         sectorVolunteers: {},
+        referentSectors: [],
         loading: false,
         error: null,
         lastFetch: null,
+        isHydrated: false, // ✅ Initial hydration state
 
         // Fetch all sectors
         fetchSectors: async () => {
@@ -107,6 +116,148 @@ export const useSectorsStore = create<SectorsState>()(
               error: errorMessage
             })
             toast.error('Erreur lors du chargement des secteurs')
+          }
+        },
+
+        // ✅ ADD: Get referent sector by ID
+        getReferentSectorById: (id: string) => {
+          return get().referentSectors.find(sector => sector.id === id)
+        },
+
+        fetchReferentSectors: async () => {
+          const { lastFetch, loading } = get()
+
+          if (loading) return
+
+          const lastFetchTime = lastFetch ? (lastFetch instanceof Date ? lastFetch.getTime() : new Date(lastFetch).getTime()) : 0
+
+          if (lastFetchTime && Date.now() - lastFetchTime < CACHE_TTL) {
+            console.log('📋 Using cached sectors data')
+            return
+          }
+
+          console.log('🔄 Fetching sectors from API...')
+          set({ loading: true, error: null })
+
+          try {
+            // ✅ OPTION 1: Use dedicated referent route
+            const response = await fetch('/api/referent/sectors')
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            const data = await response.json()
+            set({
+              referentSectors: data,
+              loading: false,
+              lastFetch: new Date(),
+              error: null
+            })
+            console.log(`✅ Fetched ${data.length} sectors`)
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+            console.error('❌ Failed to fetch sectors:', error)
+            set({
+              loading: false,
+              error: errorMessage
+            })
+            toast.error('Erreur lors du chargement des secteurs')
+          }
+        },
+
+        // ✅ ADD: Fetch single referent sector
+        fetchReferentSector: async (sectorId: string): Promise<SectorRecord> => {
+          console.log('🔄 Fetching single referent sector:', sectorId)
+          set({ loading: true, error: null })
+
+          try {
+            const response = await fetch(`/api/referent/${sectorId}`)
+
+            if (!response.ok) {
+              if (response.status === 404) {
+                throw new Error('Sector not found')
+              }
+              if (response.status === 403) {
+                throw new Error('You do not have access to this sector')
+              }
+              throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            const sector = await response.json()
+
+            // ✅ Update the specific sector in referentSectors array
+            set((state) => {
+              const existingIndex = state.referentSectors.findIndex(s => s.id === sectorId)
+
+              if (existingIndex >= 0) {
+                // Update existing
+                const updatedSectors = [...state.referentSectors]
+                updatedSectors[existingIndex] = sector
+                return {
+                  referentSectors: updatedSectors,
+                  loading: false,
+                  error: null
+                }
+              } else {
+                // Add new
+                return {
+                  referentSectors: [...state.referentSectors, sector],
+                  loading: false,
+                  error: null
+                }
+              }
+            })
+
+            console.log('✅ Fetched referent sector:', sector)
+            return sector
+
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+            console.error('❌ Failed to fetch referent sector:', error)
+            set({
+              loading: false,
+              error: errorMessage
+            })
+            throw error
+          }
+        },
+
+        // ✅ ADD: Update referent sector
+        updateReferentSector: async (sectorId: string, updates: Partial<SectorRecord['fields']>): Promise<SectorRecord> => {
+          console.log('🔄 Updating referent sector:', sectorId, updates)
+
+          try {
+            const response = await fetch(`/api/referent/${sectorId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(updates),
+            })
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            const updatedSector = await response.json()
+
+            // ✅ Update in referentSectors array
+            set((state) => {
+              const updatedSectors = state.referentSectors.map(sector =>
+                sector.id === sectorId ? updatedSector : sector
+              )
+              return { referentSectors: updatedSectors }
+            })
+
+            console.log('✅ Updated referent sector:', updatedSector)
+            toast.success('Secteur mis à jour avec succès')
+            return updatedSector
+
+          } catch (error) {
+            console.error('❌ Failed to update referent sector:', error)
+            toast.error('Erreur lors de la mise à jour')
+            throw error
           }
         },
 
@@ -262,6 +413,12 @@ export const useSectorsStore = create<SectorsState>()(
           await get().fetchSectors()
         },
 
+        forceRefreshReferentSectors: async () => {
+          console.log('🔄 Force refreshing referent sectors...')
+          set({ lastFetch: null })
+          await get().fetchReferentSectors()
+        },
+
         // Clear error state
         clearError: () => set({ error: null })
       }),
@@ -272,7 +429,14 @@ export const useSectorsStore = create<SectorsState>()(
           sectors: state.sectors,
           sectorVolunteers: state.sectorVolunteers,
           lastFetch: state.lastFetch
-        })
+        }),
+        onRehydrateStorage: () => (state) => {
+          // Set hydration state to true after rehydration
+          if (state) {
+            state.isHydrated = true
+            console.log('✅ Sectors store rehydrated')
+          }
+        }
       }
     ),
     {

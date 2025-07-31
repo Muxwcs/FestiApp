@@ -7,8 +7,6 @@ import { useCurrentUser } from "@/hooks/use-current-user"
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useCurrentUser()
 
-  console.log("🎯 Current user:", user)
-
   if (isLoading) {
     return (
       <div className="flex min-h-screen w-full">

@@ -4,15 +4,15 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Clock, Mail, Phone, ExternalLink, Users, Calendar } from "lucide-react"
 import Link from "next/link"
-import { VolunteerViewProps } from "./type"
+import { ReferentVolunteerViewProps } from "./type"
 import { formatDate, getTimeRange } from "@/lib/utils"
 
-export const VolunteersTableView = ({
+export const ReferentVolunteersTableView = ({
   timeslotGroups,
   getDisplayName,
   // allTimeslots,
   // timeslotDetails
-}: VolunteerViewProps) => {
+}: ReferentVolunteerViewProps) => {
 
   return (
     <div className="space-y-6">
@@ -24,21 +24,22 @@ export const VolunteersTableView = ({
 
                 <CardTitle className="text-base font-semibold flex items-center">
                   <Clock className="h-4 w-4 mr-2 text-blue-600" />
-                  {group.timeslot}
+                  {group.timeslot.name}
+                  <p></p>
                 </CardTitle>
                 {/* Date and Time Information */}
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  {group.dateStart && (
+                  {group.timeslot.dateStart && (
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-3 w-3" />
-                      <span>{formatDate(group.dateStart)}</span>
+                      <span>{formatDate(group.timeslot.dateStart)}</span>
                     </div>
                   )}
-                  {getTimeRange(group.dateStart, group.dateEnd) && (
+                  {getTimeRange(group.timeslot.dateStart, group.timeslot.dateEnd) && (
                     <div className="flex items-center space-x-1">
                       <Clock className="h-3 w-3" />
                       <span className="font-medium text-primary">
-                        {getTimeRange(group.dateStart, group.dateEnd)}
+                        {getTimeRange(group.timeslot.dateStart, group.timeslot.dateEnd)}
                       </span>
                     </div>
                   )}
@@ -71,7 +72,7 @@ export const VolunteersTableView = ({
                   {group.volunteers.map((volunteer, index) => {
                     // Get status from affectations for this specific timeslot
                     const relevantAffectations = volunteer.affectations?.filter(aff =>
-                      aff.timeslotNames?.includes(group.timeslot)
+                      aff.timeslotNames?.includes(group.timeslot.name)
                     ) || []
                     const status = relevantAffectations[0]?.fields?.status || "Non défini"
 

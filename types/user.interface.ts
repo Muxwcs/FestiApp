@@ -8,6 +8,7 @@ export interface User {
   surname?: string | null
   dispos?: string[]
   role?: "admin" | "bénévole" // Use specific roles
+  isReferent?: boolean // Indicates if the user is a referent
   availability?: string[] // Array of availability strings
   assignedTasks?: string[] // Array of task IDs
   assignedTxands?: string[] // Array of affectations IDs

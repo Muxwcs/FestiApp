@@ -14,6 +14,9 @@ export { volunteers } from './volunteers'
 export { events } from './events'
 export { tasks } from './tasks'
 
+// ✅ ADD: Export volunteers as membres (French alias)
+export { volunteers as membres } from './volunteers'
+
 // Export types
 export type { AirtableRecord, QueryOptions, UpdateData, CreateData } from './types'
 
@@ -31,6 +34,7 @@ const airtableServices = {
   timeslots,
   affectations,
   volunteers,
+  membres: volunteers, // ✅ Alias for French context
   sectors,
   events,
   tasks,

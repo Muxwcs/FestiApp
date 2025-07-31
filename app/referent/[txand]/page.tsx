@@ -1,12 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { ArrowLeft, Edit, Save, X, Trash2 } from "lucide-react"
-import Link from "next/link"
+import { useSession } from "next-auth/react"
 import { useParams, useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { ArrowLeft, Save, X } from "lucide-react"
+import Link from "next/link"
 import { toast } from "sonner"
 
 import { useSectorsStore } from "@/stores/sectorsStore"
+import { useVolunteers, useVolunteersStore } from "@/stores/volunteersStore"
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -15,10 +17,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { VolunteersList } from "@/components/volunteers/volunteers-list"
+import { ReferentVolunteersList } from "@/components/volunteers/referent-volunteers-list"
 
 import { SectorRecord, cleanSectorData } from "@/types/sector.interface"
-import { useVolunteers, useVolunteersStore } from "@/stores/volunteersStore"
 
 // ✅ FIXED: Proper type for edit data that matches the cleaned interface
 interface EditSectorData {
@@ -44,17 +45,17 @@ interface ManagerInfo {
   email?: string
 }
 
-const TxandPage = () => {
+const ReferentTxandPage = () => {
   const params = useParams()
   const router = useRouter()
+  const { data: session } = useSession()
   const txandId = params.txand as string
 
   const {
-    getSectorById,
-    // getCleanSectorById, // ✅ Use clean version for editing
-    updateSector,
-    fetchSectors,
-    deleteSector,
+    getReferentSectorById,
+    // updateReferentSector,
+    // fetchReferentSector,
+    // deleteSector,
   } = useSectorsStore()
 
   // ✅ Use your composite hook for volunteers
@@ -213,27 +214,58 @@ const TxandPage = () => {
       setManagerInfos([])
     }
   }, [sector, volunteers.length])
-  // ✅ FIXED: Better initialization using clean data
+
+  // ✅ FIXED: Initialize page with referent API
   useEffect(() => {
     const initializePage = async () => {
       try {
         setLoading(true)
 
-        // First try to get from store
-        let foundSector = getSectorById(txandId)
+        // ✅ First try to get from referent sectors cache
+        let foundSector = getReferentSectorById(txandId)
 
         if (!foundSector) {
-          // If not in store, fetch from API
-          await fetchSectors()
-          foundSector = getSectorById(txandId)
+          // ✅ If not found, fetch via referent API
+          try {
+            console.log("🔄 Fetching sector via referent API:", txandId)
+            const response = await fetch(`/api/referent/${txandId}`)
+
+            if (!response.ok) {
+              if (response.status === 404) {
+                throw new Error('Sector not found')
+              }
+              if (response.status === 403) {
+                throw new Error('You do not have access to this sector')
+              }
+              throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            foundSector = await response.json()
+            console.log("✅ Sector fetched via API:", foundSector)
+          } catch (error) {
+            console.error("Error fetching referent sector:", error)
+
+            if (error instanceof Error) {
+              if (error.message.includes('not found')) {
+                toast.error("Secteur non trouvé")
+              } else if (error.message.includes('access')) {
+                toast.error("Vous n'avez pas accès à ce secteur")
+              } else {
+                toast.error("Erreur lors du chargement")
+              }
+            }
+
+            router.push("/referent")
+            return
+          }
         }
 
         if (foundSector) {
           setSector(foundSector)
 
-          // ✅ FIXED: Use clean data for editing to avoid null issues
+          // ✅ Initialize edit data
           const cleanSector = cleanSectorData(foundSector)
-          console.log("Cleaned sector data:", cleanSector)
+          console.log("Cleaned referent sector data:", cleanSector)
           setEditData({
             id: cleanSector.id,
             fields: {
@@ -252,24 +284,25 @@ const TxandPage = () => {
           })
         } else {
           toast.error("Secteur non trouvé")
-          router.push("/admin/txands")
+          router.push("/referent")
           return
         }
       } catch (error) {
-        console.error("Error initializing page:", error)
+        console.error("Error initializing referent page:", error)
         toast.error("Erreur lors du chargement")
-        router.push("/admin/txands")
+        router.push("/referent")
       } finally {
         setLoading(false)
       }
     }
 
-    if (txandId) {
+    if (txandId && session) {
       initializePage()
     }
-  }, [txandId, fetchSectors, getSectorById, router])
+  }, [txandId, session, getReferentSectorById, router])
 
-  // ✅ FIXED: Better save handler
+
+  // ✅ FIXED: Handle save with referent API
   const handleSave = async () => {
     if (!editData.fields || !sector) {
       toast.error("Données invalides")
@@ -278,53 +311,61 @@ const TxandPage = () => {
 
     setSaving(true)
     try {
-      const response = await fetch(`/api/txands/${txandId}`, {
-        method: "PUT",
+      // ✅ Prepare updates for API
+      const updates: Partial<SectorRecord['fields']> = {
+        name: editData.fields.name,
+        color: editData.fields.color,
+        status: editData.fields.status,
+        description: editData.fields.description,
+        skills: editData.fields.skills,
+        // ✅ Handle referent field properly
+        referent: typeof editData.fields.referent === 'string'
+          ? editData.fields.referent.split(',').map(s => s.trim()).filter(Boolean)
+          : editData.fields.referent
+      }
+
+      console.log("🔄 Updating sector via referent API:", txandId, updates)
+
+      // ✅ Call referent API directly
+      const response = await fetch(`/api/referent/${txandId}`, {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editData.fields),
+        body: JSON.stringify(updates),
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || "Erreur lors de la sauvegarde")
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const updatedData = await response.json()
+      const updatedSector = await response.json()
+      console.log("✅ Sector updated via API:", updatedSector)
 
-      // Update store
-      updateSector(txandId, {
-        fields: updatedData.fields || updatedData
+      // ✅ Update local state
+      setSector(updatedSector)
+      const cleanSector = cleanSectorData(updatedSector)
+      setEditData({
+        id: cleanSector.id,
+        fields: {
+          name: cleanSector.fields.name,
+          color: cleanSector.fields.color,
+          referent: Array.isArray(cleanSector.fields.referent)
+            ? cleanSector.fields.referent.join(", ")
+            : cleanSector.fields.referent,
+          status: cleanSector.fields.status,
+          description: cleanSector.fields.description,
+          skills: Array.isArray(cleanSector.fields.skills)
+            ? cleanSector.fields.skills
+            : [],
+        },
+        createdTime: cleanSector.createdTime
       })
-
-      // Update local state
-      const updatedSector = getSectorById(txandId)
-      if (updatedSector) {
-        setSector(updatedSector)
-        const cleanSector = cleanSectorData(updatedSector)
-        setEditData({
-          id: cleanSector.id,
-          fields: {
-            name: cleanSector.fields.name,
-            color: cleanSector.fields.color,
-            referent: Array.isArray(cleanSector.fields.referent)
-              ? cleanSector.fields.referent.join(", ")
-              : cleanSector.fields.referent,
-            status: cleanSector.fields.status,
-            description: cleanSector.fields.description,
-            skills: Array.isArray(cleanSector.fields.skills)
-              ? cleanSector.fields.skills
-              : [],
-          },
-          createdTime: cleanSector.createdTime
-        })
-      }
 
       setEditing(false)
       toast.success("Secteur mis à jour avec succès")
     } catch (error) {
-      console.error("Error updating sector:", error)
+      console.error("Error updating referent sector:", error)
       toast.error(error instanceof Error ? error.message : "Erreur lors de la sauvegarde")
     } finally {
       setSaving(false)
@@ -367,22 +408,22 @@ const TxandPage = () => {
   }
 
   // ✅ FIXED: Better delete handler
-  const handleDelete = async () => {
-    if (!sector) return
+  // const handleDelete = async () => {
+  //   if (!sector) return
 
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer le secteur "${sector.fields.name || 'sans nom'}" ?`)) {
-      return
-    }
+  //   if (!confirm(`Êtes-vous sûr de vouloir supprimer le secteur "${sector.fields.name || 'sans nom'}" ?`)) {
+  //     return
+  //   }
 
-    try {
-      await deleteSector(txandId)
-      toast.success("Secteur supprimé avec succès")
-      router.push("/admin/txands")
-    } catch (error) {
-      console.error("Error deleting sector:", error)
-      toast.error("Erreur lors de la suppression")
-    }
-  }
+  //   try {
+  //     await deleteSector(txandId)
+  //     toast.success("Secteur supprimé avec succès")
+  //     router.push("/referent")
+  //   } catch (error) {
+  //     console.error("Error deleting sector:", error)
+  //     toast.error("Erreur lors de la suppression")
+  //   }
+  // }
 
   // Loading state
   if (loading) {
@@ -408,7 +449,7 @@ const TxandPage = () => {
         {/* Header */}
         <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
           <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
-            <Link href="/admin/txands">
+            <Link href="/referent">
               <Button variant="outline" size="sm" className="w-full sm:w-auto">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Retour
@@ -441,7 +482,7 @@ const TxandPage = () => {
               </>
             ) : (
               <>
-                <Button
+                {/* <Button
                   onClick={() => setEditing(true)}
                   className="w-full sm:w-auto"
                 >
@@ -455,7 +496,7 @@ const TxandPage = () => {
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Supprimer
-                </Button>
+                </Button> */}
               </>
             )}
           </div>
@@ -557,8 +598,8 @@ const TxandPage = () => {
                           </div>
                         ) : Array.isArray(managerInfos) && managerInfos.length > 0 ? (
                           <div className="space-y-3">
-                            {managerInfos.map((manager, idx) => (
-                              <div key={manager.id || idx} className="mb-6 last:mb-0">
+                            {managerInfos.map((manager, index) => (
+                              <div key={manager.id || index} className="mb-6 last:mb-0">
                                 {/* Header with Avatar and Name */}
                                 <div className="flex items-center gap-3">
                                   <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
@@ -760,7 +801,9 @@ const TxandPage = () => {
                     <div className="text-xs text-muted-foreground">Responsable</div>
                   </div>
                   <div className="text-center">
-                    <div className={`text-lg font-semibold ${sector.fields.status === 'actif' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                    <div className={`text-lg font-semibold ${sector.fields.status === 'actif'
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-red-600 dark:text-red-400'
                       }`}>
                       {sector.fields.status === 'actif' ? '✓' : '✗'}
                     </div>
@@ -803,13 +846,15 @@ const TxandPage = () => {
         </div>
 
         {/* Volunteers List */}
-        <VolunteersList
+        <ReferentVolunteersList
           sectorId={txandId}
           sectorName={sector.fields.name || "Non renseigné"}
+          isReferentView={true}          // ✅ ADD: Flag to indicate referent view
+          useReferentAPI={true}          // ✅ ADD: Explicit flag for API choice
         />
       </div>
     </div>
   )
 }
 
-export default TxandPage
+export default ReferentTxandPage

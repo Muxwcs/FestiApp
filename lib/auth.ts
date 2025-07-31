@@ -30,6 +30,7 @@ export const authOptions: NextAuthOptions = {
 
         return {
           id: firebaseUid,
+          airtableId: user.id,
           email: user.email,
           name: user.name,
           role: user.role,
@@ -42,6 +43,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
+        token.airtableId = user.airtableId // ✅ ADD: Store airtableId in token
         token.role = user.role
         token.isReferent = user.isReferent
       }
@@ -50,6 +52,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string
+        session.user.airtableId = token.airtableId as string // ✅ ADD: Add airtableId to session
         session.user.role = token.role
         session.user.isReferent = token.isReferent // ✅ Available in session
       }
