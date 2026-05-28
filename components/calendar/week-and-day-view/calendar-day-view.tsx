@@ -2,7 +2,7 @@ import { Calendar, Clock, User } from "lucide-react"
 import { parseISO, areIntervalsOverlapping, format } from "date-fns"
 
 import { cn } from "@/lib/utils"
-import { useCalendar } from "../context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { SingleCalendar } from "@/components/ui/single-calendar"
@@ -23,7 +23,7 @@ interface IProps {
 }
 
 export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
-  const { selectedDate, setSelectedDate, users, visibleHours, workingHours } = useCalendar()
+  const { selectedDate, setSelectedDate, users, visibleHours, workingHours } = useCalendarStore()
 
   const { hours, earliestEventHour, latestEventHour } = getVisibleHours(visibleHours, singleDayEvents)
 
@@ -139,7 +139,14 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
       </div>
 
       <div className="hidden w-64 divide-y border-l md:block">
-        <SingleCalendar className="mx-auto w-fit" mode="single" selected={selectedDate} onSelect={setSelectedDate} />
+        <SingleCalendar
+          className="mx-auto w-fit"
+          mode="single"
+          selected={selectedDate}
+          onSelect={(date) => {
+            if (date) setSelectedDate(date)
+          }}
+        />
 
         <div className="flex-1 space-y-3">
           {currentEvents.length > 0 ? (

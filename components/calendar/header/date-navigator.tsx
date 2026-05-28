@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import { formatDate } from "date-fns"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-import { useCalendar } from "../context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -18,7 +18,7 @@ interface IProps {
 }
 
 export function DateNavigator({ view, events }: IProps) {
-  const { selectedDate, setSelectedDate } = useCalendar()
+  const { selectedDate, setSelectedDate } = useCalendarStore()
 
   const month = formatDate(selectedDate, "MMMM")
   const year = selectedDate.getFullYear()

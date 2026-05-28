@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Home, Users, LayoutDashboard, CalendarSync, SquareKanban } from "lucide-react"
+import { Users, LayoutDashboard, CalendarSync, SquareKanban, Music2 } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -18,17 +18,18 @@ import { usePathname } from "next/navigation"
 
 interface SidebarProps {
   role: "admin" | "bénévole"
+  isReferent?: boolean // Optional prop for referent status
   className?: string
 }
 
-const AppSidebar = ({ role, className }: SidebarProps) => {
+const AppSidebar = ({ role, isReferent = false, className }: SidebarProps) => {
   const pathname = usePathname() // Get current path
   const commonLinks = [
-    { href: "/", label: "Accueil", icon: Home },
+    { href: "/", label: "Lineup", icon: Music2 },
   ]
 
   const adminLinks = [
-    { href: "/admin/dashboard", label: "Dashboard Admin", icon: LayoutDashboard },
+    { href: "/admin/", label: "Dashboard Admin", icon: LayoutDashboard },
     { href: "/admin/benevoles", label: "Gestion Bénévoles", icon: Users },
     { href: "/admin/txands", label: "Gestion Txands", icon: CalendarSync },
   ]
@@ -37,11 +38,49 @@ const AppSidebar = ({ role, className }: SidebarProps) => {
     { href: "/dashboard", label: "Mon Dashboard", icon: SquareKanban },
   ]
 
-  // Admins get all routes: common + benevole + admin
-  // Bénévoles get: common + benevole only
-  const navLinks = role === "admin"
-    ? [...commonLinks, ...benevoleLinks, ...adminLinks]
-    : [...commonLinks, ...benevoleLinks]
+  const referentLinks = [
+    { href: "/referent", label: "Mon Espace Référent", icon: SquareKanban },
+  ]
+
+  // ✅ CORRECTED: Admin gets everything, bénévole gets subset
+  const buildNavLinks = () => {
+    let links = [...commonLinks]
+
+    if (role === "admin") {
+      // ✅ Admins ALWAYS get admin links
+      links.push(...adminLinks)
+
+      // ✅ Admins ALWAYS get bénévole access (they can be volunteers too)
+      links.push(...benevoleLinks)
+
+      // ✅ If admin is also referent, add referent links
+      if (isReferent) {
+        links.push(...referentLinks)
+      }
+    } else {
+      // ✅ Regular bénévoles get their dashboard
+      links.push(...benevoleLinks)
+
+      // ✅ If bénévole is referent, add referent links
+      if (isReferent) {
+        links.push(...referentLinks)
+      }
+    }
+
+    return links
+  }
+
+  const finalNavLinks = buildNavLinks()
+
+  // ✅ Add debug info in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`🔍 Sidebar Navigation:`, {
+      role,
+      isReferent,
+      linksCount: finalNavLinks.length,
+      links: finalNavLinks.map(l => l.label)
+    })
+  }
 
   // Function to check if link is active
   const isActive = (href: string) => {
@@ -63,23 +102,7 @@ const AppSidebar = ({ role, className }: SidebarProps) => {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* {navLinks.map(({ href, label, icon: Icon }) => (
-                <SidebarMenuItem key={href}>
-                  <SidebarMenuButton asChild>
-                    <a
-                      href={href}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition"
-                      )}
-                    >
-                      <Icon className="h-5 w-5" />
-                      {label}
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))} */}
-
-              {navLinks.map(({ href, label, icon: Icon }) => {
+              {finalNavLinks.map(({ href, label, icon: Icon }) => {
                 const active = isActive(href)
 
                 return (

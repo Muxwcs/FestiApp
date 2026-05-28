@@ -1,8 +1,16 @@
-import { useState, useEffect, useCallback } from "react"
+"use client"
+
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "sonner"
 import { VolunteerRecord } from "@/types/user.interface"
-import { VolunteersListProps, VolunteerWithAffectations, TimeslotGroup, ViewMode, TimeslotDetails } from "./type"
+import {
+  VolunteersListProps,
+  VolunteerWithAffectations,
+  ViewMode,
+  TimeslotDetails,
+  TimeslotStats
+} from "./type"
 import { VolunteersCardView } from "./volunteers-card-view"
 import { VolunteersTableView } from "./volunteers-table-view"
 import VolunteersLoading from "./volunteers-loading"
@@ -10,215 +18,179 @@ import VolunteersError from "./volunteers-error"
 import VolunteersHeader from "./volunteers-header"
 
 export const VolunteersList = ({ sectorId, sectorName }: VolunteersListProps) => {
+  // ✅ Core state
   const [volunteers, setVolunteers] = useState<VolunteerWithAffectations[]>([])
-  const [timeslots, setTimeslots] = useState<Record<string, string>>({})
-  const [allTimeslots, setAllTimeslots] = useState<Record<string, string>>({})
+  const [timeslotDetails, setTimeslotDetails] = useState<Record<string, TimeslotDetails>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedTimeslot, setSelectedTimeslot] = useState<string>("all")
-  const [timeslotGroups, setTimeslotGroups] = useState<TimeslotGroup[]>([])
-  const [viewMode, setViewMode] = useState<ViewMode>("cards")
-  const [allTimeslotDetails, setAllTimeslotDetails] = useState<Record<string, TimeslotDetails>>({})
+  const [lastFetch, setLastFetch] = useState<number>(0)
 
-  const fetchVolunteers = useCallback(async () => {
+  // ✅ UI state
+  const [selectedTimeslot, setSelectedTimeslot] = useState<string>("all")
+  const [viewMode, setViewMode] = useState<ViewMode>("cards")
+
+  // ✅ Fetch function with better error handling
+  const fetchVolunteers = useCallback(async (forceRefresh = false) => {
+    // Skip if recently fetched (unless force refresh)
+    const now = Date.now()
+    if (!forceRefresh && lastFetch && (now - lastFetch) < 30000) { // 30 seconds
+      console.log('⏭️ Skipping fetch - too recent')
+      return
+    }
+
     setLoading(true)
     setError(null)
 
-    // Move processTimeslots inside fetchVolunteers to avoid dependency issues
-    const processTimeslots = (
-      volunteerData: VolunteerWithAffectations[],
-      timeslotMap: Record<string, string>,
-      allSectorTimeslots: Record<string, TimeslotDetails | string>,
-      timeslotDetails: Record<string, TimeslotDetails>
-    ) => {
-      if (!Array.isArray(volunteerData)) {
-        console.warn('volunteerData is not an array:', volunteerData)
-        setTimeslotGroups([])
-        return
-      }
-
-      const timeslotGroupMap = new Map<string, VolunteerWithAffectations[]>()
-
-      // Initialize ALL sector timeslots (even empty ones) for table view
-      Object.entries(allSectorTimeslots).forEach(([, details]) => {
-        const timeslotName = typeof details === 'string' ? details : details.name
-        if (timeslotName && !timeslotGroupMap.has(timeslotName)) {
-          timeslotGroupMap.set(timeslotName, [])
-        }
-      })
-
-      // Add volunteers to their timeslots
-      volunteerData.forEach(volunteer => {
-        if (volunteer.affectations && Array.isArray(volunteer.affectations)) {
-          volunteer.affectations.forEach(affectation => {
-            const timeslotNames = affectation.timeslotNames || []
-
-            if (timeslotNames.length > 0) {
-              timeslotNames.forEach(timeslotName => {
-                if (timeslotName && typeof timeslotName === 'string') {
-                  if (!timeslotGroupMap.has(timeslotName)) {
-                    timeslotGroupMap.set(timeslotName, [])
-                  }
-
-                  const existingVolunteers = timeslotGroupMap.get(timeslotName)!
-                  if (!existingVolunteers.find(v => v.id === volunteer.id)) {
-                    existingVolunteers.push(volunteer)
-                  }
-                }
-              })
-            }
-          })
-        }
-      })
-
-      // Convert to array and sort with enhanced details
-      const groups = Array.from(timeslotGroupMap.entries())
-        .map(([timeslot, volunteers]) => {
-          const timeslotId = Object.keys(allSectorTimeslots).find(id => {
-            const details = allSectorTimeslots[id]
-            return (typeof details === 'string' ? details : details.name) === timeslot
-          }) || ''
-
-          const details = timeslotId ? allSectorTimeslots[timeslotId] : null
-
-          return {
-            timeslot,
-            timeslotId,
-            volunteers,
-            count: volunteers.length,
-            dateStart: typeof details === 'object' && details ? details.dateStart : undefined,
-            dateEnd: typeof details === 'object' && details ? details.dateEnd : undefined,
-            totalVolunteers: typeof details === 'object' && details ? details.totalVolunteers : undefined,
-          }
-        })
-        .sort((a, b) => {
-          // Sort by date first, then by name
-          if (a.dateStart && b.dateStart) {
-            return new Date(a.dateStart).getTime() - new Date(b.dateStart).getTime()
-          }
-          return a.timeslot.localeCompare(b.timeslot)
-        })
-
-      console.log('Processed timeslot groups:', groups)
-      console.log('Available timeslots:', timeslotMap)
-      console.log('All timeslots:', allSectorTimeslots)
-      console.log('Timeslot details:', timeslotDetails)
-      setTimeslotGroups(groups)
-    }
-
     try {
-      const response = await fetch(`/api/txands/${sectorId}/volunteers`)
+      console.log(`📡 Fetching volunteers for sector: ${sectorId}`)
+
+      const response = await fetch(`/api/txands/${sectorId}/volunteers`, {
+        headers: {
+          'Cache-Control': forceRefresh ? 'no-cache' : 'default'
+        }
+      })
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
 
       const data = await response.json()
-      console.log('API Response:', data)
+      console.log('✅ API Response received:', {
+        volunteers: data.volunteers?.length || 0,
+        timeslots: Object.keys(data.allSectorTimeslots || {}).length,
+        totalTimeslots: data.totalTimeslots
+      })
 
-      // Handle both old and new API response format
-      if (Array.isArray(data)) {
-        setVolunteers(data)
-        setTimeslots({})
-        setAllTimeslots({})
-        setAllTimeslotDetails({})
-        processTimeslots(data, {}, {}, {})
-      } else if (data && data.volunteers) {
-        setVolunteers(data.volunteers || [])
-        setTimeslots(data.timeslots || {})
+      // ✅ Update state with clean data
+      setVolunteers(data.volunteers || [])
+      setTimeslotDetails(data.allSectorTimeslots || {})
+      setLastFetch(now)
 
-        const allSectorTimeslots = data.allSectorTimeslots || {}
-        const processedAllTimeslots = Object.fromEntries(
-          Object.entries(allSectorTimeslots as Record<string, TimeslotDetails | string>)
-            .map(([id, details]) => [
-              id,
-              typeof details === "string"
-                ? details
-                : (details && typeof details === "object" && "name" in details && details.name)
-                  ? String(details.name)
-                  : ""
-            ])
-        )
-
-        setAllTimeslots(processedAllTimeslots)
-        setAllTimeslotDetails(allSectorTimeslots)
-
-        processTimeslots(
-          data.volunteers || [],
-          data.timeslots || {},
-          allSectorTimeslots,
-          allSectorTimeslots
-        )
-      } else {
-        setVolunteers([])
-        setTimeslots({})
-        setAllTimeslots({})
-        setAllTimeslotDetails({})
-        setTimeslotGroups([])
-      }
     } catch (err) {
-      console.error("Error fetching volunteers:", err)
-      setError("Erreur lors du chargement des bénévoles")
-      toast.error("Erreur lors du chargement des bénévoles")
-      setVolunteers([])
-      setTimeslots({})
-      setAllTimeslots({})
-      setAllTimeslotDetails({})
-      setTimeslotGroups([])
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
+      console.error('❌ Fetch error:', err)
+      setError(errorMessage)
+      toast.error('Erreur lors du chargement des bénévoles')
     } finally {
       setLoading(false)
     }
-  }, [sectorId]) // Only sectorId dependency now!
+  }, [sectorId, lastFetch])
 
-  const getDisplayName = (volunteer: VolunteerRecord) => {
-    if (volunteer.fields.surname) {
-      return `${volunteer.fields.surname} (${volunteer.fields.firstname || ""} ${volunteer.fields.name || ""})`.trim()
-    } else if (volunteer.fields.firstname || volunteer.fields.name) {
-      return `${volunteer.fields.firstname || ""} ${volunteer.fields.name || ""}`.trim()
-    }
-    return "Sans nom"
-  }
-
-  const getFilteredVolunteers = () => {
-    if (!Array.isArray(volunteers)) {
-      console.warn('volunteers is not an array:', volunteers)
+  // ✅ Process timeslot groups with memoization
+  const timeslotGroups = useMemo(() => {
+    if (!volunteers.length || !Object.keys(timeslotDetails).length) {
       return []
     }
 
+    const groupMap = new Map<string, VolunteerWithAffectations[]>()
+
+    // Initialize all timeslots (even empty ones)
+    Object.values(timeslotDetails).forEach(details => {
+      if (details.name) {
+        groupMap.set(details.name, [])
+      }
+    })
+
+    // Add volunteers to their timeslots
+    volunteers.forEach(volunteer => {
+      if (volunteer.affectations?.length) {
+        volunteer.affectations.forEach(affectation => {
+          affectation.timeslotNames?.forEach(timeslotName => {
+            if (timeslotName) {
+              const existing = groupMap.get(timeslotName) || []
+              if (!existing.find(v => v.id === volunteer.id)) {
+                existing.push(volunteer)
+                groupMap.set(timeslotName, existing)
+              }
+            }
+          })
+        })
+      }
+    })
+
+    // Convert to TimeslotGroup array with enhanced details
+    return Array.from(groupMap.entries())
+      .map(([timeslotName, volunteers]) => {
+        const details = Object.values(timeslotDetails).find(d => d.name === timeslotName)
+
+        return {
+          timeslot: timeslotName,
+          timeslotId: details?.id || '',
+          volunteers,
+          count: volunteers.length,
+          dateStart: details?.dateStart,
+          dateEnd: details?.dateEnd,
+          totalVolunteers: details?.totalVolunteers
+        }
+      })
+      .sort((a, b) => {
+        // Sort by date first, then by name
+        if (a.dateStart && b.dateStart) {
+          return new Date(a.dateStart).getTime() - new Date(b.dateStart).getTime()
+        }
+        return a.timeslot.localeCompare(b.timeslot)
+      })
+  }, [volunteers, timeslotDetails])
+
+  // ✅ Filtered volunteers for card view
+  const filteredVolunteers = useMemo(() => {
     if (selectedTimeslot === "all") {
       return volunteers
     }
 
     const selectedGroup = timeslotGroups.find(group => group.timeslot === selectedTimeslot)
-    return selectedGroup ? selectedGroup.volunteers : []
-  }
+    return selectedGroup?.volunteers || []
+  }, [volunteers, timeslotGroups, selectedTimeslot])
 
-  // Get timeslot statistics for debugging/info display
-  const getTimeslotStats = () => {
+  // ✅ Statistics
+  const timeslotStats = useMemo((): TimeslotStats => {
     return {
-      totalTimeslots: Object.keys(allTimeslots).length,
-      timelsotsWithVolunteers: Object.keys(timeslots).length,
-      detailedTimeslots: Object.keys(allTimeslotDetails).length,
+      totalTimeslots: Object.keys(timeslotDetails).length,
+      timelsotsWithVolunteers: timeslotGroups.filter(g => g.count > 0).length,
+      detailedTimeslots: timeslotGroups.length,
       volunteerCount: volunteers.length
     }
-  }
+  }, [timeslotDetails, timeslotGroups, volunteers])
 
+  // ✅ Utility function
+  const getDisplayName = useCallback((volunteer: VolunteerRecord): string => {
+    if (volunteer.fields.surname) {
+      return `${volunteer.fields.surname} (${volunteer.fields.firstname || ""} ${volunteer.fields.name || ""})`.trim()
+    }
+    if (volunteer.fields.firstname || volunteer.fields.name) {
+      return `${volunteer.fields.firstname || ""} ${volunteer.fields.name || ""}`.trim()
+    }
+    return "Sans nom"
+  }, [])
+
+  // ✅ Initial fetch
   useEffect(() => {
     fetchVolunteers()
   }, [fetchVolunteers])
 
-  // Loading state
-  if (loading) {
+  // ✅ Handle refresh
+  const handleRefresh = useCallback(() => {
+    fetchVolunteers(true)
+  }, [fetchVolunteers])
+
+  // ✅ Reset timeslot filter when switching views
+  useEffect(() => {
+    if (viewMode === "tables") {
+      setSelectedTimeslot("all")
+    }
+  }, [viewMode])
+
+  // ✅ Loading state
+  if (loading && !volunteers.length) {
     return <VolunteersLoading sectorName={sectorName} />
   }
 
-  // Error state
-  if (error) {
-    return <VolunteersError error={error} onRetry={fetchVolunteers} />
+  // ✅ Error state
+  if (error && !volunteers.length) {
+    return <VolunteersError error={error} onRetry={handleRefresh} />
   }
 
-  const filteredVolunteers = getFilteredVolunteers()
-  const stats = getTimeslotStats()
-
+  // ✅ Main render
   return (
     <Card className="w-full">
       <VolunteersHeader
@@ -230,28 +202,46 @@ export const VolunteersList = ({ sectorId, sectorName }: VolunteersListProps) =>
         timeslotGroups={timeslotGroups}
         volunteers={volunteers}
         filteredVolunteersCount={filteredVolunteers.length}
-        onRefresh={fetchVolunteers}
-        timeslotStats={stats}
+        onRefresh={handleRefresh}
+        timeslotStats={timeslotStats}
       />
 
       <CardContent>
+        {/* Loading overlay for refreshes */}
+        {loading && volunteers.length > 0 && (
+          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10 rounded-lg">
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-lg">
+              <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full" />
+              <span className="text-sm">Actualisation...</span>
+            </div>
+          </div>
+        )}
+
+        {/* Error banner for refresh errors */}
+        {error && volunteers.length > 0 && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-600 text-sm">⚠️ {error}</p>
+          </div>
+        )}
+
+        {/* Content */}
         {viewMode === "tables" ? (
           <VolunteersTableView
             volunteers={volunteers}
             timeslotGroups={timeslotGroups}
             selectedTimeslot={selectedTimeslot}
             getDisplayName={getDisplayName}
-            allTimeslots={allTimeslots}
-            timeslotDetails={allTimeslotDetails}
+            timeslotDetails={timeslotDetails}
+            allTimeslotDetails={timeslotDetails}
           />
         ) : (
           <VolunteersCardView
-            volunteers={volunteers}
+            volunteers={filteredVolunteers}
             timeslotGroups={timeslotGroups}
             selectedTimeslot={selectedTimeslot}
             getDisplayName={getDisplayName}
-            timeslots={timeslots}
-            allTimeslotDetails={allTimeslotDetails}
+            timeslots={{}}
+            allTimeslotDetails={timeslotDetails}
           />
         )}
       </CardContent>

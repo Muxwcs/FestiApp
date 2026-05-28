@@ -1,7 +1,6 @@
 import { startOfWeek, addDays, format, parseISO, isSameDay, areIntervalsOverlapping } from "date-fns"
 
-import { useCalendar } from "../context/calendar-context"
-// import { useCalendar } from "@/calendar/contexts/calendar-context";
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 
@@ -22,7 +21,7 @@ interface IProps {
 }
 
 export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
-  const { selectedDate, workingHours, visibleHours } = useCalendar()
+  const { selectedDate, workingHours, visibleHours } = useCalendarStore()
 
   const { hours, earliestEventHour, latestEventHour } = getVisibleHours(visibleHours, singleDayEvents)
 

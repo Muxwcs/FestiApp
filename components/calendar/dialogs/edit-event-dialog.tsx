@@ -5,15 +5,14 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { useDisclosure } from "@/hooks/use-disclosure"
-// import { useUpdateEvent } from "@/hooks/use-update-event"
-import { useCalendar } from "../context/calendar-context"
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { TimeInput } from "@/components/ui/time-input"
 import { SingleDayPicker } from "@/components/ui/single-day-picker"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Form, FormField, FormLabel, FormItem, FormControl, FormMessage } from "@/components/ui/form"
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogHeader, DialogClose, DialogContent, DialogTrigger, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -30,7 +29,7 @@ interface IProps {
 export function EditEventDialog({ children, event }: IProps) {
   const { isOpen, onClose, onToggle } = useDisclosure()
 
-  const { users } = useCalendar()
+  const { users } = useCalendarStore()
 
   // const { updateEvent } = useUpdateEvent()
 
@@ -103,7 +102,7 @@ export function EditEventDialog({ children, event }: IProps) {
                           <SelectItem key={user.id} value={user.id} className="flex-1">
                             <div className="flex items-center gap-2">
                               <Avatar key={user.id} className="size-6">
-                                <AvatarImage src={user.picturePath ?? undefined} alt={user.name} />
+                                {/* <AvatarImage src={user.picturePath ?? undefined} alt={user.name} /> */}
                                 <AvatarFallback className="text-xxs">{user.name[0]}</AvatarFallback>
                               </Avatar>
 

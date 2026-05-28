@@ -118,6 +118,40 @@ export const airtableGet = {
     return null
   },
 
+  byIds: async (tableName: string, recordIds: string[]): Promise<AirtableRecord[]> => {
+    try {
+      if (!recordIds || recordIds.length === 0) {
+        logger.info(`No record IDs provided for ${tableName}`)
+        return []
+      }
+
+      logger.info(`Fetching ${recordIds.length} records by IDs from ${tableName}`, { recordIds })
+
+      // Airtable supports batch retrieval with multiple IDs
+      const records = await Promise.all(
+        recordIds.map(id => base(tableName).find(id).catch(error => {
+          logger.warn(`Record ${id} not found in ${tableName}`, error)
+          return null
+        }))
+      )
+
+      // Filter out null records (not found) and format
+      const formattedRecords = records
+        .filter((record): record is NonNullable<typeof record> => record !== null)
+        .map(record => ({
+          id: record.id,
+          fields: record.fields,
+          createdAt: record.get('createdAt') as string,
+        }))
+
+      logger.info(`Retrieved ${formattedRecords.length} records from ${tableName}`)
+      return formattedRecords
+    } catch (error) {
+      handleAirtableError(error, 'GET BY IDS', tableName)
+    }
+    return []
+  },
+
   where: async (tableName: string, filterByFormula: string, options: Omit<QueryOptions, 'filterByFormula'> = {}): Promise<AirtableRecord[]> => {
     return airtableGet.all(tableName, { ...options, filterByFormula })
   },

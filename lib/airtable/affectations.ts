@@ -25,10 +25,19 @@ export const affectations = {
     return airtableGet.byId(TABLE_NAME, id)
   },
 
-  // Get affectations by volunteer ID - using .where instead of .filtered
+  // Simple method using IDs from volunteer data
+  getByIds: async (affectationIds: string[]) => {
+    return airtableGet.byIds(TABLE_NAME, affectationIds)
+  },
+
+  // // Get affectations by volunteer ID - using .where instead of .filtered
   getByVolunteer: async (volunteerId: string): Promise<AirtableRecord[]> => {
+    // ✅ ALREADY CORRECT: This one should work
     const filterFormula = `FIND('${volunteerId}', ARRAYJOIN({volunteer}, ',')) > 0`
-    return airtableGet.where(TABLE_NAME, filterFormula)
+    console.log('🔍 Affectations filter formula:', filterFormula)
+    const result = await airtableGet.where(TABLE_NAME, filterFormula)
+    console.log('📊 Affectations result:', result?.length || 0, 'records')
+    return result
   },
 
   // Get affectations by sector ID - using .where instead of .filtered  
@@ -55,5 +64,23 @@ export const affectations = {
   // Delete affectations
   delete: async (recordIds: string[]): Promise<{ deletedRecords: string[] }> => {
     return airtableDelete(TABLE_NAME, recordIds)
+  },
+
+  // Debug method to see actual data structure  
+  debugAffectationsStructure: async () => {
+    console.log('🔍 Debugging affectations table structure...')
+    const allAffectations = await airtableGet.all(TABLE_NAME, { maxRecords: 5 })
+    console.log('📊 Sample affectations:', JSON.stringify(allAffectations, null, 2))
+
+    if (allAffectations && allAffectations.length > 0) {
+      console.log('🔑 Available fields in first affectation:', Object.keys(allAffectations[0].fields))
+
+      // Check volunteer field specifically
+      const firstAffectation = allAffectations[0]
+      console.log('👤 volunteer field value:', firstAffectation.fields.volunteer)
+      console.log('👤 volunteer type:', typeof firstAffectation.fields.volunteer)
+    }
+
+    return allAffectations
   }
 }

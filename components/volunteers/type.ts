@@ -3,6 +3,8 @@ import { VolunteerRecord } from "@/types/user.interface"
 export interface VolunteersListProps {
   sectorId: string
   sectorName?: string
+  isReferentView?: boolean
+  useReferentAPI?: boolean
 }
 
 export interface AffectationFields {
@@ -49,6 +51,23 @@ export interface TimeslotGroup {
   totalVolunteers?: number
 }
 
+export interface ReferentTimeslotGroup {
+  timeslot: {
+    id: string
+    name: string
+    dateStart?: string
+    dateEnd?: string
+    totalVolunteers?: number
+    [key: string]: any
+  }
+  timeslotId: string
+  volunteers: VolunteerWithAffectations[]
+  count: number
+  dateStart?: string
+  dateEnd?: string
+  totalVolunteers?: number
+}
+
 export interface TimeslotStats {
   totalTimeslots: number
   timelsotsWithVolunteers: number
@@ -61,6 +80,17 @@ export type ViewMode = "cards" | "tables"
 export interface VolunteerViewProps {
   volunteers: VolunteerWithAffectations[]
   timeslotGroups: TimeslotGroup[]
+  selectedTimeslot: string
+  getDisplayName: (volunteer: VolunteerRecord) => string
+  timeslots?: Record<string, string>
+  allTimeslots?: Record<string, string>
+  timeslotDetails?: Record<string, TimeslotDetails>
+  allTimeslotDetails?: Record<string, TimeslotDetails>
+}
+
+export interface ReferentVolunteerViewProps {
+  volunteers: VolunteerWithAffectations[]
+  timeslotGroups: ReferentTimeslotGroup[]
   selectedTimeslot: string
   getDisplayName: (volunteer: VolunteerRecord) => string
   timeslots?: Record<string, string>

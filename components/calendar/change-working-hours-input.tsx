@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { Info, Moon } from "lucide-react"
-import { useCalendar } from "./context/calendar-context"
+
+import { useCalendarStore } from "@/stores/calendarStore"
 
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -24,7 +25,7 @@ const DAYS_OF_WEEK = [
 ]
 
 export function ChangeWorkingHoursInput() {
-  const { workingHours, setWorkingHours } = useCalendar()
+  const { workingHours, setWorkingHours } = useCalendarStore()
 
   const [localWorkingHours, setLocalWorkingHours] = useState({ ...workingHours })
 

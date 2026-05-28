@@ -53,7 +53,7 @@ const fridayArray = [
     emojis: Emojis.MAIN_STAGE,
     day: TimelineDay.FRIDAY,
     title: Emojis.CONCERT + " Xutik",
-    comment: "Le concert de l'artiste Xutik y el Zorro Loco commence à 22h30.",
+    comment: "Le concert de l'artiste Xutik commence à 22h30.",
     hour: "22h30",
     imageSrc: "/bands/xutik.webp"
   },

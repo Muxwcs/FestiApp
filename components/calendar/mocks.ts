@@ -127,6 +127,7 @@ const mockGenerator = (numberOfEvents: number): IEvent[] => {
       title: "My wedding :)",
       color: "red",
       description: "Can't wait to see the most beautiful woman in that dress!",
+      place: "Festilasai",
       user: USERS_MOCK[0],
     },
   ]
@@ -150,6 +151,7 @@ const mockGenerator = (numberOfEvents: number): IEvent[] => {
     title: EVENTS[Math.floor(Math.random() * EVENTS.length)],
     color: COLORS[Math.floor(Math.random() * COLORS.length)],
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    place: "Random Place",
     user: randomUser,
   }
 
@@ -214,6 +216,7 @@ const mockGenerator = (numberOfEvents: number): IEvent[] => {
       title: EVENTS[Math.floor(Math.random() * EVENTS.length)],
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
       description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      place: "Random Place",
       user: USERS_MOCK[Math.floor(Math.random() * USERS_MOCK.length)],
     })
 

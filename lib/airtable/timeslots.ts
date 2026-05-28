@@ -14,22 +14,10 @@ export const timeslots = {
     return airtableGet.byId(TABLE_NAME, id)
   },
 
-  // Get multiple timeslots by IDs
-  getByIds: async (ids: string[]): Promise<AirtableRecord[]> => {
-    if (ids.length === 0) return []
-
-    const timeslotsData = []
-    for (const id of ids) {
-      try {
-        const timeslot = await timeslots.getById(id)
-        if (timeslot) {
-          timeslotsData.push(timeslot)
-        }
-      } catch (error) {
-        console.warn(`Failed to fetch timeslot ${id}:`, error)
-      }
-    }
-    return timeslotsData
+  // ✅ ADD EFFICIENT BATCH RETRIEVAL
+  getByIds: async (timeslotIds: string[]): Promise<AirtableRecord[]> => {
+    if (!timeslotIds.length) return []
+    return airtableGet.byIds(TABLE_NAME, timeslotIds)
   },
 
   // Get first timeslot matching criteria

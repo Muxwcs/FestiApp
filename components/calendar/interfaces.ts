@@ -3,7 +3,7 @@ import { TEventColor } from "./types"
 export interface IUser {
   id: string
   name: string
-  picturePath: string | null
+  picturePath?: string | null
 }
 
 export interface IEvent {
@@ -13,6 +13,7 @@ export interface IEvent {
   title: string
   color: TEventColor
   description: string
+  place: string
   user: IUser
 }
 

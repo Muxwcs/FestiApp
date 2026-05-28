@@ -8,6 +8,7 @@ import { EditEventDialog } from "./edit-event-dialog"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 import { IEvent } from "../interfaces"
+import { Badge } from "@/components/ui/badge"
 
 interface IProps {
   event: IEvent
@@ -57,6 +58,9 @@ export function EventDetailsDialog({ event, children }: IProps) {
               <Text className="mt-1 size-4 shrink-0" />
               <div>
                 <p className="text-sm font-medium">Description</p>
+                <Badge className="text-sm text-muted-foreground">
+                  {event.place || "No description provided"}
+                </Badge>
                 <p className="text-sm text-muted-foreground">{event.description}</p>
               </div>
             </div>

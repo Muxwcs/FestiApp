@@ -10,18 +10,14 @@ import { formatDate, getTimeRange } from "@/lib/utils"
 export const VolunteersTableView = ({
   timeslotGroups,
   getDisplayName,
-  allTimeslots,
-  timeslotDetails
+  // allTimeslots,
+  // timeslotDetails
 }: VolunteerViewProps) => {
-
-  // Use allTimeslots and timeslotDetails for enhanced display
-  console.log('All timeslots:', allTimeslots)
-  console.log('Detailed timeslots:', timeslotDetails)
 
   return (
     <div className="space-y-6">
-      {timeslotGroups.map((group) => (
-        <Card key={group.timeslot} className="w-full">
+      {timeslotGroups.map((group, key) => (
+        <Card key={key} className="w-full">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex flex-col space-y-1">
@@ -72,7 +68,7 @@ export const VolunteersTableView = ({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {group.volunteers.map((volunteer) => {
+                  {group.volunteers.map((volunteer, index) => {
                     // Get status from affectations for this specific timeslot
                     const relevantAffectations = volunteer.affectations?.filter(aff =>
                       aff.timeslotNames?.includes(group.timeslot)
@@ -80,7 +76,7 @@ export const VolunteersTableView = ({
                     const status = relevantAffectations[0]?.fields?.status || "Non défini"
 
                     return (
-                      <TableRow key={volunteer.id} className="hover:bg-muted/50">
+                      <TableRow key={index} className="hover:bg-muted/50">
                         <TableCell className="font-medium">
                           {getDisplayName(volunteer)}
                         </TableCell>

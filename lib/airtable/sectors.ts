@@ -33,6 +33,12 @@ export const sectors = {
     return airtableGet.byId(TABLE_NAME, id)
   },
 
+  // ✅ ADD EFFICIENT BATCH RETRIEVAL
+  getByIds: async (sectorIds: string[]): Promise<AirtableRecord[]> => {
+    if (!sectorIds.length) return []
+    return airtableGet.byIds(TABLE_NAME, sectorIds)
+  },
+
   // Get sectors by email
   getByEmail: async (email: string): Promise<AirtableRecord | null> => {
     const filterFormula = `{email} = '${email}'`

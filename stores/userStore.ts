@@ -20,7 +20,7 @@ export const useUserStore = create<UserState>()(
       }),
       {
         name: "user-store", // key in localStorage
-        partialize: (state) => ({ role: state.role, user: state.user }), // only persist these fields
+        partialize: (state) => ({ user: state.user }), // Don't persist role in localStorage (tamperable)
       }
     ),
     {
