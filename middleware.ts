@@ -11,20 +11,9 @@ export async function middleware(request: NextRequest) {
   response.headers.set('X-XSS-Protection', '1; mode=block')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
 
-  // Rate limiting for API routes
-  if (request.nextUrl.pathname.startsWith('/api/')) {
-    // const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
-    const ip = request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip') ||
-      request.headers.get('x-client-ip') ||
-      'unknown'
-
-    // Simple rate limiting (you might want to use a more sophisticated solution)
-    const rateLimit = await checkRateLimit(ip)
-    if (!rateLimit.success) {
-      return new NextResponse('Too Many Requests', { status: 429 })
-    }
-  }
+  // Rate limiting: disabled — in-memory Map does not persist across
+  // Vercel serverless invocations. Will be replaced with Upstash Redis.
+  // See Phase 3 of the migration plan.
 
   // Protected routes
   const protectedPaths = ['/dashboard', '/admin', '/referent']
@@ -35,74 +24,28 @@ export async function middleware(request: NextRequest) {
   if (isProtectedPath) {
     const token = await getToken({ req: request })
 
-    // ✅ TEMPORARY: Debug token contents
-    console.log("🔍 Full token debug:", {
-      hasToken: !!token,
-      role: token?.role,
-      isReferent: token?.isReferent,
-      email: token?.email,
-      id: token?.id,
-      airtableId: token?.airtableId,
-      allTokenKeys: token ? Object.keys(token) : 'no token'
-    })
-
     if (!token) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    // ✅ Debug logging
-    console.log("🔍 Middleware check:", {
-      path: request.nextUrl.pathname,
-      role: token.role,
-      isReferent: token.isReferent,
-      email: token.email
-    })
-
     // Admin-only routes
     if (request.nextUrl.pathname.startsWith('/admin') && token.role !== 'admin') {
-      console.log("🚫 Redirecting non-admin from /admin")
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
-    // ✅ FIXED: Referent routes - allow both referents AND admins
+    // Referent routes - allow both referents AND admins
     if (request.nextUrl.pathname.startsWith('/referent')) {
       const isAdmin = token.role === 'admin'
       const isReferent = token.isReferent
 
-      // ✅ Block only if user is NEITHER admin NOR referent
+      // Block only if user is NEITHER admin NOR referent
       if (!isAdmin && !isReferent) {
-        console.log("🚫 Redirecting non-referent/non-admin from /referent")
         return NextResponse.redirect(new URL('/dashboard', request.url))
       }
-
-      console.log("✅ Allowing access to /referent:", { isAdmin, isReferent })
     }
   }
 
   return response
-}
-
-// Simple in-memory rate limiting (use Redis in production)
-const rateLimit = new Map<string, { count: number; resetTime: number }>()
-
-async function checkRateLimit(ip: string): Promise<{ success: boolean }> {
-  const now = Date.now()
-  const windowMs = 15 * 60 * 1000 // 15 minutes
-  const maxRequests = 100
-
-  const current = rateLimit.get(ip)
-
-  if (!current || now > current.resetTime) {
-    rateLimit.set(ip, { count: 1, resetTime: now + windowMs })
-    return { success: true }
-  }
-
-  if (current.count >= maxRequests) {
-    return { success: false }
-  }
-
-  current.count++
-  return { success: true }
 }
 
 export const config = {

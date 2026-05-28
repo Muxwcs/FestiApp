@@ -6,7 +6,7 @@ import { sectors } from "@/lib/airtable"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ sector: string }> }
+  { params }: { params: Promise<{ txand: string }> }
 ) {
   const headers = createSecureHeaders()
 
@@ -17,7 +17,7 @@ export async function GET(
     }
 
     const resolvedParams = await params
-    const sectorId = resolvedParams.sector
+    const sectorId = resolvedParams.txand
 
     if (!sectorId) {
       return NextResponse.json(
@@ -53,7 +53,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ sector: string }> }
+  { params }: { params: Promise<{ txand: string }> }
 ) {
   const headers = createSecureHeaders()
 
@@ -65,7 +65,7 @@ export async function PUT(
     }
 
     const resolvedParams = await params
-    const sectorId = resolvedParams.sector
+    const sectorId = resolvedParams.txand
     const updateData = await request.json()
 
     // FIX: Pass only the fields data, not wrapped in another object
@@ -91,7 +91,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ sector: string }> }
+  { params }: { params: Promise<{ txand: string }> }
 ) {
   const headers = createSecureHeaders()
 
@@ -102,7 +102,7 @@ export async function DELETE(
     }
 
     const resolvedParams = await params
-    const sectorId = resolvedParams.sector
+    const sectorId = resolvedParams.txand
 
     await sectors.deleteOne(sectorId)
 
