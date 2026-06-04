@@ -1,15 +1,11 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { LoginForm } from "../LoginForm"
-import { SignUpForm } from "../SignUpForm"
 import HomeTopbar from "@/components/layout/home-topbar"
 
-export default function AuthPage() {
-  const [mode, setMode] = useState<"login" | "register">("login")
+const AuthPage = () => {
   return (
     <div className="flex flex-col min-h-screen w-full bg-muted">
       <HomeTopbar />
@@ -23,24 +19,15 @@ export default function AuthPage() {
         />
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Connexion / Inscription</CardTitle>
+            <CardTitle>Connexion</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs value={mode} onValueChange={v => setMode(v as "login" | "register")}>
-              <TabsList className="grid grid-cols-2 mb-4">
-                <TabsTrigger value="login">Connexion</TabsTrigger>
-                <TabsTrigger value="register">Inscription</TabsTrigger>
-              </TabsList>
-              <TabsContent value="login">
-                <LoginForm />
-              </TabsContent>
-              <TabsContent value="register">
-                <SignUpForm />
-              </TabsContent>
-            </Tabs>
+            <LoginForm />
           </CardContent>
         </Card>
       </div>
     </div>
   )
 }
+
+export default AuthPage

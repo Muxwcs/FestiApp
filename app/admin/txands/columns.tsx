@@ -3,53 +3,64 @@
 import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Eye, Trash2 } from "lucide-react"
-
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
-import { SectorRecord } from "@/types/sector.interface"
+export type SectorListItem = {
+  id: string
+  name: string
+  description: string | null
+  color: string | null
+  status: string | null
+  skills: string[]
+  _count: { timeslots: number; affectations: number }
+}
 
-export const createColumns = (handleDelete: (id: string) => void): ColumnDef<SectorRecord>[] => [
+export const createColumns = (handleDelete: (id: string) => void): ColumnDef<SectorListItem>[] => [
   {
-    accessorKey: "fields.name",
+    accessorKey: "name",
     id: "name",
-    header: ({ column }) => {
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Nom
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const s = row.original
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Nom
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          {s.color && (
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }} />
+          )}
+          <span className="font-medium">{s.name}</span>
+        </div>
       )
     },
   },
   {
-    accessorKey: "fields.totalNeeds",
-    header: "Ninjas manquant(s)",
-    cell: ({ row }) => {
-      return <span className="text-muted-foreground">{row.getValue("fields_totalNeeds")}</span>
-    },
+    id: "timeslots",
+    header: "Créneaux",
+    cell: ({ row }) => <span>{row.original._count.timeslots}</span>,
   },
   {
-    accessorKey: "fields.totalVolunteers",
-    header: "Besoin(s) en ninjas",
-    cell: ({ row }) => {
-      return <span className="text-muted-foreground">{row.getValue("fields_totalVolunteers")}</span>
-    },
+    id: "affectations",
+    header: "Bénévoles affectés",
+    cell: ({ row }) => <span>{row.original._count.affectations}</span>,
   },
   {
-    accessorKey: "fields.skills",
+    accessorKey: "skills",
     header: "Compétences",
     cell: ({ row }) => {
-      const skills = row.getValue("fields_skills") as string[]
-      return skills.map((skill, index) => (
-        <Badge key={index} className="mr-1 mb-1">
-          {skill}
-        </Badge>
-      ))
-
+      const skills = row.original.skills
+      if (!skills?.length) return <span className="text-muted-foreground">—</span>
+      return (
+        <div className="flex flex-wrap gap-1">
+          {skills.map((skill, i) => (
+            <Badge key={i} variant="secondary">{skill}</Badge>
+          ))}
+        </div>
+      )
     },
   },
   {
@@ -57,7 +68,6 @@ export const createColumns = (handleDelete: (id: string) => void): ColumnDef<Sec
     enableHiding: false,
     cell: ({ row }) => {
       const sector = row.original
-
       return (
         <div className="flex items-center space-x-2">
           <Link href={`/admin/txands/${sector.id}`}>
@@ -66,11 +76,7 @@ export const createColumns = (handleDelete: (id: string) => void): ColumnDef<Sec
               Voir
             </Button>
           </Link>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => handleDelete(sector.id)}
-          >
+          <Button variant="destructive" size="sm" onClick={() => handleDelete(sector.id)}>
             <Trash2 className="h-4 w-4 mr-1" />
             Supprimer
           </Button>

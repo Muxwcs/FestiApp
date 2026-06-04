@@ -32,6 +32,9 @@ const AppSidebar = ({ role, isReferent = false, className }: SidebarProps) => {
     { href: "/admin/", label: "Dashboard Admin", icon: LayoutDashboard },
     { href: "/admin/benevoles", label: "Gestion Bénévoles", icon: Users },
     { href: "/admin/txands", label: "Gestion Txands", icon: CalendarSync },
+    { href: "/admin/events", label: "Gestion Événements", icon: SquareKanban },
+    { href: "/admin/infos", label: "Gestion Infos Pratiques", icon: SquareKanban },
+    { href: "/admin/prices", label: "Gestion Tarifs", icon: SquareKanban },
   ]
 
   const benevoleLinks = [
@@ -117,9 +120,9 @@ const AppSidebar = ({ role, isReferent = false, className }: SidebarProps) => {
                           "text-muted-foreground hover:text-foreground hover:bg-accent/50",
                           // Active styles - modern gradient with glow effect
                           active && [
-                            "bg-gradient-to-r from-primary/90 to-primary text-primary-foreground",
+                            "bg-linear-to-r from-primary/90 to-primary text-primary-foreground",
                             "shadow-lg shadow-primary/25",
-                            "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-r before:from-primary/20 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300",
+                            "before:absolute before:inset-0 before:rounded-lg before:bg-linear-to-r before:from-primary/20 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300",
                             "hover:before:opacity-100",
                             "hover:shadow-xl hover:shadow-primary/30",
                             "hover:scale-[1.02]"

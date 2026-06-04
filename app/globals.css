@@ -4,6 +4,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-flYellow: #f8b648;
+  --color-flRed: #8c0000;
+  --color-flAccent: #14727a;
+  --color-flDarkBlue: #044154;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);

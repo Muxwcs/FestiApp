@@ -1,81 +1,89 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { VolunteerRecord } from "@/types/user.interface"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Eye, Trash2 } from "lucide-react"
 import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
 
-export const createColumns = (handleDelete: (id: string) => void): ColumnDef<VolunteerRecord>[] => [
+export type VolunteerListItem = {
+  id: string
+  email: string
+  name: string | null
+  firstname: string | null
+  surname: string | null
+  phone: string | null
+  role: string
+  isReferent: boolean
+  isActive: boolean
+  status: string | null
+  skills: string[]
+  createdAt: Date
+  _count: { affectations: number; missionAssignments: number }
+}
+
+export const createColumns = (handleDelete: (id: string) => void): ColumnDef<VolunteerListItem>[] => [
   {
-    accessorKey: "fields.name",
+    accessorKey: "name",
     id: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Nom
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Nom
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => {
-      const volunteer = row.original
-      // Display surname if it exists, otherwise firstname + name
-      let displayName = ""
-      if (volunteer.fields.surname) {
-        displayName = `${volunteer.fields.surname} (${volunteer.fields.firstname || ""} ${volunteer.fields.name || ""})`.trim()
-      } else if (volunteer.fields.firstname || volunteer.fields.name) {
-        displayName = `${volunteer.fields.firstname || ""} ${volunteer.fields.name || ""}`.trim()
-      } else {
-        displayName = "Sans nom"
-      }
+      const v = row.original
+      const displayName = v.surname
+        ? `${v.surname} (${v.firstname || ""} ${v.name || ""})`.trim()
+        : `${v.firstname || ""} ${v.name || ""}`.trim() || "Sans nom"
       return <span className="font-medium">{displayName}</span>
     },
   },
   {
-    accessorKey: "fields.email",
+    accessorKey: "email",
     header: "Email",
-    cell: ({ row }) => {
-      return <span className="text-muted-foreground">{row.getValue("fields_email")}</span>
-    },
+    cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span>,
   },
   {
-    accessorKey: "fields.phone",
+    accessorKey: "phone",
     header: "Tél",
+    cell: ({ row }) => <span className="text-muted-foreground">{row.original.phone || "—"}</span>,
+  },
+  {
+    accessorKey: "role",
+    header: "Rôle",
     cell: ({ row }) => {
-      return <span className="text-muted-foreground">{row.getValue("fields_phone")}</span>
+      const v = row.original
+      return (
+        <div className="flex gap-1">
+          <Badge variant={v.role === "ADMIN" ? "destructive" : "secondary"}>
+            {v.role === "ADMIN" ? "Admin" : "Bénévole"}
+          </Badge>
+          {v.isReferent && <Badge variant="outline">Référent</Badge>}
+        </div>
+      )
     },
   },
   {
-    accessorKey: "fields.role",
-    header: "Rôle",
-  },
-  {
-    accessorKey: "fields.status",
-    header: "Status",
+    accessorKey: "status",
+    header: "Statut",
+    cell: ({ row }) => <span>{row.original.status || "Actif"}</span>,
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const volunteer = row.original
-
+      const v = row.original
       return (
         <div className="flex items-center space-x-2">
-          <Link href={`/admin/benevoles/${volunteer.id}`}>
+          <Link href={`/admin/benevoles/${v.id}`}>
             <Button variant="outline" size="sm">
               <Eye className="h-4 w-4 mr-1" />
               Voir
             </Button>
           </Link>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => handleDelete(volunteer.id)}
-          >
+          <Button variant="destructive" size="sm" onClick={() => handleDelete(v.id)}>
             <Trash2 className="h-4 w-4 mr-1" />
             Supprimer
           </Button>
