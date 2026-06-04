@@ -52,7 +52,7 @@ export const ReferentVolunteersList = ({ sectorId, sectorName, isReferentView = 
       if (sectorId) {
         // ✅ If explicitly set to use referent API or user is a referent (not admin)
         const shouldUseReferentAPI = useReferentAPI ||
-          (session?.user?.isReferent && session?.user?.role !== 'admin')
+          (session?.user?.isReferent && session?.user?.role !== 'ADMIN')
 
         if (shouldUseReferentAPI) {
           url = `/api/referent/${sectorId}/volunteers`
