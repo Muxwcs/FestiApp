@@ -1,128 +1,101 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { requireAdminOrReferent } from "@/lib/auth-helpers"
+import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
-import { createSecureHeaders } from "@/lib/security"
-import { sectors, volunteers, affectations, timeslots } from "@/lib/airtable"
+import { createSecureHeaders, validateId } from "@/lib/security"
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ txand: string }> }
 ) {
   const headers = createSecureHeaders()
 
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.airtableId) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401, headers })
-    }
-    const isAdmin = session.user.role === 'admin'
-    const isReferent = session.user.isReferent
-    if (!isAdmin && !isReferent) {
-      return NextResponse.json({ error: "Admin or referent access required" }, { status: 403, headers })
-    }
+    const { session, error } = await requireAdminOrReferent()
+    if (error) return error
 
-    const resolvedParams = await params
-    const sectorId = resolvedParams.txand
-    if (!sectorId) {
-      return NextResponse.json({ error: "Sector ID is required" }, { status: 400, headers })
-    }
+    const { txand } = await params
+    const sectorId = validateId(txand)
 
-    const sector = await sectors.getById(sectorId)
+    // Verify sector exists + referent access
+    const sector = await prisma.sector.findUnique({
+      where: { id: sectorId },
+      include: { referents: { select: { userId: true } } },
+    })
+
     if (!sector) {
-      return NextResponse.json({ error: "Sector not found" }, { status: 404, headers })
+      return NextResponse.json({ error: "Secteur introuvable" }, { status: 404, headers })
     }
 
-    // Referent access check
-    if (!isAdmin) {
-      const referents = sector.fields?.referent
-      let canAccess = false
-      if (Array.isArray(referents)) {
-        canAccess = referents.includes(session.user.airtableId)
-      } else if (typeof referents === 'string') {
-        canAccess = referents === session.user.airtableId
-      }
-      if (!canAccess) {
-        return NextResponse.json(
-          { error: "You can only access volunteers from sectors you're responsible for" },
-          { status: 403, headers }
-        )
-      }
+    const isAdmin = session.user.role === "ADMIN"
+    if (!isAdmin && !sector.referents.some((r) => r.userId === session.user.id)) {
+      return NextResponse.json({ error: "Accès interdit" }, { status: 403, headers })
     }
 
-    // --- MIRROR ADMIN LOGIC BELOW ---
-
-    // 1. Get all timeslots for this sector
-    const allTimeslots = await timeslots.getAll()
-    const sectorTimeslots = allTimeslots.filter(ts => {
-      const sectorField = ts.fields.sector || ts.fields.secteur || ts.fields.pole
-      if (Array.isArray(sectorField)) return sectorField.includes(sectorId)
-      return sectorField === sectorId
+    // Same logic as admin route — get all affectations for this sector
+    const sectorTimeslots = await prisma.timeslot.findMany({
+      where: { sectorId },
+      orderBy: { dateStart: "asc" },
     })
 
-    // 2. Get all affectations for these timeslots
-    const allAffectations = await affectations.getAll()
-    const sectorAffectations = allAffectations.filter(aff => {
-      const txand = aff.fields.txand
-      if (Array.isArray(txand)) return txand.some(id => sectorTimeslots.map(ts => ts.id).includes(id))
-      return sectorTimeslots.map(ts => ts.id).includes(txand as string)
-    })
-
-    // 3. Extract all volunteer IDs from these affectations
-    const volunteerIds = new Set<string>()
-    sectorAffectations.forEach(aff => {
-      const vols = aff.fields.volunteer
-      if (Array.isArray(vols)) vols.forEach(id => id && volunteerIds.add(id))
-      else if (typeof vols === "string" && vols) volunteerIds.add(vols)
-    })
-
-    // 4. Get all volunteers and filter by those IDs
-    const allVolunteers = await volunteers.getAll()
-    const sectorVolunteers = allVolunteers.filter(v => volunteerIds.has(v.id))
-
-    // 5. Group volunteers by timeslot
-    const timeslotMap: Record<string, any[]> = {}
-    sectorAffectations.forEach(aff => {
-      const txand = Array.isArray(aff.fields.txand) ? aff.fields.txand : [aff.fields.txand]
-      const vols = Array.isArray(aff.fields.volunteer) ? aff.fields.volunteer : [aff.fields.volunteer]
-      txand.forEach(tsId => {
-        if (!timeslotMap[tsId]) timeslotMap[tsId] = []
-        vols.forEach(volId => {
-          const vol = sectorVolunteers.find(v => v.id === volId)
-          if (vol && !timeslotMap[tsId].some(vv => vv.id === vol.id)) {
-            timeslotMap[tsId].push(vol)
-          }
-        })
-      })
-    })
-
-    // Example in your API route:
-    const timeslotGroups = sectorTimeslots.map(group => ({
-      ...group,
-      timeslot: {
-        id: group.id,
-        ...group.fields // flatten fields into timeslot
+    const sectorAffectations = await prisma.affectation.findMany({
+      where: { sectorId },
+      include: {
+        volunteer: {
+          select: {
+            id: true, email: true, name: true, firstname: true, surname: true,
+            phone: true, role: true, isReferent: true, isActive: true, status: true,
+            skills: true, availability: true, createdAt: true,
+          },
+        },
+        timeslot: { select: { id: true, name: true } },
       },
-      volunteers: timeslotMap[group.id] || []
+    })
+
+    // Build timeslot details
+    const allSectorTimeslots: Record<string, { id: string; name: string; dateStart: string | null; dateEnd: string | null; totalVolunteers: number }> = {}
+    sectorTimeslots.forEach((ts) => {
+      allSectorTimeslots[ts.id] = {
+        id: ts.id, name: ts.name,
+        dateStart: ts.dateStart?.toISOString() || null,
+        dateEnd: ts.dateEnd?.toISOString() || null,
+        totalVolunteers: ts.totalVolunteers,
+      }
+    })
+
+    // Group by volunteer
+    const volunteerMap = new Map<string, { volunteer: typeof sectorAffectations[0]["volunteer"]; affectations: typeof sectorAffectations }>()
+    sectorAffectations.forEach((aff) => {
+      const existing = volunteerMap.get(aff.volunteerId)
+      if (existing) {
+        existing.affectations.push(aff)
+      } else {
+        volunteerMap.set(aff.volunteerId, { volunteer: aff.volunteer, affectations: [aff] })
+      }
+    })
+
+    const volunteers = Array.from(volunteerMap.values()).map(({ volunteer, affectations: affs }) => ({
+      id: volunteer.id,
+      fields: volunteer,
+      affectations: affs.map((aff) => ({
+        id: aff.id,
+        fields: { volunteer: [aff.volunteerId], txand: [aff.timeslotId] },
+        timeslotNames: [aff.timeslot.name],
+      })),
     }))
 
-    return NextResponse.json({
-      sector: {
-        id: sector.id,
-        name: sector.fields?.name || 'Secteur sans nom'
-      },
-      volunteers: sectorVolunteers,
-      timeslotGroups,
-      sectorTimeslots,
-      total: sectorVolunteers.length,
-      success: true
-    }, { headers })
+    const timeslotNameMap: Record<string, string> = {}
+    sectorTimeslots.forEach((ts) => { timeslotNameMap[ts.id] = ts.name })
 
-  } catch (err: unknown) {
-    logger.error("Error in referent sector volunteers API", err)
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500, headers }
-    )
+    return NextResponse.json({
+      volunteers,
+      timeslots: timeslotNameMap,
+      allSectorTimeslots,
+      timeslotDetails: allSectorTimeslots,
+      totalTimeslots: sectorTimeslots.length,
+    }, { headers })
+  } catch (err) {
+    logger.error("Error fetching referent sector volunteers:", err)
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500, headers })
   }
 }

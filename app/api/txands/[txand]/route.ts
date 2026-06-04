@@ -1,53 +1,57 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/auth-helpers"
+import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
-import { createSecureHeaders } from "@/lib/security"
-import { sectors } from "@/lib/airtable"
+import { createSecureHeaders, validateId } from "@/lib/security"
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ txand: string }> }
 ) {
   const headers = createSecureHeaders()
 
   try {
-    const { token, error } = await requireAdmin(request)
-    if (error) {
-      return error
-    }
+    const { error } = await requireAdmin()
+    if (error) return error
 
-    const resolvedParams = await params
-    const sectorId = resolvedParams.txand
+    const { txand } = await params
+    const sectorId = validateId(txand)
 
-    if (!sectorId) {
-      return NextResponse.json(
-        { error: "Sector ID is required" },
-        { status: 400, headers }
-      )
-    }
-
-    const sector = await sectors.getById(sectorId)
-
-    if (!sector) {
-      logger.warn(`Sector not found: ${sectorId}`)
-      return NextResponse.json(
-        { error: "Sector not found" },
-        { status: 404, headers }
-      )
-    }
-
-    logger.info(`Sector details accessed by admin: ${token.email}`, {
-      sectorId,
-      volunteerEmail: sector.fields.email
+    const sector = await prisma.sector.findUnique({
+      where: { id: sectorId },
+      include: {
+        referents: {
+          include: { user: { select: { id: true, name: true, firstname: true, email: true, phone: true } } },
+        },
+        timeslots: { orderBy: { dateStart: "asc" } },
+        _count: { select: { affectations: true } },
+      },
     })
 
-    return NextResponse.json(sector, { headers })
-  } catch (err: unknown) {
-    logger.error("Error in sector details API", err)
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500, headers }
-    )
+    if (!sector) {
+      return NextResponse.json({ error: "Secteur introuvable" }, { status: 404, headers })
+    }
+
+    return NextResponse.json({
+      id: sector.id,
+      fields: {
+        name: sector.name,
+        description: sector.description,
+        color: sector.color,
+        status: sector.status,
+        skills: sector.skills,
+        referent: sector.referents.map((r) => r.userId),
+        txands: sector.timeslots.map((t) => t.id),
+        totalNeeds: sector.timeslots.length,
+        totalVolunteers: sector._count.affectations,
+        createdAt: sector.createdAt.toISOString(),
+        modifiedAt: sector.updatedAt.toISOString(),
+      },
+      createdTime: sector.createdAt.toISOString(),
+    }, { headers })
+  } catch (err) {
+    logger.error("Error fetching sector:", err)
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500, headers })
   }
 }
 
@@ -58,65 +62,54 @@ export async function PUT(
   const headers = createSecureHeaders()
 
   try {
-    const { token, error } = await requireAdmin(request)
-    if (error) {
-      logger.warn("Unauthorized update attempt")
-      return error
-    }
+    const { session, error } = await requireAdmin()
+    if (error) return error
 
-    const resolvedParams = await params
-    const sectorId = resolvedParams.txand
-    const updateData = await request.json()
+    const { txand } = await params
+    const sectorId = validateId(txand)
+    const body = await request.json()
+    const fieldsData = body.fields || body
 
-    // FIX: Pass only the fields data, not wrapped in another object
-    const fieldsData = updateData.fields || updateData
-
-    // Pass only fieldsData, not wrapped in { id, fields }
-    const updatedVolunteer = await sectors.updateOne(sectorId, fieldsData)
-
-    logger.info(`Sector updated by admin: ${token.email}`, {
-      sectorId,
-      updatedFields: Object.keys(fieldsData)
+    const updated = await prisma.sector.update({
+      where: { id: sectorId },
+      data: {
+        name: fieldsData.name,
+        description: fieldsData.description,
+        color: fieldsData.color,
+        status: fieldsData.status,
+        skills: fieldsData.skills,
+      },
     })
 
-    return NextResponse.json(updatedVolunteer, { headers })
-  } catch (err: unknown) {
-    logger.error("Error updating sector", err)
-    return NextResponse.json(
-      { error: "Failed to update sector" },
-      { status: 500, headers }
-    )
+    logger.info(`Sector updated by ${session.user.email}`, { sectorId })
+
+    return NextResponse.json({ id: updated.id, fields: updated }, { headers })
+  } catch (err) {
+    logger.error("Error updating sector:", err)
+    return NextResponse.json({ error: "Erreur lors de la mise à jour" }, { status: 500, headers })
   }
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ txand: string }> }
 ) {
   const headers = createSecureHeaders()
 
   try {
-    const { token, error } = await requireAdmin(request)
-    if (error) {
-      return error
-    }
+    const { session, error } = await requireAdmin()
+    if (error) return error
 
-    const resolvedParams = await params
-    const sectorId = resolvedParams.txand
+    const { txand } = await params
+    const sectorId = validateId(txand)
 
-    await sectors.deleteOne(sectorId)
+    await prisma.sector.delete({ where: { id: sectorId } })
 
-    logger.warn(`Sector deleted by admin: ${token.email}`, { sectorId })
+    logger.warn(`Sector deleted by ${session.user.email}`, { sectorId })
 
-    return NextResponse.json(
-      { message: "Sector deleted successfully" },
-      { headers }
-    )
-  } catch (err: unknown) {
-    logger.error("Error deleting sector", err)
-    return NextResponse.json(
-      { error: "Failed to delete sector" },
-      { status: 500, headers }
-    )
+    return NextResponse.json({ message: "Secteur supprimé" }, { headers })
+  } catch (err) {
+    logger.error("Error deleting sector:", err)
+    return NextResponse.json({ error: "Erreur lors de la suppression" }, { status: 500, headers })
   }
 }
