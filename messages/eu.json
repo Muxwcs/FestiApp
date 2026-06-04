@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "home": "Hasiera",
+    "program": "Programa",
+    "prices": "Tarifak",
+    "info": "Informazio praktikoak",
+    "login": "Konexioa"
+  },
+  "hero": {
+    "title": "Festibala",
+    "subtitle": "Agorrilak 2 Abuztua",
+    "cta": "Programa ikusi"
+  },
+  "program": {
+    "title": "Programa",
+    "allDays": "Egun guztiak",
+    "noEvents": "Ez dago ekitaldirik egun honetarako",
+    "categories": {
+      "CONCERT": "Kontzertuak",
+      "ANIMATION": "Animazioak",
+      "RESTAURATION": "Jatetxea",
+      "INFO": "Informazioak"
+    }
+  },
+  "prices": {
+    "title": "Tarifak",
+    "free": "Doan",
+    "currency": "€"
+  },
+  "info": {
+    "title": "Informazio praktikoak"
+  },
+  "common": {
+    "loading": "Kargatzen...",
+    "error": "Errore bat gertatu da",
+    "back": "Itzuli"
+  },
+  "footer": {
+    "rights": "Eskubide guztiak erreserbatuak"
+  }
+}

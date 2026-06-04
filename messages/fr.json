@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "program": "Programme",
+    "prices": "Tarifs",
+    "info": "Infos pratiques",
+    "login": "Connexion"
+  },
+  "hero": {
+    "title": "Festival",
+    "subtitle": "Agorrilak 2 Août",
+    "cta": "Voir le programme"
+  },
+  "program": {
+    "title": "Programme",
+    "allDays": "Tous les jours",
+    "noEvents": "Aucun événement prévu pour ce jour",
+    "categories": {
+      "CONCERT": "Concerts",
+      "ANIMATION": "Animations",
+      "RESTAURATION": "Restauration",
+      "INFO": "Informations"
+    }
+  },
+  "prices": {
+    "title": "Tarifs",
+    "free": "Gratuit",
+    "currency": "€"
+  },
+  "info": {
+    "title": "Infos pratiques"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "back": "Retour"
+  },
+  "footer": {
+    "rights": "Tous droits réservés"
+  }
+}
