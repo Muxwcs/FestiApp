@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Calendar, Clock, MapPin, Info, Music, Utensils, PartyPopper } from "lucide-react"
 import { t as translate, type Locale, localeNames } from "@/lib/i18n/types"
-import type { EventCategory } from "@/generated_old/prisma/client"
+import { EventCategory } from "@/generated/prisma/enums"
 import Image from "next/image"
 import { NotificationToggle } from "@/components/pwa/notification-prompt"
 

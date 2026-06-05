@@ -2,8 +2,8 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
-import { Role } from "@/generated_old/prisma/client"
 import { logger } from "@/lib/logger"
+import { Role } from "./generated/prisma/enums"
 
 const MAX_LOGIN_ATTEMPTS = 5
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000 // 15 minutes
