@@ -1,62 +1,59 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { getToken } from 'next-auth/jwt'
+import createMiddleware from "next-intl/middleware"
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import { routing } from "@/lib/i18n/routing"
 
-export async function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+const intlMiddleware = createMiddleware(routing)
 
-  // Add security headers
-  response.headers.set('X-Content-Type-Options', 'nosniff')
-  response.headers.set('X-Frame-Options', 'DENY')
-  response.headers.set('X-XSS-Protection', '1; mode=block')
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
 
-  // Rate limiting: disabled — in-memory Map does not persist across
-  // Vercel serverless invocations. Will be replaced with Upstash Redis.
-  // See Phase 3 of the migration plan.
+  // Auth check for protected routes (no i18n on these)
+  const isProtectedPath =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/referent")
 
-  // Protected routes
-  const protectedPaths = ['/dashboard', '/admin', '/referent']
-  const isProtectedPath = protectedPaths.some(path =>
-    request.nextUrl.pathname.startsWith(path)
-  )
+  const isAuthPath = pathname.startsWith("/login")
 
-  if (isProtectedPath) {
-    const token = await getToken({ req: request })
+  if (isProtectedPath || isAuthPath) {
+    const sessionToken =
+      request.cookies.get("authjs.session-token")?.value ||
+      request.cookies.get("__Secure-authjs.session-token")?.value
+    const isLoggedIn = !!sessionToken
 
-    if (!token) {
-      return NextResponse.redirect(new URL('/login', request.url))
+    if (isProtectedPath && !isLoggedIn) {
+      const loginUrl = new URL("/login", request.url)
+      loginUrl.searchParams.set("callbackUrl", pathname)
+      return NextResponse.redirect(loginUrl)
     }
 
-    // Admin-only routes
-    if (request.nextUrl.pathname.startsWith('/admin') && token.role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+    if (isAuthPath && isLoggedIn) {
+      return NextResponse.redirect(new URL("/dashboard", request.url))
     }
 
-    // Referent routes - allow both referents AND admins
-    if (request.nextUrl.pathname.startsWith('/referent')) {
-      const isAdmin = token.role === 'admin'
-      const isReferent = token.isReferent
-
-      // Block only if user is NEITHER admin NOR referent
-      if (!isAdmin && !isReferent) {
-        return NextResponse.redirect(new URL('/dashboard', request.url))
-      }
-    }
+    // Security headers for protected routes
+    const response = NextResponse.next()
+    response.headers.set("X-Content-Type-Options", "nosniff")
+    response.headers.set("X-Frame-Options", "DENY")
+    response.headers.set("X-XSS-Protection", "1; mode=block")
+    response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
+    return response
   }
 
-  return response
+  // i18n routing for public pages (/, /fr, /eu, /en, /fr/..., etc.)
+  return intlMiddleware(request)
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (public folder)
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Public pages (i18n)
+    "/",
+    "/(fr|eu|en)/:path*",
+    // Protected pages (auth)
+    "/dashboard/:path*",
+    "/admin/:path*",
+    "/referent/:path*",
+    "/login",
   ],
 }

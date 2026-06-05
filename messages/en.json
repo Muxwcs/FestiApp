@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "Home",
+    "program": "Program",
+    "prices": "Prices",
+    "info": "Practical Info",
+    "login": "Login"
+  },
+  "hero": {
+    "title": "Festival",
+    "subtitle": "August 2nd",
+    "cta": "View program"
+  },
+  "program": {
+    "title": "Program",
+    "allDays": "All days",
+    "noEvents": "No events scheduled for this day",
+    "categories": {
+      "CONCERT": "Concerts",
+      "ANIMATION": "Activities",
+      "RESTAURATION": "Food & Drinks",
+      "INFO": "Information"
+    }
+  },
+  "prices": {
+    "title": "Prices",
+    "free": "Free",
+    "currency": "€"
+  },
+  "info": {
+    "title": "Practical Information"
+  },
+  "notifications": {
+    "title": "Stay informed!",
+    "description": "Receive notifications to not miss anything about the festival.",
+    "enable": "Enable notifications",
+    "disable": "Disable notifications",
+    "permissionDenied": "Permission denied for notifications.",
+    "error": "An error occurred while managing notifications.",
+    "later": "Later"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "back": "Back"
+  },
+  "footer": {
+    "rights": "All rights reserved"
+  }
+}

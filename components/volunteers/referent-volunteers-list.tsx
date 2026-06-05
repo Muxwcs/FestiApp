@@ -52,7 +52,7 @@ export const ReferentVolunteersList = ({ sectorId, sectorName, isReferentView = 
       if (sectorId) {
         // ✅ If explicitly set to use referent API or user is a referent (not admin)
         const shouldUseReferentAPI = useReferentAPI ||
-          (session?.user?.isReferent && session?.user?.role !== 'admin')
+          (session?.user?.isReferent && session?.user?.role !== 'ADMIN')
 
         if (shouldUseReferentAPI) {
           url = `/api/referent/${sectorId}/volunteers`
@@ -273,7 +273,7 @@ export const ReferentVolunteersList = ({ sectorId, sectorName, isReferentView = 
                 <CardContent className="p-4">
                   {/* Volunteer Header */}
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                    <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
                       {volunteer.fields.firstname?.charAt(0)?.toUpperCase() ||
                         volunteer.fields.name?.charAt(0)?.toUpperCase() || 'B'}
                     </div>
@@ -294,7 +294,7 @@ export const ReferentVolunteersList = ({ sectorId, sectorName, isReferentView = 
                   <div className="space-y-2">
                     {volunteer.fields.email && (
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Mail className="h-3 w-3 flex-shrink-0" />
+                        <Mail className="h-3 w-3 shrink-0" />
                         <a
                           href={`mailto:${volunteer.fields.email}`}
                           className="truncate hover:text-blue-600 transition-colors"
@@ -306,7 +306,7 @@ export const ReferentVolunteersList = ({ sectorId, sectorName, isReferentView = 
 
                     {volunteer.fields.phone && (
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Phone className="h-3 w-3 flex-shrink-0" />
+                        <Phone className="h-3 w-3 shrink-0" />
                         <a
                           href={`tel:${volunteer.fields.phone}`}
                           className="hover:text-blue-600 transition-colors"

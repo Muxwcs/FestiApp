@@ -1,109 +1,68 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { requireAdminOrReferent } from "@/lib/auth-helpers"
+import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
-import { createSecureHeaders } from "@/lib/security"
-import { sectors } from "@/lib/airtable"
+import { createSecureHeaders, validateId } from "@/lib/security"
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ txand: string }> }
 ) {
   const headers = createSecureHeaders()
 
   try {
-    const session = await getServerSession(authOptions)
+    const { session, error } = await requireAdminOrReferent()
+    if (error) return error
 
-    if (!session?.user?.airtableId) {
-      logger.warn("Unauthorized access attempt to /api/referent/[txand]")
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401, headers }
-      )
-    }
+    const { txand } = await params
+    const sectorId = validateId(txand)
 
-    const isAdmin = session.user.role === 'admin'
-    const isReferent = session.user.isReferent
-
-    if (!isAdmin && !isReferent) {
-      logger.warn(`Insufficient permissions for sector access: ${session.user.email}`)
-      return NextResponse.json(
-        { error: "Admin or referent access required" },
-        { status: 403, headers }
-      )
-    }
-
-    const resolvedParams = await params
-    const sectorId = resolvedParams.txand
-
-    if (!sectorId) {
-      return NextResponse.json(
-        { error: "Sector ID is required" },
-        { status: 400, headers }
-      )
-    }
-
-    console.log("🔍 Fetching sector:", sectorId, "for user:", session.user.email)
-
-    // ✅ Get the sector
-    const sector = await sectors.getById(sectorId)
+    const sector = await prisma.sector.findUnique({
+      where: { id: sectorId },
+      include: {
+        referents: { select: { userId: true } },
+        timeslots: { orderBy: { dateStart: "asc" } },
+        _count: { select: { affectations: true } },
+      },
+    })
 
     if (!sector) {
-      logger.warn(`Sector not found: ${sectorId}`)
-      return NextResponse.json(
-        { error: "Sector not found" },
-        { status: 404, headers }
-      )
+      return NextResponse.json({ error: "Secteur introuvable" }, { status: 404, headers })
     }
 
-    // ✅ For referents (non-admin), verify they can access this sector
+    // Check referent access
+    const isAdmin = session.user.role === "ADMIN"
     if (!isAdmin) {
-      const referents = sector.fields?.referent
-      let canAccess = false
-
-      console.log("🔍 Checking access for referent:", {
-        userAirtableId: session.user.airtableId,
-        sectorReferents: referents
-      })
-
-      if (Array.isArray(referents)) {
-        canAccess = referents.includes(session.user.airtableId)
-      } else if (typeof referents === 'string') {
-        canAccess = referents === session.user.airtableId
-      }
-
-      if (!canAccess) {
-        logger.warn(`Referent accessing unauthorized sector: ${session.user.email}`, {
-          sectorId,
-          userAirtableId: session.user.airtableId,
-          sectorReferents: referents
-        })
+      const isReferentOfSector = sector.referents.some((r) => r.userId === session.user.id)
+      if (!isReferentOfSector) {
         return NextResponse.json(
-          { error: "You can only access sectors you're responsible for" },
+          { error: "Accès réservé au référent de ce secteur" },
           { status: 403, headers }
         )
       }
-
-      console.log("✅ Access granted for referent")
     }
 
-    logger.info(`Sector details accessed: ${session.user.email}`, {
-      sectorId,
-      accessType: isAdmin ? 'admin' : 'referent'
-    })
-
-    return NextResponse.json(sector, { headers })
-
-  } catch (err: unknown) {
-    logger.error("Error in referent sector details API", err)
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500, headers }
-    )
+    return NextResponse.json({
+      id: sector.id,
+      fields: {
+        name: sector.name,
+        description: sector.description,
+        color: sector.color,
+        status: sector.status,
+        skills: sector.skills,
+        referent: sector.referents.map((r) => r.userId),
+        txands: sector.timeslots.map((t) => t.id),
+        totalNeeds: sector.timeslots.length,
+        totalVolunteers: sector._count.affectations,
+      },
+      createdTime: sector.createdAt.toISOString(),
+    }, { headers })
+  } catch (err) {
+    logger.error("Error in /api/referent/[txand]:", err)
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500, headers })
   }
 }
 
-// ✅ Allow referents to update their own sectors
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ txand: string }> }
@@ -111,79 +70,41 @@ export async function PUT(
   const headers = createSecureHeaders()
 
   try {
-    const session = await getServerSession(authOptions)
+    const { session, error } = await requireAdminOrReferent()
+    if (error) return error
 
-    if (!session?.user?.airtableId) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401, headers }
-      )
-    }
+    const { txand } = await params
+    const sectorId = validateId(txand)
 
-    const isAdmin = session.user.role === 'admin'
-    const isReferent = session.user.isReferent
-
-    if (!isAdmin && !isReferent) {
-      return NextResponse.json(
-        { error: "Admin or referent access required" },
-        { status: 403, headers }
-      )
-    }
-
-    const resolvedParams = await params
-    const sectorId = resolvedParams.txand
-    const updates = await request.json()
-
-    console.log("🔄 Updating referent sector:", sectorId, updates)
-
-    // ✅ Get and verify sector access
-    const sector = await sectors.getById(sectorId)
-
-    if (!sector) {
-      return NextResponse.json(
-        { error: "Sector not found" },
-        { status: 404, headers }
-      )
-    }
-
-    // ✅ For referents, verify they can modify this sector
+    // Verify referent access
+    const isAdmin = session.user.role === "ADMIN"
     if (!isAdmin) {
-      const referents = sector.fields?.referent
-      let canModify = false
-
-      if (Array.isArray(referents)) {
-        canModify = referents.includes(session.user.airtableId)
-      } else if (typeof referents === 'string') {
-        canModify = referents === session.user.airtableId
-      }
-
-      if (!canModify) {
-        logger.warn(`Unauthorized sector modification attempt: ${session.user.email}`, {
-          sectorId,
-          userAirtableId: session.user.airtableId
-        })
-        return NextResponse.json(
-          { error: "You can only modify sectors you're responsible for" },
-          { status: 403, headers }
-        )
+      const sector = await prisma.sector.findUnique({
+        where: { id: sectorId },
+        include: { referents: { select: { userId: true } } },
+      })
+      if (!sector || !sector.referents.some((r) => r.userId === session.user.id)) {
+        return NextResponse.json({ error: "Accès interdit" }, { status: 403, headers })
       }
     }
 
-    // ✅ Perform update
-    const updatedSector = await sectors.updateOne(sectorId, updates)
+    const body = await request.json()
+    const fieldsData = body.fields || body
 
-    logger.info(`Sector updated by referent: ${session.user.email}`, {
-      sectorId,
-      isAdmin
+    const updated = await prisma.sector.update({
+      where: { id: sectorId },
+      data: {
+        description: fieldsData.description,
+        status: fieldsData.status,
+        skills: fieldsData.skills,
+      },
     })
 
-    return NextResponse.json(updatedSector, { headers })
+    logger.info(`Sector updated by referent ${session.user.email}`, { sectorId })
 
-  } catch (err: unknown) {
-    logger.error("❌ Error updating sector via referent API:", err)
-    return NextResponse.json(
-      { error: "Failed to update sector" },
-      { status: 500, headers }
-    )
+    return NextResponse.json({ id: updated.id, fields: updated }, { headers })
+  } catch (err) {
+    logger.error("Error updating sector:", err)
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500, headers })
   }
 }

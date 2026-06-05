@@ -1,0 +1,269 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================
+// USERS
+// =============================================================
+
+enum Role {
+  ADMIN
+  BENEVOLE
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  password     String
+  name         String?
+  firstname    String?
+  surname      String?
+  phone        String?
+  role         Role      @default(BENEVOLE)
+  isReferent   Boolean   @default(false)
+  isActive     Boolean   @default(true)
+  status       String?
+  avatar       String?
+  notes        String?
+  skills       String[]  @default([])
+  availability String[]  @default([])
+
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  lastLoginIp         String?
+
+  affectations       Affectation[]
+  missionAssignments MissionAssignment[]
+  referentSectors    SectorReferent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+// =============================================================
+// SECTORS (Pôles)
+// =============================================================
+
+model Sector {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String?
+  status      String?
+  skills      String[] @default([])
+
+  timeslots    Timeslot[]
+  affectations Affectation[]
+  referents    SectorReferent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("sectors")
+}
+
+model SectorReferent {
+  id       String @id @default(cuid())
+  userId   String
+  sectorId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sector Sector @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sectorId])
+  @@map("sector_referents")
+}
+
+// =============================================================
+// TIMESLOTS (Créneaux / Txands)
+// =============================================================
+
+model Timeslot {
+  id              String    @id @default(cuid())
+  name            String
+  dateStart       DateTime?
+  dateEnd         DateTime?
+  totalVolunteers Int       @default(0)
+  details         String?
+
+  sectorId     String
+  sector       Sector        @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  affectations Affectation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("timeslots")
+}
+
+// =============================================================
+// AFFECTATIONS
+// =============================================================
+
+enum AffectationStatus {
+  VALIDE
+  EN_ATTENTE
+  REFUSE
+}
+
+model Affectation {
+  id     String            @id @default(cuid())
+  number Int               @default(autoincrement())
+  status AffectationStatus @default(EN_ATTENTE)
+
+  volunteerId String
+  timeslotId  String
+  sectorId    String
+
+  volunteer User     @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  timeslot  Timeslot @relation(fields: [timeslotId], references: [id], onDelete: Cascade)
+  sector    Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([volunteerId, timeslotId])
+  @@map("affectations")
+}
+
+// =============================================================
+// MISSIONS
+// =============================================================
+
+enum MissionPriority {
+  HAUTE
+  MOYENNE
+  BASSE
+}
+
+enum MissionStatus {
+  A_FAIRE
+  EN_COURS
+  TERMINEE
+}
+
+model Mission {
+  id             String          @id @default(cuid())
+  name           String
+  description    String?
+  dateStart      DateTime
+  dateEnd        DateTime
+  place          String?
+  priority       MissionPriority @default(MOYENNE)
+  status         MissionStatus   @default(A_FAIRE)
+  humanResources Int             @default(0)
+
+  assignments MissionAssignment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("missions")
+}
+
+model MissionAssignment {
+  id        String @id @default(cuid())
+  userId    String
+  missionId String
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, missionId])
+  @@map("mission_assignments")
+}
+
+// =============================================================
+// PUSH SUBSCRIPTIONS (for PWA notifications)
+// =============================================================
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("push_subscriptions")
+}
+
+// =============================================================
+// PUBLIC — Events (programme du festival)
+// Champs traduits en JSON : { fr: "...", eu: "...", en: "..." }
+// =============================================================
+
+enum EventCategory {
+  CONCERT
+  ANIMATION
+  RESTAURATION
+  INFO
+}
+
+model Event {
+  id          String        @id @default(cuid())
+  title       Json          // { fr: "...", eu: "...", en: "..." }
+  description Json?         // { fr: "...", eu: "...", en: "..." }
+  category    EventCategory
+  place       String?
+  day         String        // "vendredi", "samedi", "dimanche"
+  startTime   DateTime
+  endTime     DateTime?
+  imageSrc    String?
+  sortOrder   Int           @default(0)
+  isActive    Boolean       @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("events")
+}
+
+// =============================================================
+// PUBLIC — Prices (tarifs)
+// =============================================================
+
+model Price {
+  id          String  @id @default(cuid())
+  title       Json    // { fr: "...", eu: "...", en: "..." }
+  description Json?   // { fr: "...", eu: "...", en: "..." }
+  amount      Float
+  currency    String  @default("EUR")
+  category    String? // "Entrée", "Pass", "Restauration"
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("prices")
+}
+
+// =============================================================
+// PUBLIC — Useful Info (infos pratiques)
+// =============================================================
+
+model UsefulInfo {
+  id       String  @id @default(cuid())
+  title    Json    // { fr: "...", eu: "...", en: "..." }
+  content  Json    // { fr: "...", eu: "...", en: "..." }
+  icon     String? // emoji or icon name
+  category String? // "Accès", "Sécurité", "Contact"
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("useful_infos")
+}
