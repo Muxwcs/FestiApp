@@ -182,6 +182,23 @@ model MissionAssignment {
 }
 
 // =============================================================
+// PUSH SUBSCRIPTIONS (for PWA notifications)
+// =============================================================
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("push_subscriptions")
+}
+
+// =============================================================
 // PUBLIC — Events (programme du festival)
 // Champs traduits en JSON : { fr: "...", eu: "...", en: "..." }
 // =============================================================

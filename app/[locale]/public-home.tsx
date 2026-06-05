@@ -10,6 +10,7 @@ import { Calendar, Clock, MapPin, Info, Music, Utensils, PartyPopper } from "luc
 import { t as translate, type Locale, localeNames } from "@/lib/i18n/types"
 import type { EventCategory } from "@/generated_old/prisma/client"
 import Image from "next/image"
+import { NotificationToggle } from "@/components/pwa/notification-prompt"
 
 interface EventItem {
   id: string
@@ -283,6 +284,12 @@ export function PublicHomePage({ locale, events, prices, infos }: Props) {
           </div>
         </section>
       )}
+      <section className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-6">{t("notifications.title")}</h2>
+          <NotificationToggle />
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="py-8 border-t">

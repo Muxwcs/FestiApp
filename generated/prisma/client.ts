@@ -77,6 +77,11 @@ export type Mission = Prisma.MissionModel
  */
 export type MissionAssignment = Prisma.MissionAssignmentModel
 /**
+ * Model PushSubscription
+ * 
+ */
+export type PushSubscription = Prisma.PushSubscriptionModel
+/**
  * Model Event
  * 
  */

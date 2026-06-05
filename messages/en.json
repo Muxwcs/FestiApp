@@ -30,6 +30,15 @@
   "info": {
     "title": "Practical Information"
   },
+  "notifications": {
+    "title": "Stay informed!",
+    "description": "Receive notifications to not miss anything about the festival.",
+    "enable": "Enable notifications",
+    "disable": "Disable notifications",
+    "permissionDenied": "Permission denied for notifications.",
+    "error": "An error occurred while managing notifications.",
+    "later": "Later"
+  },
   "common": {
     "loading": "Loading...",
     "error": "An error occurred",

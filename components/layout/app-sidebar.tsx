@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Users, LayoutDashboard, CalendarSync, SquareKanban, Music2 } from "lucide-react"
+import { Users, LayoutDashboard, CalendarSync, SquareKanban, Music2, Bell } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -35,6 +35,7 @@ const AppSidebar = ({ role, isReferent = false, className }: SidebarProps) => {
     { href: "/admin/events", label: "Gestion Événements", icon: SquareKanban },
     { href: "/admin/infos", label: "Gestion Infos Pratiques", icon: SquareKanban },
     { href: "/admin/prices", label: "Gestion Tarifs", icon: SquareKanban },
+    { href: "/admin/notifications", label: "Notifications Push", icon: Bell },
   ]
 
   const benevoleLinks = [

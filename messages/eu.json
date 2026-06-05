@@ -30,6 +30,15 @@
   "info": {
     "title": "Informazio praktikoak"
   },
+  "notifications": {
+    "title": "Jarrai ezazu informatua!",
+    "description": "Jaso jakinarazpenak festibala ez galtzeko.",
+    "enable": "Aktibatu jakinarazpenak",
+    "disable": "Desaktibatu jakinarazpenak",
+    "permissionDenied": "Jakinarazpenetarako baimena ukatua.",
+    "error": "Errore bat gertatu da jakinarazpenak kudeatzean.",
+    "later": "Geroago"
+  },
   "common": {
     "loading": "Kargatzen...",
     "error": "Errore bat gertatu da",

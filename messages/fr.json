@@ -30,6 +30,15 @@
   "info": {
     "title": "Infos pratiques"
   },
+  "notifications": {
+    "title": "Restez informé !",
+    "description": "Recevez des notifications pour ne rien manquer du festival.",
+    "enable": "Activer les notifications",
+    "disable": "Désactiver les notifications",
+    "permissionDenied": "Permission refusée pour les notifications.",
+    "error": "Une erreur est survenue lors de la gestion des notifications.",
+    "later": "Plus tard"
+  },
   "common": {
     "loading": "Chargement...",
     "error": "Une erreur est survenue",

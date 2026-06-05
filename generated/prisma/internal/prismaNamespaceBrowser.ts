@@ -58,6 +58,7 @@ export const ModelName = {
   Affectation: 'Affectation',
   Mission: 'Mission',
   MissionAssignment: 'MissionAssignment',
+  PushSubscription: 'PushSubscription',
   Event: 'Event',
   Price: 'Price',
   UsefulInfo: 'UsefulInfo'
@@ -182,6 +183,19 @@ export const MissionAssignmentScalarFieldEnum = {
 } as const
 
 export type MissionAssignmentScalarFieldEnum = (typeof MissionAssignmentScalarFieldEnum)[keyof typeof MissionAssignmentScalarFieldEnum]
+
+
+export const PushSubscriptionScalarFieldEnum = {
+  id: 'id',
+  endpoint: 'endpoint',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  userAgent: 'userAgent',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
 
 
 export const EventScalarFieldEnum = {
