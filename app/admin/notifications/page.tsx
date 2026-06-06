@@ -8,27 +8,60 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
+const GROUPS = [
+  { value: "PUBLIC", label: "Public", description: "Visiteurs sans compte" },
+  { value: "BENEVOLE", label: "Bénévoles", description: "Bénévoles inscrits" },
+  { value: "REFERENT", label: "Référents", description: "Référents de secteur" },
+  { value: "ADMIN", label: "Admins", description: "Administrateurs" },
+] as const
+
+type GroupCounts = Record<string, number>
+
 export default function AdminNotificationsPage() {
   const [title, setTitle] = useState("")
   const [message, setMessage] = useState("")
   const [url, setUrl] = useState("/")
-  const [subscriberCount, setSubscriberCount] = useState<number | null>(null)
+  const [selectedGroups, setSelectedGroups] = useState<string[]>(
+    GROUPS.map((g) => g.value)
+  )
+  const [subscriberTotal, setSubscriberTotal] = useState<number | null>(null)
+  const [groupCounts, setGroupCounts] = useState<GroupCounts>({})
   const [sending, setSending] = useState(false)
   const [result, setResult] = useState<{
     success: boolean
-    stats?: { total: number; sent: number; failed: number; cleaned: number }
+    stats?: { total: number; sent: number; failed: number; cleaned: number; groups: string[] }
     error?: string
   } | null>(null)
 
-  useEffect(() => {
+  function fetchCounts() {
     fetch("/api/admin/notifications/subscribers")
       .then((res) => res.json())
-      .then((data) => setSubscriberCount(data.count))
-      .catch(() => setSubscriberCount(0))
+      .then((data) => {
+        setSubscriberTotal(data.total ?? 0)
+        setGroupCounts(data.counts ?? {})
+      })
+      .catch(() => setSubscriberTotal(0))
+  }
+
+  useEffect(() => {
+    fetchCounts()
   }, [])
 
+  function toggleGroup(value: string) {
+    setSelectedGroups((prev) =>
+      prev.includes(value)
+        ? prev.filter((g) => g !== value)
+        : [...prev, value]
+    )
+  }
+
+  const selectedCount = selectedGroups.reduce(
+    (sum, g) => sum + (groupCounts[g] ?? 0),
+    0
+  )
+
   async function handleSend() {
-    if (!title.trim() || !message.trim()) return
+    if (!title.trim() || !message.trim() || selectedGroups.length === 0) return
 
     setSending(true)
     setResult(null)
@@ -37,7 +70,12 @@ export default function AdminNotificationsPage() {
       const res = await fetch("/api/admin/notifications/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, body: message, url }),
+        body: JSON.stringify({
+          title,
+          body: message,
+          url,
+          groups: selectedGroups,
+        }),
       })
       const data = await res.json()
       setResult(data)
@@ -46,10 +84,7 @@ export default function AdminNotificationsPage() {
         setTitle("")
         setMessage("")
         setUrl("/")
-        // Refresh count (stale subs may have been cleaned)
-        fetch("/api/admin/notifications/subscribers")
-          .then((res) => res.json())
-          .then((d) => setSubscriberCount(d.count))
+        fetchCounts()
       }
     } catch {
       setResult({ success: false, error: "Erreur réseau" })
@@ -66,7 +101,7 @@ export default function AdminNotificationsPage() {
           Notifications Push
         </h1>
         <p className="text-muted-foreground mt-1">
-          Envoyez des notifications à tous les utilisateurs abonnés.
+          Envoyez des notifications ciblées aux utilisateurs abonnés.
         </p>
       </div>
 
@@ -77,13 +112,23 @@ export default function AdminNotificationsPage() {
             <CardTitle className="text-sm font-medium">Abonnés</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <div className="text-3xl font-bold">
-              {subscriberCount === null ? "…" : subscriberCount}
+              {subscriberTotal === null ? "…" : subscriberTotal}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              appareils enregistrés
-            </p>
+            <div className="space-y-1.5">
+              {GROUPS.map((group) => (
+                <div
+                  key={group.value}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="text-muted-foreground">{group.label}</span>
+                  <span className="font-medium tabular-nums">
+                    {groupCounts[group.value] ?? 0}
+                  </span>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -92,10 +137,45 @@ export default function AdminNotificationsPage() {
           <CardHeader>
             <CardTitle>Envoyer une notification</CardTitle>
             <CardDescription>
-              La notification sera envoyée à tous les appareils abonnés (y compris les visiteurs sans compte).
+              Sélectionnez un ou plusieurs groupes destinataires.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Group selector */}
+            <div className="space-y-2">
+              <Label>Destinataires</Label>
+              <div className="flex flex-wrap gap-2">
+                {GROUPS.map((group) => {
+                  const isSelected = selectedGroups.includes(group.value)
+                  const count = groupCounts[group.value] ?? 0
+                  return (
+                    <button
+                      key={group.value}
+                      type="button"
+                      onClick={() => toggleGroup(group.value)}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${isSelected
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        }`}
+                    >
+                      {group.label}
+                      <span
+                        className={`tabular-nums ${isSelected ? "text-primary-foreground/70" : "text-muted-foreground/60"
+                          }`}
+                      >
+                        ({count})
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+              {selectedGroups.length > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  {selectedCount} appareil{selectedCount > 1 ? "s" : ""} ciblé{selectedCount > 1 ? "s" : ""}
+                </p>
+              )}
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="title">Titre</Label>
               <Input
@@ -120,9 +200,7 @@ export default function AdminNotificationsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="url">
-                Lien (optionnel)
-              </Label>
+              <Label htmlFor="url">Lien (optionnel)</Label>
               <Input
                 id="url"
                 placeholder="/"
@@ -137,8 +215,8 @@ export default function AdminNotificationsPage() {
             {result && (
               <div
                 className={`flex items-start gap-2 rounded-lg p-3 text-sm ${result.success
-                    ? "bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200"
-                    : "bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200"
+                  ? "bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200"
+                  : "bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200"
                   }`}
               >
                 {result.success ? (
@@ -148,8 +226,10 @@ export default function AdminNotificationsPage() {
                 )}
                 <span>
                   {result.success
-                    ? `Envoyé à ${result.stats?.sent}/${result.stats?.total} appareils.${result.stats?.cleaned
-                      ? ` ${result.stats.cleaned} abonnement(s) expiré(s) nettoyé(s).`
+                    ? `Envoyé à ${result.stats?.sent}/${result.stats?.total} appareils (${result.stats?.groups?.map(
+                      (g) => GROUPS.find((gr) => gr.value === g)?.label ?? g
+                    ).join(", ")}).${result.stats?.cleaned
+                      ? ` ${result.stats.cleaned} expiré(s) nettoyé(s).`
                       : ""
                     }`
                     : result.error || "Erreur lors de l'envoi."}
@@ -159,7 +239,13 @@ export default function AdminNotificationsPage() {
 
             <Button
               onClick={handleSend}
-              disabled={sending || !title.trim() || !message.trim() || subscriberCount === 0}
+              disabled={
+                sending ||
+                !title.trim() ||
+                !message.trim() ||
+                selectedGroups.length === 0 ||
+                selectedCount === 0
+              }
               className="w-full sm:w-auto gap-2"
             >
               {sending ? (

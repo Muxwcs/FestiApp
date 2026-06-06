@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { auth } from "@/auth"
+import { Session } from "next-auth"
 
 const ENDPOINT_MAX_LENGTH = 2048
 const KEY_MAX_LENGTH = 512
@@ -19,6 +21,13 @@ function isRateLimited(ip: string): boolean {
 
   entry.count++
   return entry.count > 10
+}
+
+function resolveRole(session: Session | null): string {
+  if (!session?.user) return "PUBLIC"
+  if (session.user.role === "ADMIN") return "ADMIN"
+  if (session.user.isReferent) return "REFERENT"
+  return "BENEVOLE"
 }
 
 export async function POST(request: NextRequest) {
@@ -67,6 +76,11 @@ export async function POST(request: NextRequest) {
 
     const userAgent = (request.headers.get("user-agent") || "").slice(0, 500)
 
+    // Determine role from session (server-side, no client trust)
+    const session = await auth()
+    const role = resolveRole(session)
+    const userId = session?.user?.id || null
+
     await prisma.pushSubscription.upsert({
       where: { endpoint },
       create: {
@@ -74,11 +88,15 @@ export async function POST(request: NextRequest) {
         p256dh: keys.p256dh,
         auth: keys.auth,
         userAgent: userAgent || null,
+        role,
+        userId,
       },
       update: {
         p256dh: keys.p256dh,
         auth: keys.auth,
         userAgent: userAgent || null,
+        role,
+        userId,
       },
     })
 

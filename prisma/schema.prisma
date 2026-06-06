@@ -41,6 +41,7 @@ model User {
   affectations       Affectation[]
   missionAssignments MissionAssignment[]
   referentSectors    SectorReferent[]
+  pushSubscriptions  PushSubscription[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -191,6 +192,9 @@ model PushSubscription {
   p256dh    String
   auth      String
   userAgent String?
+  role      String   @default("PUBLIC") // PUBLIC | BENEVOLE | REFERENT | ADMIN
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

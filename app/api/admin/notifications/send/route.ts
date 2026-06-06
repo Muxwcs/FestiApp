@@ -8,14 +8,15 @@ const TITLE_MAX_LENGTH = 100
 const BODY_MAX_LENGTH = 500
 const URL_MAX_LENGTH = 500
 const URL_REGEX = /^\/[a-zA-Z0-9\-_/?.=&#%]*$/
+const VALID_GROUPS = ["PUBLIC", "BENEVOLE", "REFERENT", "ADMIN"] as const
 
 export async function POST(request: NextRequest) {
-  try {
-    const { error: authError } = await requireAdmin()
-    if (authError) return authError
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
+  try {
     const body = await request.json()
-    const { title, body: message, url } = body
+    const { title, body: message, url, groups } = body
 
     // Validate & sanitize inputs
     if (typeof title !== "string" || typeof message !== "string") {
@@ -41,7 +42,25 @@ export async function POST(request: NextRequest) {
       cleanUrl = URL_REGEX.test(url) ? url : "/"
     }
 
-    const subscriptions = await prisma.pushSubscription.findMany()
+    // Validate groups (must be non-empty array of valid roles)
+    let targetGroups: string[] = VALID_GROUPS.slice()
+    if (Array.isArray(groups) && groups.length > 0) {
+      targetGroups = groups.filter((g: unknown) =>
+        typeof g === "string" && VALID_GROUPS.includes(g as typeof VALID_GROUPS[number])
+      )
+      if (targetGroups.length === 0) {
+        return NextResponse.json(
+          { error: "At least one valid group required" },
+          { status: 400 }
+        )
+      }
+    }
+
+    const subscriptions = await prisma.pushSubscription.findMany({
+      where: {
+        role: { in: targetGroups },
+      },
+    })
 
     const payload: PushPayload = {
       title: cleanTitle,
@@ -82,6 +101,7 @@ export async function POST(request: NextRequest) {
         sent,
         failed,
         cleaned: staleEndpoints.length,
+        groups: targetGroups,
       },
     })
   } catch (error) {
