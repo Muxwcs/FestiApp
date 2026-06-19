@@ -1397,6 +1397,7 @@ export const EventScalarFieldEnum = {
   startTime: 'startTime',
   endTime: 'endTime',
   imageSrc: 'imageSrc',
+  style: 'style',
   sortOrder: 'sortOrder',
   isActive: 'isActive',
   createdAt: 'createdAt',
@@ -1625,6 +1626,34 @@ export type ListEnumEventCategoryFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'Places'
+ */
+export type EnumPlacesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Places'>
+    
+
+
+/**
+ * Reference to a field of type 'Places[]'
+ */
+export type ListEnumPlacesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Places[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Days'
+ */
+export type EnumDaysFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Days'>
+    
+
+
+/**
+ * Reference to a field of type 'Days[]'
+ */
+export type ListEnumDaysFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Days[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1635,6 +1664,34 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PriceCategory'
+ */
+export type EnumPriceCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PriceCategory'>
+    
+
+
+/**
+ * Reference to a field of type 'PriceCategory[]'
+ */
+export type ListEnumPriceCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PriceCategory[]'>
+    
+
+
+/**
+ * Reference to a field of type 'InfosCategory'
+ */
+export type EnumInfosCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InfosCategory'>
+    
+
+
+/**
+ * Reference to a field of type 'InfosCategory[]'
+ */
+export type ListEnumInfosCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InfosCategory[]'>
     
 
 /**

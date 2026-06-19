@@ -210,20 +210,35 @@ model PushSubscription {
 enum EventCategory {
   CONCERT
   ANIMATION
-  RESTAURATION
   INFO
+  SKATE
+  STREET_ART
+}
+
+enum Places {
+  HANDIA
+  TTIKIA
+  CASTLE
+  VILLAGE
+  FESTIVAL
+}
+
+enum Days {
+  VENDREDI
+  SAMEDI
 }
 
 model Event {
   id          String        @id @default(cuid())
   title       Json          // { fr: "...", eu: "...", en: "..." }
   description Json?         // { fr: "...", eu: "...", en: "..." }
-  category    EventCategory
-  place       String?
-  day         String        // "vendredi", "samedi", "dimanche"
+  category    EventCategory @default(CONCERT)
+  place       Places        @default(FESTIVAL)
+  day         Days          @default(VENDREDI)
   startTime   DateTime
   endTime     DateTime?
   imageSrc    String?
+  style       String?       // rock, reggae ...
   sortOrder   Int           @default(0)
   isActive    Boolean       @default(true)
 
@@ -237,13 +252,20 @@ model Event {
 // PUBLIC — Prices (tarifs)
 // =============================================================
 
+enum PriceCategory {
+  MERCH
+  BAR
+  RESTAURATION
+  PASS
+}
+
 model Price {
   id          String  @id @default(cuid())
   title       Json    // { fr: "...", eu: "...", en: "..." }
   description Json?   // { fr: "...", eu: "...", en: "..." }
   amount      Float
   currency    String  @default("EUR")
-  category    String? // "Entrée", "Pass", "Restauration"
+  category    PriceCategory  @default(BAR)
   sortOrder   Int     @default(0)
   isActive    Boolean @default(true)
 
@@ -257,12 +279,20 @@ model Price {
 // PUBLIC — Useful Info (infos pratiques)
 // =============================================================
 
+enum InfosCategory {
+  ACCESS
+  SECURITY
+  USEFUL 
+  FAQ
+  PMR
+}
+
 model UsefulInfo {
   id       String  @id @default(cuid())
   title    Json    // { fr: "...", eu: "...", en: "..." }
   content  Json    // { fr: "...", eu: "...", en: "..." }
   icon     String? // emoji or icon name
-  category String? // "Accès", "Sécurité", "Contact"
+  category InfosCategory  @default(USEFUL)
   sortOrder Int     @default(0)
   isActive  Boolean @default(true)
 

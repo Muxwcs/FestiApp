@@ -40,7 +40,7 @@ export type PriceMinAggregateOutputType = {
   id: string | null
   amount: number | null
   currency: string | null
-  category: string | null
+  category: $Enums.PriceCategory | null
   sortOrder: number | null
   isActive: boolean | null
   createdAt: Date | null
@@ -51,7 +51,7 @@ export type PriceMaxAggregateOutputType = {
   id: string | null
   amount: number | null
   currency: string | null
-  category: string | null
+  category: $Enums.PriceCategory | null
   sortOrder: number | null
   isActive: boolean | null
   createdAt: Date | null
@@ -211,7 +211,7 @@ export type PriceGroupByOutputType = {
   description: runtime.JsonValue | null
   amount: number
   currency: string
-  category: string | null
+  category: $Enums.PriceCategory
   sortOrder: number
   isActive: boolean
   createdAt: Date
@@ -247,7 +247,7 @@ export type PriceWhereInput = {
   description?: Prisma.JsonNullableFilter<"Price">
   amount?: Prisma.FloatFilter<"Price"> | number
   currency?: Prisma.StringFilter<"Price"> | string
-  category?: Prisma.StringNullableFilter<"Price"> | string | null
+  category?: Prisma.EnumPriceCategoryFilter<"Price"> | $Enums.PriceCategory
   sortOrder?: Prisma.IntFilter<"Price"> | number
   isActive?: Prisma.BoolFilter<"Price"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Price"> | Date | string
@@ -260,7 +260,7 @@ export type PriceOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
-  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  category?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -276,7 +276,7 @@ export type PriceWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.JsonNullableFilter<"Price">
   amount?: Prisma.FloatFilter<"Price"> | number
   currency?: Prisma.StringFilter<"Price"> | string
-  category?: Prisma.StringNullableFilter<"Price"> | string | null
+  category?: Prisma.EnumPriceCategoryFilter<"Price"> | $Enums.PriceCategory
   sortOrder?: Prisma.IntFilter<"Price"> | number
   isActive?: Prisma.BoolFilter<"Price"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Price"> | Date | string
@@ -289,7 +289,7 @@ export type PriceOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
-  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  category?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -310,7 +310,7 @@ export type PriceScalarWhereWithAggregatesInput = {
   description?: Prisma.JsonNullableWithAggregatesFilter<"Price">
   amount?: Prisma.FloatWithAggregatesFilter<"Price"> | number
   currency?: Prisma.StringWithAggregatesFilter<"Price"> | string
-  category?: Prisma.StringNullableWithAggregatesFilter<"Price"> | string | null
+  category?: Prisma.EnumPriceCategoryWithAggregatesFilter<"Price"> | $Enums.PriceCategory
   sortOrder?: Prisma.IntWithAggregatesFilter<"Price"> | number
   isActive?: Prisma.BoolWithAggregatesFilter<"Price"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Price"> | Date | string
@@ -323,7 +323,7 @@ export type PriceCreateInput = {
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   amount: number
   currency?: string
-  category?: string | null
+  category?: $Enums.PriceCategory
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -336,7 +336,7 @@ export type PriceUncheckedCreateInput = {
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   amount: number
   currency?: string
-  category?: string | null
+  category?: $Enums.PriceCategory
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -349,7 +349,7 @@ export type PriceUpdateInput = {
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumPriceCategoryFieldUpdateOperationsInput | $Enums.PriceCategory
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -362,7 +362,7 @@ export type PriceUncheckedUpdateInput = {
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumPriceCategoryFieldUpdateOperationsInput | $Enums.PriceCategory
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -375,7 +375,7 @@ export type PriceCreateManyInput = {
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   amount: number
   currency?: string
-  category?: string | null
+  category?: $Enums.PriceCategory
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -388,7 +388,7 @@ export type PriceUpdateManyMutationInput = {
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumPriceCategoryFieldUpdateOperationsInput | $Enums.PriceCategory
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -401,7 +401,7 @@ export type PriceUncheckedUpdateManyInput = {
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumPriceCategoryFieldUpdateOperationsInput | $Enums.PriceCategory
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -459,6 +459,10 @@ export type FloatFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type EnumPriceCategoryFieldUpdateOperationsInput = {
+  set?: $Enums.PriceCategory
 }
 
 
@@ -526,7 +530,7 @@ export type $PricePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     description: runtime.JsonValue | null
     amount: number
     currency: string
-    category: string | null
+    category: $Enums.PriceCategory
     sortOrder: number
     isActive: boolean
     createdAt: Date
@@ -959,7 +963,7 @@ export interface PriceFieldRefs {
   readonly description: Prisma.FieldRef<"Price", 'Json'>
   readonly amount: Prisma.FieldRef<"Price", 'Float'>
   readonly currency: Prisma.FieldRef<"Price", 'String'>
-  readonly category: Prisma.FieldRef<"Price", 'String'>
+  readonly category: Prisma.FieldRef<"Price", 'PriceCategory'>
   readonly sortOrder: Prisma.FieldRef<"Price", 'Int'>
   readonly isActive: Prisma.FieldRef<"Price", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Price", 'DateTime'>

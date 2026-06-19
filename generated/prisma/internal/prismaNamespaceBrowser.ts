@@ -210,6 +210,7 @@ export const EventScalarFieldEnum = {
   startTime: 'startTime',
   endTime: 'endTime',
   imageSrc: 'imageSrc',
+  style: 'style',
   sortOrder: 'sortOrder',
   isActive: 'isActive',
   createdAt: 'createdAt',

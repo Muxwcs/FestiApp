@@ -37,7 +37,7 @@ export type UsefulInfoSumAggregateOutputType = {
 export type UsefulInfoMinAggregateOutputType = {
   id: string | null
   icon: string | null
-  category: string | null
+  category: $Enums.InfosCategory | null
   sortOrder: number | null
   isActive: boolean | null
   createdAt: Date | null
@@ -47,7 +47,7 @@ export type UsefulInfoMinAggregateOutputType = {
 export type UsefulInfoMaxAggregateOutputType = {
   id: string | null
   icon: string | null
-  category: string | null
+  category: $Enums.InfosCategory | null
   sortOrder: number | null
   isActive: boolean | null
   createdAt: Date | null
@@ -200,7 +200,7 @@ export type UsefulInfoGroupByOutputType = {
   title: runtime.JsonValue
   content: runtime.JsonValue
   icon: string | null
-  category: string | null
+  category: $Enums.InfosCategory
   sortOrder: number
   isActive: boolean
   createdAt: Date
@@ -235,7 +235,7 @@ export type UsefulInfoWhereInput = {
   title?: Prisma.JsonFilter<"UsefulInfo">
   content?: Prisma.JsonFilter<"UsefulInfo">
   icon?: Prisma.StringNullableFilter<"UsefulInfo"> | string | null
-  category?: Prisma.StringNullableFilter<"UsefulInfo"> | string | null
+  category?: Prisma.EnumInfosCategoryFilter<"UsefulInfo"> | $Enums.InfosCategory
   sortOrder?: Prisma.IntFilter<"UsefulInfo"> | number
   isActive?: Prisma.BoolFilter<"UsefulInfo"> | boolean
   createdAt?: Prisma.DateTimeFilter<"UsefulInfo"> | Date | string
@@ -247,7 +247,7 @@ export type UsefulInfoOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   icon?: Prisma.SortOrderInput | Prisma.SortOrder
-  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  category?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -262,7 +262,7 @@ export type UsefulInfoWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.JsonFilter<"UsefulInfo">
   content?: Prisma.JsonFilter<"UsefulInfo">
   icon?: Prisma.StringNullableFilter<"UsefulInfo"> | string | null
-  category?: Prisma.StringNullableFilter<"UsefulInfo"> | string | null
+  category?: Prisma.EnumInfosCategoryFilter<"UsefulInfo"> | $Enums.InfosCategory
   sortOrder?: Prisma.IntFilter<"UsefulInfo"> | number
   isActive?: Prisma.BoolFilter<"UsefulInfo"> | boolean
   createdAt?: Prisma.DateTimeFilter<"UsefulInfo"> | Date | string
@@ -274,7 +274,7 @@ export type UsefulInfoOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   icon?: Prisma.SortOrderInput | Prisma.SortOrder
-  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  category?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -294,7 +294,7 @@ export type UsefulInfoScalarWhereWithAggregatesInput = {
   title?: Prisma.JsonWithAggregatesFilter<"UsefulInfo">
   content?: Prisma.JsonWithAggregatesFilter<"UsefulInfo">
   icon?: Prisma.StringNullableWithAggregatesFilter<"UsefulInfo"> | string | null
-  category?: Prisma.StringNullableWithAggregatesFilter<"UsefulInfo"> | string | null
+  category?: Prisma.EnumInfosCategoryWithAggregatesFilter<"UsefulInfo"> | $Enums.InfosCategory
   sortOrder?: Prisma.IntWithAggregatesFilter<"UsefulInfo"> | number
   isActive?: Prisma.BoolWithAggregatesFilter<"UsefulInfo"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UsefulInfo"> | Date | string
@@ -306,7 +306,7 @@ export type UsefulInfoCreateInput = {
   title: Prisma.JsonNullValueInput | runtime.InputJsonValue
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
   icon?: string | null
-  category?: string | null
+  category?: $Enums.InfosCategory
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -318,7 +318,7 @@ export type UsefulInfoUncheckedCreateInput = {
   title: Prisma.JsonNullValueInput | runtime.InputJsonValue
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
   icon?: string | null
-  category?: string | null
+  category?: $Enums.InfosCategory
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -330,7 +330,7 @@ export type UsefulInfoUpdateInput = {
   title?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumInfosCategoryFieldUpdateOperationsInput | $Enums.InfosCategory
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -342,7 +342,7 @@ export type UsefulInfoUncheckedUpdateInput = {
   title?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumInfosCategoryFieldUpdateOperationsInput | $Enums.InfosCategory
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -354,7 +354,7 @@ export type UsefulInfoCreateManyInput = {
   title: Prisma.JsonNullValueInput | runtime.InputJsonValue
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
   icon?: string | null
-  category?: string | null
+  category?: $Enums.InfosCategory
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -366,7 +366,7 @@ export type UsefulInfoUpdateManyMutationInput = {
   title?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumInfosCategoryFieldUpdateOperationsInput | $Enums.InfosCategory
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -378,7 +378,7 @@ export type UsefulInfoUncheckedUpdateManyInput = {
   title?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumInfosCategoryFieldUpdateOperationsInput | $Enums.InfosCategory
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -423,6 +423,10 @@ export type UsefulInfoMinOrderByAggregateInput = {
 
 export type UsefulInfoSumOrderByAggregateInput = {
   sortOrder?: Prisma.SortOrder
+}
+
+export type EnumInfosCategoryFieldUpdateOperationsInput = {
+  set?: $Enums.InfosCategory
 }
 
 
@@ -485,7 +489,7 @@ export type $UsefulInfoPayload<ExtArgs extends runtime.Types.Extensions.Internal
     title: runtime.JsonValue
     content: runtime.JsonValue
     icon: string | null
-    category: string | null
+    category: $Enums.InfosCategory
     sortOrder: number
     isActive: boolean
     createdAt: Date
@@ -917,7 +921,7 @@ export interface UsefulInfoFieldRefs {
   readonly title: Prisma.FieldRef<"UsefulInfo", 'Json'>
   readonly content: Prisma.FieldRef<"UsefulInfo", 'Json'>
   readonly icon: Prisma.FieldRef<"UsefulInfo", 'String'>
-  readonly category: Prisma.FieldRef<"UsefulInfo", 'String'>
+  readonly category: Prisma.FieldRef<"UsefulInfo", 'InfosCategory'>
   readonly sortOrder: Prisma.FieldRef<"UsefulInfo", 'Int'>
   readonly isActive: Prisma.FieldRef<"UsefulInfo", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"UsefulInfo", 'DateTime'>

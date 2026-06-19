@@ -37,11 +37,12 @@ export type EventSumAggregateOutputType = {
 export type EventMinAggregateOutputType = {
   id: string | null
   category: $Enums.EventCategory | null
-  place: string | null
-  day: string | null
+  place: $Enums.Places | null
+  day: $Enums.Days | null
   startTime: Date | null
   endTime: Date | null
   imageSrc: string | null
+  style: string | null
   sortOrder: number | null
   isActive: boolean | null
   createdAt: Date | null
@@ -51,11 +52,12 @@ export type EventMinAggregateOutputType = {
 export type EventMaxAggregateOutputType = {
   id: string | null
   category: $Enums.EventCategory | null
-  place: string | null
-  day: string | null
+  place: $Enums.Places | null
+  day: $Enums.Days | null
   startTime: Date | null
   endTime: Date | null
   imageSrc: string | null
+  style: string | null
   sortOrder: number | null
   isActive: boolean | null
   createdAt: Date | null
@@ -72,6 +74,7 @@ export type EventCountAggregateOutputType = {
   startTime: number
   endTime: number
   imageSrc: number
+  style: number
   sortOrder: number
   isActive: number
   createdAt: number
@@ -96,6 +99,7 @@ export type EventMinAggregateInputType = {
   startTime?: true
   endTime?: true
   imageSrc?: true
+  style?: true
   sortOrder?: true
   isActive?: true
   createdAt?: true
@@ -110,6 +114,7 @@ export type EventMaxAggregateInputType = {
   startTime?: true
   endTime?: true
   imageSrc?: true
+  style?: true
   sortOrder?: true
   isActive?: true
   createdAt?: true
@@ -126,6 +131,7 @@ export type EventCountAggregateInputType = {
   startTime?: true
   endTime?: true
   imageSrc?: true
+  style?: true
   sortOrder?: true
   isActive?: true
   createdAt?: true
@@ -224,11 +230,12 @@ export type EventGroupByOutputType = {
   title: runtime.JsonValue
   description: runtime.JsonValue | null
   category: $Enums.EventCategory
-  place: string | null
-  day: string
+  place: $Enums.Places
+  day: $Enums.Days
   startTime: Date
   endTime: Date | null
   imageSrc: string | null
+  style: string | null
   sortOrder: number
   isActive: boolean
   createdAt: Date
@@ -263,11 +270,12 @@ export type EventWhereInput = {
   title?: Prisma.JsonFilter<"Event">
   description?: Prisma.JsonNullableFilter<"Event">
   category?: Prisma.EnumEventCategoryFilter<"Event"> | $Enums.EventCategory
-  place?: Prisma.StringNullableFilter<"Event"> | string | null
-  day?: Prisma.StringFilter<"Event"> | string
+  place?: Prisma.EnumPlacesFilter<"Event"> | $Enums.Places
+  day?: Prisma.EnumDaysFilter<"Event"> | $Enums.Days
   startTime?: Prisma.DateTimeFilter<"Event"> | Date | string
   endTime?: Prisma.DateTimeNullableFilter<"Event"> | Date | string | null
   imageSrc?: Prisma.StringNullableFilter<"Event"> | string | null
+  style?: Prisma.StringNullableFilter<"Event"> | string | null
   sortOrder?: Prisma.IntFilter<"Event"> | number
   isActive?: Prisma.BoolFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
@@ -279,11 +287,12 @@ export type EventOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
-  place?: Prisma.SortOrderInput | Prisma.SortOrder
+  place?: Prisma.SortOrder
   day?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrderInput | Prisma.SortOrder
   imageSrc?: Prisma.SortOrderInput | Prisma.SortOrder
+  style?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -298,11 +307,12 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.JsonFilter<"Event">
   description?: Prisma.JsonNullableFilter<"Event">
   category?: Prisma.EnumEventCategoryFilter<"Event"> | $Enums.EventCategory
-  place?: Prisma.StringNullableFilter<"Event"> | string | null
-  day?: Prisma.StringFilter<"Event"> | string
+  place?: Prisma.EnumPlacesFilter<"Event"> | $Enums.Places
+  day?: Prisma.EnumDaysFilter<"Event"> | $Enums.Days
   startTime?: Prisma.DateTimeFilter<"Event"> | Date | string
   endTime?: Prisma.DateTimeNullableFilter<"Event"> | Date | string | null
   imageSrc?: Prisma.StringNullableFilter<"Event"> | string | null
+  style?: Prisma.StringNullableFilter<"Event"> | string | null
   sortOrder?: Prisma.IntFilter<"Event"> | number
   isActive?: Prisma.BoolFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
@@ -314,11 +324,12 @@ export type EventOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
-  place?: Prisma.SortOrderInput | Prisma.SortOrder
+  place?: Prisma.SortOrder
   day?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrderInput | Prisma.SortOrder
   imageSrc?: Prisma.SortOrderInput | Prisma.SortOrder
+  style?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -338,11 +349,12 @@ export type EventScalarWhereWithAggregatesInput = {
   title?: Prisma.JsonWithAggregatesFilter<"Event">
   description?: Prisma.JsonNullableWithAggregatesFilter<"Event">
   category?: Prisma.EnumEventCategoryWithAggregatesFilter<"Event"> | $Enums.EventCategory
-  place?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
-  day?: Prisma.StringWithAggregatesFilter<"Event"> | string
+  place?: Prisma.EnumPlacesWithAggregatesFilter<"Event"> | $Enums.Places
+  day?: Prisma.EnumDaysWithAggregatesFilter<"Event"> | $Enums.Days
   startTime?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   endTime?: Prisma.DateTimeNullableWithAggregatesFilter<"Event"> | Date | string | null
   imageSrc?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
+  style?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
   sortOrder?: Prisma.IntWithAggregatesFilter<"Event"> | number
   isActive?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
@@ -353,12 +365,13 @@ export type EventCreateInput = {
   id?: string
   title: Prisma.JsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  category: $Enums.EventCategory
-  place?: string | null
-  day: string
+  category?: $Enums.EventCategory
+  place?: $Enums.Places
+  day?: $Enums.Days
   startTime: Date | string
   endTime?: Date | string | null
   imageSrc?: string | null
+  style?: string | null
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -369,12 +382,13 @@ export type EventUncheckedCreateInput = {
   id?: string
   title: Prisma.JsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  category: $Enums.EventCategory
-  place?: string | null
-  day: string
+  category?: $Enums.EventCategory
+  place?: $Enums.Places
+  day?: $Enums.Days
   startTime: Date | string
   endTime?: Date | string | null
   imageSrc?: string | null
+  style?: string | null
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -386,11 +400,12 @@ export type EventUpdateInput = {
   title?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
-  place?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  day?: Prisma.StringFieldUpdateOperationsInput | string
+  place?: Prisma.EnumPlacesFieldUpdateOperationsInput | $Enums.Places
+  day?: Prisma.EnumDaysFieldUpdateOperationsInput | $Enums.Days
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   imageSrc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -402,11 +417,12 @@ export type EventUncheckedUpdateInput = {
   title?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
-  place?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  day?: Prisma.StringFieldUpdateOperationsInput | string
+  place?: Prisma.EnumPlacesFieldUpdateOperationsInput | $Enums.Places
+  day?: Prisma.EnumDaysFieldUpdateOperationsInput | $Enums.Days
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   imageSrc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -417,12 +433,13 @@ export type EventCreateManyInput = {
   id?: string
   title: Prisma.JsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  category: $Enums.EventCategory
-  place?: string | null
-  day: string
+  category?: $Enums.EventCategory
+  place?: $Enums.Places
+  day?: $Enums.Days
   startTime: Date | string
   endTime?: Date | string | null
   imageSrc?: string | null
+  style?: string | null
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -434,11 +451,12 @@ export type EventUpdateManyMutationInput = {
   title?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
-  place?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  day?: Prisma.StringFieldUpdateOperationsInput | string
+  place?: Prisma.EnumPlacesFieldUpdateOperationsInput | $Enums.Places
+  day?: Prisma.EnumDaysFieldUpdateOperationsInput | $Enums.Days
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   imageSrc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -450,11 +468,12 @@ export type EventUncheckedUpdateManyInput = {
   title?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   category?: Prisma.EnumEventCategoryFieldUpdateOperationsInput | $Enums.EventCategory
-  place?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  day?: Prisma.StringFieldUpdateOperationsInput | string
+  place?: Prisma.EnumPlacesFieldUpdateOperationsInput | $Enums.Places
+  day?: Prisma.EnumDaysFieldUpdateOperationsInput | $Enums.Days
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   imageSrc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -471,6 +490,7 @@ export type EventCountOrderByAggregateInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   imageSrc?: Prisma.SortOrder
+  style?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -489,6 +509,7 @@ export type EventMaxOrderByAggregateInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   imageSrc?: Prisma.SortOrder
+  style?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -503,6 +524,7 @@ export type EventMinOrderByAggregateInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   imageSrc?: Prisma.SortOrder
+  style?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -517,6 +539,14 @@ export type EnumEventCategoryFieldUpdateOperationsInput = {
   set?: $Enums.EventCategory
 }
 
+export type EnumPlacesFieldUpdateOperationsInput = {
+  set?: $Enums.Places
+}
+
+export type EnumDaysFieldUpdateOperationsInput = {
+  set?: $Enums.Days
+}
+
 
 
 export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -529,6 +559,7 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   startTime?: boolean
   endTime?: boolean
   imageSrc?: boolean
+  style?: boolean
   sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
@@ -545,6 +576,7 @@ export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   startTime?: boolean
   endTime?: boolean
   imageSrc?: boolean
+  style?: boolean
   sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
@@ -561,6 +593,7 @@ export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   startTime?: boolean
   endTime?: boolean
   imageSrc?: boolean
+  style?: boolean
   sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
@@ -577,13 +610,14 @@ export type EventSelectScalar = {
   startTime?: boolean
   endTime?: boolean
   imageSrc?: boolean
+  style?: boolean
   sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "category" | "place" | "day" | "startTime" | "endTime" | "imageSrc" | "sortOrder" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["event"]>
+export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "category" | "place" | "day" | "startTime" | "endTime" | "imageSrc" | "style" | "sortOrder" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["event"]>
 
 export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Event"
@@ -593,11 +627,12 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     title: runtime.JsonValue
     description: runtime.JsonValue | null
     category: $Enums.EventCategory
-    place: string | null
-    day: string
+    place: $Enums.Places
+    day: $Enums.Days
     startTime: Date
     endTime: Date | null
     imageSrc: string | null
+    style: string | null
     sortOrder: number
     isActive: boolean
     createdAt: Date
@@ -1029,11 +1064,12 @@ export interface EventFieldRefs {
   readonly title: Prisma.FieldRef<"Event", 'Json'>
   readonly description: Prisma.FieldRef<"Event", 'Json'>
   readonly category: Prisma.FieldRef<"Event", 'EventCategory'>
-  readonly place: Prisma.FieldRef<"Event", 'String'>
-  readonly day: Prisma.FieldRef<"Event", 'String'>
+  readonly place: Prisma.FieldRef<"Event", 'Places'>
+  readonly day: Prisma.FieldRef<"Event", 'Days'>
   readonly startTime: Prisma.FieldRef<"Event", 'DateTime'>
   readonly endTime: Prisma.FieldRef<"Event", 'DateTime'>
   readonly imageSrc: Prisma.FieldRef<"Event", 'String'>
+  readonly style: Prisma.FieldRef<"Event", 'String'>
   readonly sortOrder: Prisma.FieldRef<"Event", 'Int'>
   readonly isActive: Prisma.FieldRef<"Event", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Event", 'DateTime'>

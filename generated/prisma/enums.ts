@@ -47,8 +47,49 @@ export type MissionStatus = (typeof MissionStatus)[keyof typeof MissionStatus]
 export const EventCategory = {
   CONCERT: 'CONCERT',
   ANIMATION: 'ANIMATION',
-  RESTAURATION: 'RESTAURATION',
-  INFO: 'INFO'
+  INFO: 'INFO',
+  SKATE: 'SKATE',
+  STREET_ART: 'STREET_ART'
 } as const
 
 export type EventCategory = (typeof EventCategory)[keyof typeof EventCategory]
+
+
+export const Places = {
+  HANDIA: 'HANDIA',
+  TTIKIA: 'TTIKIA',
+  CASTLE: 'CASTLE',
+  VILLAGE: 'VILLAGE',
+  FESTIVAL: 'FESTIVAL'
+} as const
+
+export type Places = (typeof Places)[keyof typeof Places]
+
+
+export const Days = {
+  VENDREDI: 'VENDREDI',
+  SAMEDI: 'SAMEDI'
+} as const
+
+export type Days = (typeof Days)[keyof typeof Days]
+
+
+export const PriceCategory = {
+  MERCH: 'MERCH',
+  BAR: 'BAR',
+  RESTAURATION: 'RESTAURATION',
+  PASS: 'PASS'
+} as const
+
+export type PriceCategory = (typeof PriceCategory)[keyof typeof PriceCategory]
+
+
+export const InfosCategory = {
+  ACCESS: 'ACCESS',
+  SECURITY: 'SECURITY',
+  USEFUL: 'USEFUL',
+  FAQ: 'FAQ',
+  PMR: 'PMR'
+} as const
+
+export type InfosCategory = (typeof InfosCategory)[keyof typeof InfosCategory]
