@@ -1,11 +1,13 @@
 /// <reference lib="webworker" />
 
-const CACHE_NAME = "festiapp-v1";
+const CACHE_NAME = "festiapp-v2";
 
 const STATIC_ASSETS = [
   "/icon-192x192.png",
   "/icon-512x512.png",
-  "/background-public.png",
+  "/public-bg.png",
+  "/home-cta-bg.webp",
+  "/fl20-logo.webp",
 ];
 
 // Install: pre-cache static assets

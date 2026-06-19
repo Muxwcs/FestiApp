@@ -3,27 +3,57 @@
     "home": "Accueil",
     "program": "Programme",
     "prices": "Tarifs",
-    "info": "Infos pratiques",
+    "info": "Infos",
+    "menu": "Menu",
     "login": "Connexion"
   },
   "hero": {
     "title": "Festival",
-    "subtitle": "Agorrilak 2 Août",
+    "subtitle": "31 Juillet & 1er Août",
     "cta": "Voir le programme"
   },
   "program": {
     "title": "Programme",
     "allDays": "Tous les jours",
+    "allCategories": "Tout",
     "noEvents": "Aucun événement prévu pour ce jour",
     "categories": {
       "CONCERT": "Concerts",
       "ANIMATION": "Animations",
+      "INFO": "Informations",
+      "SKATE": "Skate",
+      "STREET_ART": "Street Art"
+    }
+  },
+  "enums": {
+    "days": {
+      "VENDREDI": "Vendredi",
+      "SAMEDI": "Samedi"
+    },
+    "places": {
+      "HANDIA": "Handia",
+      "TTIKIA": "Ttikia",
+      "CASTLE": "Château",
+      "VILLAGE": "Village",
+      "FESTIVAL": "Festival"
+    },
+    "priceCategory": {
+      "MERCH": "Merch",
+      "BAR": "Bar",
       "RESTAURATION": "Restauration",
-      "INFO": "Informations"
+      "PASS": "Pass"
+    },
+    "infosCategory": {
+      "ACCESS": "Accès",
+      "SECURITY": "Sécurité",
+      "USEFUL": "Utile",
+      "FAQ": "FAQ",
+      "PMR": "PMR"
     }
   },
   "prices": {
     "title": "Tarifs",
+    "description": "Sur le site du festival vous trouverez des stands de restauration et de boissons. Vous pouvez également acheter des produits dérivés du festival.\n Tous ces produits s'achètent à l'aide de TXARTELS, la monnaie du festival.\n Vous pouvez échanger vos euros contre des TXARTELS juste après l'entrée du festival, sur votre gauche. \n1€ = 1 TXARTEL.",
     "free": "Gratuit",
     "currency": "€"
   },

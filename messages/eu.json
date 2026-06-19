@@ -3,27 +3,57 @@
     "home": "Hasiera",
     "program": "Programa",
     "prices": "Tarifak",
-    "info": "Informazio praktikoak",
+    "info": "Infoak",
+    "menu": "Menua",
     "login": "Konexioa"
   },
   "hero": {
     "title": "Festibala",
-    "subtitle": "Agorrilak 2 Abuztua",
+    "subtitle": "Uztailak 31 & Agorrilak 1",
     "cta": "Programa ikusi"
   },
   "program": {
     "title": "Programa",
     "allDays": "Egun guztiak",
+    "allCategories": "Guztiak",
     "noEvents": "Ez dago ekitaldirik egun honetarako",
     "categories": {
       "CONCERT": "Kontzertuak",
       "ANIMATION": "Animazioak",
+      "INFO": "Informazioak",
+      "SKATE": "Skate",
+      "STREET_ART": "Street Art"
+    }
+  },
+  "enums": {
+    "days": {
+      "VENDREDI": "Ostirala",
+      "SAMEDI": "Larunbata"
+    },
+    "places": {
+      "HANDIA": "Handia",
+      "TTIKIA": "Ttikia",
+      "CASTLE": "Château",
+      "VILLAGE": "Herrikoa",
+      "FESTIVAL": "Festibala"
+    },
+    "priceCategory": {
+      "MERCH": "Merch",
+      "BAR": "Ostatua",
       "RESTAURATION": "Jatetxea",
-      "INFO": "Informazioak"
+      "PASS": "Pass"
+    },
+    "infosCategory": {
+      "ACCESS": "Sarbidea",
+      "SECURITY": "Segurtasuna",
+      "USEFUL": "Erabilgarria",
+      "FAQ": "FAQ",
+      "PMR": "PMR"
     }
   },
   "prices": {
     "title": "Tarifak",
+    "description": "Festibalaren gunean janari eta edari postuak aurkituko dituzu. Festibalaren merchandisinga ere erosi dezakezu.\n Produktu hauek guztiak TXARTEL-ak erabiliz erosten dira, festibalaren moneta.\n Euroak TXARTEL-etan trukatu ditzakezu festibalera sartzean, ezkerrean. \n1€ = 1 TXARTEL.",
     "free": "Doan",
     "currency": "€"
   },

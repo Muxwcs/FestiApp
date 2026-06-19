@@ -3,27 +3,57 @@
     "home": "Home",
     "program": "Program",
     "prices": "Prices",
-    "info": "Practical Info",
+    "info": "Infos",
+    "menu": "Menu",
     "login": "Login"
   },
   "hero": {
     "title": "Festival",
-    "subtitle": "August 2nd",
+    "subtitle": "July 31 & August 1",
     "cta": "View program"
   },
   "program": {
     "title": "Program",
     "allDays": "All days",
+    "allCategories": "All",
     "noEvents": "No events scheduled for this day",
     "categories": {
       "CONCERT": "Concerts",
       "ANIMATION": "Activities",
-      "RESTAURATION": "Food & Drinks",
-      "INFO": "Information"
+      "INFO": "Information",
+      "SKATE": "Skate",
+      "STREET_ART": "Street Art"
+    }
+  },
+  "enums": {
+    "days": {
+      "VENDREDI": "Friday",
+      "SAMEDI": "Saturday"
+    },
+    "places": {
+      "HANDIA": "Handia",
+      "TTIKIA": "Ttikia",
+      "CASTLE": "Castle",
+      "VILLAGE": "Village",
+      "FESTIVAL": "Festival"
+    },
+    "priceCategory": {
+      "MERCH": "Merch",
+      "BAR": "Drinks",
+      "RESTAURATION": "Food",
+      "PASS": "Pass"
+    },
+    "infosCategory": {
+      "ACCESS": "Access",
+      "SECURITY": "Security",
+      "USEFUL": "Useful",
+      "FAQ": "FAQ",
+      "PMR": "Accessibility"
     }
   },
   "prices": {
     "title": "Prices",
+    "description": "At the festival site, you will find food and drink stands. You can also purchase festival merchandise.\n All these products are purchased using TXARTELS, the festival currency. \nYou can exchange your euros for TXARTELS just after entering the festival, on your left.\n 1€ = 1 TXARTEL.",
     "free": "Free",
     "currency": "€"
   },
