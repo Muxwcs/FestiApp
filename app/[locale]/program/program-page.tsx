@@ -116,8 +116,8 @@ export function ProgramPage({ locale, events }: Props) {
             <button
               onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
               className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all backdrop-blur-xl ${showFavoritesOnly
-                  ? "bg-flYellow text-flDarkBlue"
-                  : "bg-white/5 text-white/50 hover:bg-white/10"
+                ? "bg-flYellow text-flDarkBlue"
+                : "bg-white/5 text-white/50 hover:bg-white/10"
                 }`}
             >
               <Heart className={`h-3 w-3 ${showFavoritesOnly ? "fill-current" : ""}`} />
@@ -163,8 +163,11 @@ export function ProgramPage({ locale, events }: Props) {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-sm sm:text-base text-white truncate">
+                  <h3 className="flex items-center font-bold text-sm sm:text-base text-white truncate">
                     {translate(event.title, locale)}
+                    {isFavorite(event.id) && (
+                      <Heart className="h-3 w-3 ml-1 text-red-500 fill-red-500" />
+                    )}
                   </h3>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-xs text-white/50">
                     <span className="flex items-center gap-1">
