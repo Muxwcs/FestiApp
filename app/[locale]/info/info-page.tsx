@@ -1,10 +1,8 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { ArrowLeft } from "lucide-react"
 import { t as translate, type Locale } from "@/lib/i18n/types"
-import { BottomNav } from "@/components/public/bottom-nav"
-import Link from "next/link"
+import Header from "@/components/public/header"
 
 interface InfoItem {
   id: string
@@ -24,17 +22,9 @@ export function InfoPage({ locale, infos }: Props) {
 
   return (
     <div className="min-h-screen w-full text-white pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-flDarkBlue/95 backdrop-blur-xl border-b border-white/5">
-        <div className="flex items-center gap-3 px-4 py-3 max-w-3xl mx-auto">
-          <Link href={`/${locale}`} className="text-white/60 hover:text-white transition-colors">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <h1 className="text-lg font-bold text-flYellow">{t("info.title")}</h1>
-        </div>
-      </header>
-
+      <Header locale={locale} />
       <div className="px-4 pt-6 max-w-3xl mx-auto">
+        <h1 className="text-lg pb-2 text-center font-bold text-flYellow">{t("info.title")}</h1>
         {infos.length === 0 ? (
           <p className="text-center py-16 text-white/40">{t("program.noEvents")}</p>
         ) : (
@@ -62,8 +52,6 @@ export function InfoPage({ locale, infos }: Props) {
           </div>
         )}
       </div>
-
-      <BottomNav locale={locale} />
     </div>
   )
 }

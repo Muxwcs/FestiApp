@@ -9,6 +9,7 @@ import "../globals.css"
 import { InstallPrompt } from "@/components/pwa/install-prompt"
 import { NotificationPrompt } from "@/components/pwa/notification-prompt"
 import { BottomNav } from "@/components/public/bottom-nav"
+import LanguageButton from "@/components/public/language-button"
 
 export default async function LocaleLayout({
   children,
@@ -26,7 +27,7 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   const backgroundImageUrl = {
-    backgroundImage: "url('/background-public.png')",
+    backgroundImage: "url('/public-bg.png')",
     backgroundSize: "cover",
     backgroundPosition: "center",
   }
@@ -34,6 +35,7 @@ export default async function LocaleLayout({
   return (
     <div className="flex flex-col min-h-screen w-full items-center" style={backgroundImageUrl}>
       <NextIntlClientProvider messages={messages}>
+        <LanguageButton locale={locale as Locale} />
         {children}
         <BottomNav locale={locale as Locale} />
         <NotificationPrompt />

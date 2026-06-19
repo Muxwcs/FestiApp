@@ -1,12 +1,13 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { usePathname, useRouter } from "next/navigation"
-import { Music, Tag, Info, Globe, Menu } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { Music, Tag, Info, Menu } from "lucide-react"
 import { useState } from "react"
-import { type Locale, localeNames } from "@/lib/i18n/types"
+import { type Locale } from "@/lib/i18n/types"
 import Link from "next/link"
 import Image from "next/image"
+import { NotificationToggle } from "../pwa/notification-prompt"
 
 interface BottomNavProps {
   locale: Locale
@@ -22,17 +23,9 @@ const rightItems = [
 ] as const
 
 export function BottomNav({ locale }: BottomNavProps) {
-  const t = useTranslations("nav")
-  const router = useRouter()
+  const t = useTranslations()
   const pathname = usePathname()
-  const [showLangPicker, setShowLangPicker] = useState(false)
-
-  function switchLocale(newLocale: string) {
-    const segments = pathname.split("/")
-    segments[1] = newLocale
-    router.push(segments.join("/"))
-    setShowLangPicker(false)
-  }
+  const [showMenu, setShowMenu] = useState(false)
 
   function isActive(path: string) {
     const full = `/${locale}${path}`
@@ -55,7 +48,7 @@ export function BottomNav({ locale }: BottomNavProps) {
           className={`text-[10px] font-medium tracking-wide uppercase transition-colors ${active ? "text-flYellow" : "text-white/50"
             }`}
         >
-          {t(id)}
+          {t(`nav.${id}`)}
         </span>
       </Link>
     )
@@ -63,25 +56,25 @@ export function BottomNav({ locale }: BottomNavProps) {
 
   return (
     <>
-      {/* Language picker overlay */}
-      {showLangPicker && (
-        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm" onClick={() => setShowLangPicker(false)}>
+      {/* Menu overlay */}
+      {showMenu && (
+        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm p-2" onClick={() => setShowMenu(false)}>
           <div
-            className="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 rounded-2xl bg-flDarkBlue border border-white/10 p-2 shadow-2xl animate-in slide-in-from-bottom-4 duration-300"
+            className="absolute top-4 left-1/2 -translate-x-1/2 w-11/12 rounded-2xl bg-flDarkBlue border border-white/10 p-2 shadow-2xl animate-in slide-in-from-bottom-4 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
-            {(Object.entries(localeNames) as [Locale, string][]).map(([loc, name]) => (
-              <button
-                key={loc}
-                onClick={() => switchLocale(loc)}
-                className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${locale === loc
-                  ? "bg-flYellow/20 text-flYellow"
-                  : "text-white/70 hover:bg-white/10 hover:text-white"
-                  }`}
-              >
-                {name}
-              </button>
-            ))}
+            <h2 className="text-sm font-semibold text-white mb-2 text-center">
+              {t("nav.menu")}
+            </h2>
+
+            <div className="my-2 border-t border-white/10"></div>
+            <h3 className="text-sm font-semibold text-white/90 mb-2">
+              {t("notifications.title")}
+            </h3>
+            <p className="text-xs text-white/80 mb-2">
+              {t("notifications.description")}
+            </p>
+            <NotificationToggle />
           </div>
         </div>
       )}
@@ -145,12 +138,12 @@ export function BottomNav({ locale }: BottomNavProps) {
                 ))}
                 {/* Language button */}
                 <button
-                  onClick={() => setShowLangPicker(true)}
+                  onClick={() => setShowMenu(true)}
                   className="flex flex-col items-center gap-0.5 py-2 px-2 min-w-14 transition-colors"
                 >
-                  <Globe className="h-5 w-5 text-white/50" strokeWidth={1.5} />
+                  <Menu className="h-5 w-5 text-white/50" strokeWidth={1.5} />
                   <span className="text-[10px] font-medium tracking-wide uppercase text-white/50">
-                    {locale.toUpperCase()}
+                    {t("nav.menu")}
                   </span>
                 </button>
               </div>

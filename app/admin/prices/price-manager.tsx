@@ -4,14 +4,17 @@ import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Edit, Trash2, Euro, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { TranslatedInput } from "@/components/admin/translated-input"
+import type { PriceCategory } from "@/generated/prisma/client"
+import { priceCategoryLabels } from "@/lib/enum-labels"
 
 const emptyTranslated = { fr: "", eu: "", en: "" }
 type TranslatedText = Record<string, string>
@@ -22,7 +25,7 @@ interface PriceItem {
   description: Record<string, string> | null
   amount: number
   currency: string
-  category: string | null
+  category: PriceCategory
   sortOrder: number
   isActive: boolean
 }
@@ -32,7 +35,7 @@ const defaultForm = {
   description: { ...emptyTranslated } as TranslatedText,
   amount: 0,
   currency: "EUR",
-  category: "",
+  category: "PASS" as PriceCategory,
   sortOrder: 0,
   isActive: true
 }
@@ -44,10 +47,12 @@ export function PriceManager({ prices }: { prices: PriceItem[] }) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(defaultForm)
 
+  const categories = Object.keys(priceCategoryLabels) as PriceCategory[]
+
   const openCreate = () => { setEditingId(null); setForm(defaultForm); setDialogOpen(true) }
   const openEdit = (p: PriceItem) => {
     setEditingId(p.id)
-    setForm({ title: p.title, description: p.description || { ...emptyTranslated }, amount: p.amount, currency: p.currency, category: p.category || "", sortOrder: p.sortOrder, isActive: p.isActive })
+    setForm({ title: p.title, description: p.description || { ...emptyTranslated }, amount: p.amount, currency: p.currency, category: p.category, sortOrder: p.sortOrder, isActive: p.isActive })
     setDialogOpen(true)
   }
 
@@ -90,11 +95,18 @@ export function PriceManager({ prices }: { prices: PriceItem[] }) {
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-1">
                     <Label>Montant (€)</Label>
-                    <Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm((p) => ({ ...p, amount: parseFloat(e.target.value) || 0 }))} />
+                    <Input type="number" step=".01" value={form.amount} onChange={(e) => setForm((p) => ({ ...p, amount: parseFloat(e.target.value) || 0 }))} />
                   </div>
                   <div className="space-y-1">
                     <Label>Catégorie</Label>
-                    <Input value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} placeholder="Entrée, Pass..." />
+                    <Select value={form.category} onValueChange={(v) => setForm((p) => ({ ...p, category: v as PriceCategory }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(priceCategoryLabels).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-1">
                     <Label>Ordre</Label>
@@ -112,37 +124,50 @@ export function PriceManager({ prices }: { prices: PriceItem[] }) {
         </div>
       </div>
 
-      <Card>
-        <CardContent className="pt-4">
-          {prices.length === 0 ? (
-            <div className="text-center py-12">
-              <Euro className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-              <p className="text-muted-foreground">Aucun tarif</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {prices.map((price) => (
-                <div key={price.id} className={`flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 ${!price.isActive ? "opacity-50" : ""}`}>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl font-bold text-primary min-w-15">
-                      {price.amount === 0 ? "Gratuit" : `${price.amount}€`}
-                    </span>
-                    <div>
-                      <p className="font-medium text-sm">{price.title.fr}</p>
-                      {price.category && <Badge variant="outline" className="text-xs">{price.category}</Badge>}
+      {/* Prices grouped by Category */}
+      {prices.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+            <Euro className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+            <p className="text-lg font-medium text-muted-foreground">Aucun tarif</p>
+            <p className="text-sm text-muted-foreground">Créez votre premier tarif pour commencer.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        categories
+          .filter((cat) => prices.some((p) => p.category === cat))
+          .map((cat) => (
+            <Card key={cat}>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 capitalize">
+                  <Euro className="h-5 w-5" /> {priceCategoryLabels[cat]}
+                  <Badge variant="secondary">{prices.filter((p) => p.category === cat).length}</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {prices
+                  .filter((p) => p.category === cat)
+                  .map((price) => (
+                    <div key={price.id} className={`flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 ${!price.isActive ? "opacity-50" : ""}`}>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl font-bold text-primary min-w-15">
+                          {price.amount === 0 ? "Gratuit" : `${price.amount}€`}
+                        </span>
+                        <div>
+                          <p className="font-medium text-sm">{price.title.fr}</p>
+                          {price.category && <Badge variant="outline" className="text-xs">{price.category}</Badge>}
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        {!price.isActive && <Badge variant="outline" className="text-xs">Masqué</Badge>}
+                        <Button variant="ghost" size="sm" onClick={() => openEdit(price)}><Edit className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(price.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-1">
-                    {!price.isActive && <Badge variant="outline" className="text-xs">Masqué</Badge>}
-                    <Button variant="ghost" size="sm" onClick={() => openEdit(price)}><Edit className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(price.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  ))}
+              </CardContent>
+            </Card>
+          )))}
     </div>
   )
 }

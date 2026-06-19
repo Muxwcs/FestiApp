@@ -111,7 +111,7 @@ export function NotificationPrompt() {
   // Floating banner for unauthenticated users
   if (showBanner && !subscription) {
     return (
-      <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md animate-in slide-in-from-bottom-4 duration-500">
+      <div className="fixed top-4 left-4 right-4 z-50 mx-auto max-w-md animate-in slide-in-from-bottom-4 duration-500">
         <div className="flex items-start gap-3 rounded-2xl border border-border/50 bg-background/95 p-4 shadow-xl backdrop-blur-lg">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-flAccent/10">
             <Bell className="h-5 w-5 text-flAccent" />

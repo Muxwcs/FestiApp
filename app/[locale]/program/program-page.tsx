@@ -2,24 +2,26 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { Clock, MapPin, Info, Music, Utensils, PartyPopper, ArrowLeft } from "lucide-react"
+import { Clock, MapPin, Info, Music, PartyPopper, SprayCan, Heart, } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { t as translate, type Locale } from "@/lib/i18n/types"
-import { BottomNav } from "@/components/public/bottom-nav"
-import type { EventCategory } from "@/generated/prisma/enums"
+import type { EventCategory } from "@/generated/prisma/client"
 import Image from "next/image"
-import Link from "next/link"
+import Header from "@/components/public/header"
+import { ConcertModal } from "@/components/public/program/concert-modal"
+import { useFavorites } from "@/hooks/use-favorites"
 
 interface EventItem {
   id: string
   title: unknown
   description: unknown | null
   category: EventCategory
-  place: string | null
+  place: string
   day: string
   startTime: string
   endTime: string | null
   imageSrc: string | null
+  style: string | null
   sortOrder: number
 }
 
@@ -31,16 +33,14 @@ interface Props {
 const categoryIcons: Record<EventCategory, React.ReactNode> = {
   CONCERT: <Music className="h-4 w-4" />,
   ANIMATION: <PartyPopper className="h-4 w-4" />,
-  RESTAURATION: <Utensils className="h-4 w-4" />,
   INFO: <Info className="h-4 w-4" />,
-  SKATE: <Utensils className="h-4 w-4" />,
-  STREET_ART: <Utensils className="h-4 w-4" />
+  SKATE: <span className="text-sm">🛹</span>,
+  STREET_ART: <SprayCan className="h-4 w-4" />,
 }
 
 const categoryColors: Record<EventCategory, string> = {
   CONCERT: "bg-purple-500/20 text-purple-300 border-purple-500/30",
   ANIMATION: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  RESTAURATION: "bg-orange-500/20 text-orange-300 border-orange-500/30",
   INFO: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
   SKATE: "bg-pink-500/20 text-pink-300 border-pink-500/30",
   STREET_ART: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
@@ -50,10 +50,15 @@ export function ProgramPage({ locale, events }: Props) {
   const t = useTranslations()
   const [dayFilter, setDayFilter] = useState<string>("all")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
+  const [selectedConcert, setSelectedConcert] = useState<EventItem | null>(null)
+
+  const { favorites, isFavorite } = useFavorites()
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
 
   const days = [...new Set(events.map((e) => e.day))]
 
   const filteredEvents = events.filter((e) => {
+    if (showFavoritesOnly && !favorites.includes(e.id)) return false
     if (dayFilter !== "all" && e.day !== dayFilter) return false
     if (categoryFilter !== "all" && e.category !== categoryFilter) return false
     return true
@@ -67,17 +72,10 @@ export function ProgramPage({ locale, events }: Props) {
 
   return (
     <div className="min-h-screen w-full text-white pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-flDarkBlue/95 backdrop-blur-xl border-b border-white/5">
-        <div className="flex items-center gap-3 px-4 py-3 max-w-3xl mx-auto">
-          <Link href={`/${locale}`} className="text-white/60 hover:text-white transition-colors">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <h1 className="text-lg font-bold text-flYellow">{t("program.title")}</h1>
-        </div>
-      </header>
+      <Header locale={locale} />
 
       <div className="px-4 pt-4 max-w-3xl mx-auto">
+        <h1 className="text-lg pb-2 text-center font-bold text-flYellow">{t("program.title")}</h1>
         {/* Day filters */}
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-3 -mx-4 px-4">
           <button
@@ -98,7 +96,7 @@ export function ProgramPage({ locale, events }: Props) {
                 : "bg-white/10 text-white/90 hover:bg-white/15 backdrop-blur-xl"
                 }`}
             >
-              {day}
+              {t(`enums.days.${day}`)}
             </button>
           ))}
         </div>
@@ -107,18 +105,30 @@ export function ProgramPage({ locale, events }: Props) {
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-4 -mx-4 px-4">
           <button
             onClick={() => setCategoryFilter("all")}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${categoryFilter === "all"
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all backdrop-blur-xl ${categoryFilter === "all"
               ? "bg-white/20 text-white"
-              : "bg-white/5 text-white/80 hover:bg-white/10 backdrop-blur-xl"
+              : "bg-white/5 text-white/80 hover:bg-white/10"
               }`}
           >
-            Tout
+            {t("program.allCategories")}
           </button>
-          {(["CONCERT", "ANIMATION", "RESTAURATION", "SKATE", "STREET_ART"] as EventCategory[]).map((cat) => (
+          {favorites.length > 0 && (
+            <button
+              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+              className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all backdrop-blur-xl ${showFavoritesOnly
+                  ? "bg-flYellow text-flDarkBlue"
+                  : "bg-white/5 text-white/50 hover:bg-white/10"
+                }`}
+            >
+              <Heart className={`h-3 w-3 ${showFavoritesOnly ? "fill-current" : ""}`} />
+              Favoris ({favorites.length})
+            </button>
+          )}
+          {(["CONCERT", "ANIMATION", "INFO", "SKATE", "STREET_ART"] as EventCategory[]).map((cat) => (
             <button
               key={cat}
               onClick={() => setCategoryFilter(cat)}
-              className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${categoryFilter === cat
+              className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all backdrop-blur-xl ${categoryFilter === cat
                 ? "bg-white/20 text-white"
                 : "bg-white/5 text-white/50 hover:bg-white/10"
                 }`}
@@ -138,6 +148,8 @@ export function ProgramPage({ locale, events }: Props) {
               <div
                 key={event.id}
                 className="group flex gap-3 rounded-2xl bg-flDarkBlue/50 border border-white/5 p-3 hover:bg-white/10 transition-colors"
+                onClick={() => event.category === "CONCERT" || event.category === "ANIMATION" || event.category === "STREET_ART" || event.category === "SKATE" ? setSelectedConcert(event) : undefined}
+                style={{ cursor: event.category === "CONCERT" || event.category === "ANIMATION" || event.category === "STREET_ART" || event.category === "SKATE" ? "pointer" : undefined }}
               >
                 {event.imageSrc && (
                   <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-white/10">
@@ -160,12 +172,10 @@ export function ProgramPage({ locale, events }: Props) {
                       {formatTime(event.startTime)}
                       {event.endTime && ` – ${formatTime(event.endTime)}`}
                     </span>
-                    {event.place && (
-                      <span className="flex items-center gap-1 uppercase tracking-wide">
-                        <MapPin className="h-3 w-3" />
-                        {event.place}
-                      </span>
-                    )}
+                    <span className="flex items-center gap-1 uppercase tracking-wide">
+                      <MapPin className="h-3 w-3" />
+                      {t(`enums.places.${event.place}`)}
+                    </span>
                   </div>
                   {event.description as string && (
                     <p className="text-xs text-white/40 mt-1 line-clamp-2">
@@ -183,8 +193,13 @@ export function ProgramPage({ locale, events }: Props) {
           </div>
         )}
       </div>
-
-      <BottomNav locale={locale} />
+      {selectedConcert && (
+        <ConcertModal
+          event={selectedConcert}
+          locale={locale}
+          onClose={() => setSelectedConcert(null)}
+        />
+      )}
     </div>
   )
 }

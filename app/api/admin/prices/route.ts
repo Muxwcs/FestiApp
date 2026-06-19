@@ -11,8 +11,9 @@ const createPriceSchema = z.object({
   description: translatedField.optional(),
   amount: z.number().min(0),
   currency: z.string().default("EUR"),
-  category: z.string().max(100).optional(),
+  category: z.enum(["MERCH", "BAR", "RESTAURATION", "PASS"]),
   sortOrder: z.number().int().default(0),
+  isActive: z.boolean().default(true),
 })
 
 export async function POST(request: Request) {

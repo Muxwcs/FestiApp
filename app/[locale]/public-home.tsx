@@ -25,12 +25,12 @@ export function PublicHomePage({ locale }: Props) {
       {/* ─── HERO ─── */}
       <section className="relative flex flex-col items-center justify-center min-h-[60svh] px-4 text-center overflow-hidden">
         {/* Background gradient */}
-        <div className="absolute inset-0 bg-linear-to-b from-black/40 via-transparent to-flAccent z-10" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/40 to-flAccent z-10" />
 
         {/* Background image */}
         <div className="absolute inset-0">
           <Image
-            src="/background-public.png"
+            src="/home-cta-bg.webp"
             alt=""
             fill
             className="object-cover"
@@ -39,17 +39,15 @@ export function PublicHomePage({ locale }: Props) {
         </div>
 
         {/* Content */}
-        <div className="relative z-20 flex flex-col items-center gap-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <div className="relative z-20 flex flex-col justify-between pb-20 gap-6 min-h-[50svh] animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <Image
-            src="/icon-512x512.png"
+            src="/fl20-logo.webp"
             alt="Festiapp"
-            width={100}
+            width={200}
             height={100}
-            className="rounded-3xl shadow-2xl"
+            className="shadow-2xl"
           />
-          <h1 className="text-5xl sm:text-7xl font-black tracking-tight text-flYellow drop-shadow-lg">
-            {t("hero.title")}
-          </h1>
+
           <p className="text-lg sm:text-xl text-white/80 font-medium max-w-md">
             {t("hero.subtitle")}
           </p>
@@ -62,7 +60,7 @@ export function PublicHomePage({ locale }: Props) {
           <Link
             key={section.id}
             href={`/${locale}/${section.id}`}
-            className={`flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r ${section.color} border backdrop-blur-sm hover:scale-[1.02] active:scale-[0.98] transition-transform`}
+            className={`flex items-center gap-4 p-4 rounded-2xl bg-linear-to-r ${section.color} border backdrop-blur-sm hover:scale-[1.02] active:scale-[0.98] transition-transform`}
           >
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10">
               <section.icon className="h-5 w-5 text-white" />

@@ -9,9 +9,12 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { TranslatedInput } from "@/components/admin/translated-input"
+import type { InfosCategory } from "@/generated/prisma/client"
+import { infosCategoryLabels } from "@/lib/enum-labels"
 
 const emptyTranslated = { fr: "", eu: "", en: "" }
 type TranslatedText = Record<string, string>
@@ -21,7 +24,7 @@ interface InfoItem {
   title: Record<string, string>
   content: Record<string, string>
   icon: string | null
-  category: string | null
+  category: InfosCategory
   sortOrder: number
   isActive: boolean
 }
@@ -30,7 +33,7 @@ const defaultForm = {
   title: { ...emptyTranslated } as TranslatedText,
   content: { ...emptyTranslated } as TranslatedText,
   icon: "",
-  category: "",
+  category: "USEFUL" as InfosCategory,
   sortOrder: 0,
   isActive: true,
 }
@@ -118,7 +121,14 @@ export function InfoManager({ infos }: { infos: InfoItem[] }) {
                   </div>
                   <div className="space-y-1">
                     <Label>Catégorie</Label>
-                    <Input value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} placeholder="Accès, Contact..." />
+                    <Select value={form.category} onValueChange={(v) => setForm((p) => ({ ...p, category: v as InfosCategory }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(infosCategoryLabels).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-1">
                     <Label>Ordre</Label>

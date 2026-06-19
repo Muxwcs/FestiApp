@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Edit, Trash2, Calendar, Music, PartyPopper, Utensils, Info, RefreshCw } from "lucide-react"
+import { Plus, Edit, Trash2, Calendar, Music, PartyPopper, Info, RefreshCw, SprayCan } from "lucide-react"
 import { toast } from "sonner"
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -14,7 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { TranslatedInput } from "@/components/admin/translated-input"
-import type { EventCategory } from "@/generated/prisma/client"
+import type { Days, EventCategory, Places } from "@/generated/prisma/client"
+import { daysLabels, eventCategoryLabels, placesLabels } from "@/lib/enum-labels"
 
 const emptyTranslated = { fr: "", eu: "", en: "" }
 type TranslatedText = Record<string, string>
@@ -24,31 +25,42 @@ interface EventItem {
   title: Record<string, string>
   description: Record<string, string> | null
   category: EventCategory
-  place: string | null
-  day: string
+  place: Places
+  day: Days
   startTime: string
   endTime: string | null
   imageSrc: string | null
+  style: string | null
   sortOrder: number
   isActive: boolean
 }
 
-const categoryConfig: Record<EventCategory, { label: string; icon: React.ReactNode; color: string }> = {
-  CONCERT: { label: "Concert", icon: <Music className="h-4 w-4" />, color: "bg-purple-100 text-purple-700" },
-  ANIMATION: { label: "Animation", icon: <PartyPopper className="h-4 w-4" />, color: "bg-blue-100 text-blue-700" },
-  RESTAURATION: { label: "Restauration", icon: <Utensils className="h-4 w-4" />, color: "bg-orange-100 text-orange-700" },
-  INFO: { label: "Info", icon: <Info className="h-4 w-4" />, color: "bg-green-100 text-green-700" },
+const categoryIcons: Record<EventCategory, React.ReactNode> = {
+  CONCERT: <Music className="h-4 w-4" />,
+  ANIMATION: <PartyPopper className="h-4 w-4" />,
+  INFO: <Info className="h-4 w-4" />,
+  SKATE: <span className="text-sm">🛹</span>,
+  STREET_ART: <SprayCan className="h-4 w-4" />,
+}
+
+const categoryColors: Record<EventCategory, string> = {
+  CONCERT: "bg-purple-100 text-purple-700",
+  ANIMATION: "bg-blue-100 text-blue-700",
+  INFO: "bg-green-100 text-green-700",
+  SKATE: "bg-yellow-100 text-yellow-700",
+  STREET_ART: "bg-pink-100 text-pink-700",
 }
 
 const defaultForm = {
   title: { ...emptyTranslated } as TranslatedText,
   description: { ...emptyTranslated } as TranslatedText,
   category: "CONCERT" as EventCategory,
-  place: "",
-  day: "",
+  place: "HANDIA" as Places,
+  day: "VENDREDI" as Days,
   startTime: "",
   endTime: "",
   imageSrc: "",
+  style: "",
   sortOrder: 0,
   isActive: true,
 }
@@ -60,7 +72,7 @@ export function EventManager({ events }: { events: EventItem[] }) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(defaultForm)
 
-  const days = [...new Set(events.map((e) => e.day))].sort()
+  const days = Object.keys(daysLabels) as Days[]
 
   const openCreate = () => {
     setEditingId(null)
@@ -74,11 +86,12 @@ export function EventManager({ events }: { events: EventItem[] }) {
       title: event.title,
       description: event.description || { ...emptyTranslated },
       category: event.category,
-      place: event.place || "",
+      place: event.place,
       day: event.day,
       startTime: event.startTime.slice(0, 16),
       endTime: event.endTime?.slice(0, 16) || "",
       imageSrc: event.imageSrc || "",
+      style: event.style || "",
       sortOrder: event.sortOrder,
       isActive: event.isActive,
     })
@@ -91,6 +104,7 @@ export function EventManager({ events }: { events: EventItem[] }) {
       startTime: new Date(form.startTime).toISOString(),
       endTime: form.endTime ? new Date(form.endTime).toISOString() : undefined,
       description: form.description.fr ? form.description : undefined,
+      style: form.style || undefined,
     }
 
     try {
@@ -153,7 +167,7 @@ export function EventManager({ events }: { events: EventItem[] }) {
                     <Select value={form.category} onValueChange={(v: string) => setForm((p) => ({ ...p, category: v as EventCategory }))}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {Object.entries(categoryConfig).map(([key, { label }]) => (
+                        {Object.entries(eventCategoryLabels).map(([key, label]) => (
                           <SelectItem key={key} value={key}>{label}</SelectItem>
                         ))}
                       </SelectContent>
@@ -161,7 +175,14 @@ export function EventManager({ events }: { events: EventItem[] }) {
                   </div>
                   <div className="space-y-1">
                     <Label>Jour</Label>
-                    <Input value={form.day} onChange={(e) => setForm((p) => ({ ...p, day: e.target.value }))} placeholder="vendredi, samedi..." />
+                    <Select value={form.day} onValueChange={(v) => setForm((p) => ({ ...p, day: v as Days }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(daysLabels).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -179,17 +200,30 @@ export function EventManager({ events }: { events: EventItem[] }) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <Label>Lieu</Label>
-                    <Input value={form.place} onChange={(e) => setForm((p) => ({ ...p, place: e.target.value }))} placeholder="Scène principale..." />
+                    <Select value={form.place} onValueChange={(v) => setForm((p) => ({ ...p, place: v as Places }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(placesLabels).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Style musical</Label>
+                    <Input value={form.style} onChange={(e) => setForm((p) => ({ ...p, style: e.target.value }))} placeholder="rock, reggae..." />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label>Image (URL)</Label>
+                    <Input value={form.imageSrc} onChange={(e) => setForm((p) => ({ ...p, imageSrc: e.target.value }))} placeholder="https://..." />
                   </div>
                   <div className="space-y-1">
                     <Label>Ordre d&apos;affichage</Label>
                     <Input type="number" value={form.sortOrder} onChange={(e) => setForm((p) => ({ ...p, sortOrder: parseInt(e.target.value) || 0 }))} />
                   </div>
-                </div>
-
-                <div className="space-y-1">
-                  <Label>Image (URL)</Label>
-                  <Input value={form.imageSrc} onChange={(e) => setForm((p) => ({ ...p, imageSrc: e.target.value }))} placeholder="https://..." />
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -207,7 +241,7 @@ export function EventManager({ events }: { events: EventItem[] }) {
       </div>
 
       {/* Events grouped by day */}
-      {days.length === 0 ? (
+      {events.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Calendar className="h-12 w-12 text-muted-foreground/50 mb-4" />
@@ -216,46 +250,49 @@ export function EventManager({ events }: { events: EventItem[] }) {
           </CardContent>
         </Card>
       ) : (
-        days.map((day) => (
-          <Card key={day}>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 capitalize">
-                <Calendar className="h-5 w-5" /> {day}
-                <Badge variant="secondary">{events.filter((e) => e.day === day).length}</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {events
-                .filter((e) => e.day === day)
-                .map((event) => (
-                  <div key={event.id} className={`flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 ${!event.isActive ? "opacity-50" : ""}`}>
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <Badge className={categoryConfig[event.category].color}>
-                        {categoryConfig[event.category].icon}
-                      </Badge>
-                      <div className="min-w-0">
-                        <p className="font-medium text-sm truncate">{event.title.fr}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatTime(event.startTime)}
-                          {event.endTime && ` – ${formatTime(event.endTime)}`}
-                          {event.place && ` • ${event.place}`}
-                        </p>
+        days
+          .filter((day) => events.some((e) => e.day === day))
+          .map((day) => (
+            <Card key={day}>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 capitalize">
+                  <Calendar className="h-5 w-5" /> {daysLabels[day]}
+                  <Badge variant="secondary">{events.filter((e) => e.day === day).length}</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {events
+                  .filter((e) => e.day === day)
+                  .map((event) => (
+                    <div key={event.id} className={`flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 ${!event.isActive ? "opacity-50" : ""}`}>
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <Badge className={categoryColors[event.category]}>
+                          {categoryIcons[event.category]}
+                        </Badge>
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm truncate">{event.title.fr}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatTime(event.startTime)}
+                            {event.endTime && ` – ${formatTime(event.endTime)}`}
+                            {` • ${placesLabels[event.place]}`}
+                            {event.style && ` • ${event.style}`}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 ml-2">
+                        {!event.isActive && <Badge variant="outline" className="text-xs">Masqué</Badge>}
+                        <Button variant="ghost" size="sm" onClick={() => openEdit(event)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(event.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 ml-2">
-                      {!event.isActive && <Badge variant="outline" className="text-xs">Masqué</Badge>}
-                      <Button variant="ghost" size="sm" onClick={() => openEdit(event)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(event.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-            </CardContent>
-          </Card>
-        ))
+                  ))}
+              </CardContent>
+            </Card>
+          ))
       )}
     </div>
   )

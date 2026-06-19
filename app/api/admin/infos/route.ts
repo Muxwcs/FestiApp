@@ -10,8 +10,9 @@ const createInfoSchema = z.object({
   title: translatedField,
   content: translatedField,
   icon: z.string().max(10).optional(),
-  category: z.string().max(100).optional(),
+  category: z.enum(["ACCESS", "SECURITY", "USEFUL", "FAQ", "PMR"]),
   sortOrder: z.number().int().default(0),
+  isActive: z.boolean().default(true),
 })
 
 export async function POST(request: Request) {

@@ -9,13 +9,15 @@ const translatedField = z.object({ fr: z.string(), eu: z.string().default(""), e
 const createEventSchema = z.object({
   title: translatedField,
   description: translatedField.optional(),
-  category: z.enum(["CONCERT", "ANIMATION", "RESTAURATION", "INFO"]),
-  place: z.string().max(200).optional(),
-  day: z.string().min(1),
+  category: z.enum(["CONCERT", "ANIMATION", "INFO", "SKATE", "STREET_ART"]),
+  place: z.enum(["HANDIA", "TTIKIA", "CASTLE", "VILLAGE", "FESTIVAL"]),
+  day: z.enum(["VENDREDI", "SAMEDI"]),
   startTime: z.string().datetime(),
   endTime: z.string().datetime().optional(),
-  imageSrc: z.string().url().optional().or(z.literal("")),
+  imageSrc: z.string().max(500).optional().or(z.literal("")),
+  style: z.string().max(100).optional(),
   sortOrder: z.number().int().default(0),
+  isActive: z.boolean().default(true),
 })
 
 export async function POST(request: Request) {
@@ -37,6 +39,8 @@ export async function POST(request: Request) {
         startTime: new Date(startTime),
         endTime: endTime ? new Date(endTime) : null,
         imageSrc: data.imageSrc || null,
+        style: data.style || null,
+        isActive: data.isActive,
       },
     })
 
