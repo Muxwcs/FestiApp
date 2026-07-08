@@ -117,7 +117,8 @@ export async function GET(req: NextRequest) {
 }
 
 const createVolunteerSchema = z.object({
-  email: z.string().email().max(255),
+  email: z.string().email().max(255).optional(),
+  password: z.string().min(8).max(100).optional(),
   name: z.string().max(100).optional(),
   firstname: z.string().max(100).optional(),
   surname: z.string().max(100).optional(),
@@ -125,6 +126,7 @@ const createVolunteerSchema = z.object({
   skills: z.array(z.string()).optional(),
   availability: z.array(z.string()).optional(),
   notes: z.string().max(2000).optional(),
+  role: z.enum(["ADMIN", "BENEVOLE"]).optional().default("BENEVOLE"),
 })
 
 export async function POST(req: NextRequest) {
@@ -140,17 +142,41 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Données invalides", details: parsed.error.flatten().fieldErrors }, { status: 400, headers })
     }
 
-    const { email, ...data } = parsed.data
+    const { email, role, password: rawPassword, ...data } = parsed.data
+    const generateEmail = (firstname?: string, name?: string) => {
+      const normalize = (s: string) =>
+        s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "")
+      const f = normalize(firstname || "user")
+      const n = normalize(name || "unknown")
+      return `${f}.${n}@festiapp.local`
+    }
+
+    let finalEmail = email?.toLowerCase().trim()
+    if (!finalEmail) {
+      finalEmail = generateEmail(data.firstname, data.name)
+      // Handle duplicates
+      const existing = await prisma.user.findUnique({ where: { email: finalEmail } })
+      if (existing) {
+        finalEmail = finalEmail.replace("@", `${Date.now()}@`)
+      }
+    }
+
+
     const { hash } = await import("bcryptjs")
-    const crypto = await import("crypto")
-    const tempPassword = crypto.randomBytes(12).toString("base64url")
+    let tempPassword: string
+    if (rawPassword) {
+      tempPassword = rawPassword
+    } else {
+      const crypto = await import("crypto")
+      tempPassword = crypto.randomBytes(12).toString("base64url")
+    }
     const hashedPassword = await hash(tempPassword, 12)
 
     const newUser = await prisma.user.create({
       data: {
-        email: email.toLowerCase().trim(),
+        email: finalEmail,
         password: hashedPassword,
-        role: "BENEVOLE",
+        role: role ?? "BENEVOLE",
         isActive: true,
         status: "Actif",
         ...data,

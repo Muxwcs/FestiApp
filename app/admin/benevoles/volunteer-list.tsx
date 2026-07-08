@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useTransition } from "react"
+import { useCallback, useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { RefreshCw, Users, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { DataTable } from "./data-table"
 import { createColumns, VolunteerListItem } from "./columns"
 import { toast } from "sonner"
+import { CreateVolunteerDialog } from "@/components/admin/volunteers/create-volunteer-dialog"
 
 interface VolunteerListProps {
   volunteers: VolunteerListItem[]
@@ -17,6 +18,7 @@ interface VolunteerListProps {
 export function VolunteerList({ volunteers, userName }: VolunteerListProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [createOpen, setCreateOpen] = useState(false)
 
   const handleDelete = useCallback(async (volunteerId: string) => {
     if (!confirm("Êtes-vous sûr de vouloir désactiver ce bénévole ?")) return
@@ -70,7 +72,7 @@ export function VolunteerList({ volunteers, userName }: VolunteerListProps) {
                 <RefreshCw className={`h-4 w-4 mr-2 ${isPending ? "animate-spin" : ""}`} />
                 {isPending ? "Actualisation..." : "Actualiser"}
               </Button>
-              <Button>
+              <Button onClick={() => setCreateOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Nouveau bénévole
               </Button>
@@ -88,6 +90,7 @@ export function VolunteerList({ volunteers, userName }: VolunteerListProps) {
           )}
         </CardContent>
       </Card>
+      <CreateVolunteerDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }
