@@ -13,6 +13,7 @@ export type SectorListItem = {
   color: string | null
   status: string | null
   skills: string[]
+  totalNeeded: number
   _count: { timeslots: number; affectations: number }
 }
 
@@ -45,8 +46,17 @@ export const createColumns = (handleDelete: (id: string) => void): ColumnDef<Sec
   },
   {
     id: "affectations",
-    header: "Bénévoles affectés",
-    cell: ({ row }) => <span>{row.original._count.affectations}</span>,
+    header: "Remplissage",
+    cell: ({ row }) => {
+      const s = row.original
+      const ratio = s.totalNeeded > 0 ? s._count.affectations / s.totalNeeded : 0
+      const variant = ratio >= 1 ? "default" : ratio >= 0.5 ? "secondary" : "destructive"
+      return (
+        <Badge variant={variant}>
+          {s._count.affectations}/{s.totalNeeded}
+        </Badge>
+      )
+    },
   },
   {
     accessorKey: "skills",

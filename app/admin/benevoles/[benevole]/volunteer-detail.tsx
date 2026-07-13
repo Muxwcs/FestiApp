@@ -245,7 +245,7 @@ export function VolunteerDetail({ volunteer }: { volunteer: VolunteerData }) {
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: aff.sector.color || "#10b981" }} />
                         <div>
                           <p className="font-medium text-sm">{aff.timeslot.name}</p>
-                          <p className="text-xs text-muted-foreground">{aff.sector.name} • {formatDate(aff.timeslot.dateStart)}</p>
+                          <p className="text-xs text-muted-foreground">{aff.sector.name} • {formatDate(aff.timeslot.dateStart)} - {formatDate(aff.timeslot.dateEnd)}</p>
                         </div>
                       </div>
                       <Badge variant={aff.status === "VALIDE" ? "default" : aff.status === "REFUSE" ? "destructive" : "secondary"}>

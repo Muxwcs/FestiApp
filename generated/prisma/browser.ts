@@ -38,6 +38,11 @@ export type SectorReferent = Prisma.SectorReferentModel
  */
 export type Timeslot = Prisma.TimeslotModel
 /**
+ * Model TimeslotReferent
+ * 
+ */
+export type TimeslotReferent = Prisma.TimeslotReferentModel
+/**
  * Model Affectation
  * 
  */

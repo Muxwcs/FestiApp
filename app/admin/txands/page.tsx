@@ -14,15 +14,24 @@ const TxandsPage = async () => {
       color: true,
       status: true,
       skills: true,
+      timeslots: {
+        select: { totalVolunteers: true },
+      },
       _count: {
         select: { timeslots: true, affectations: true },
       },
     },
   })
 
+  const sectorsWithNeeded = sectors.map((s) => ({
+    ...s,
+    totalNeeded: s.timeslots.reduce((sum, ts) => sum + ts.totalVolunteers, 0),
+    timeslots: undefined,
+  }))
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
-      <SectorList sectors={sectors} />
+      <SectorList sectors={sectorsWithNeeded} />
     </div>
   )
 }

@@ -19,13 +19,16 @@ export type VolunteerListItem = {
   status: string | null
   skills: string[]
   createdAt: Date
+  fridayHours: number
+  saturdayHours: number
   _count: { affectations: number; missionAssignments: number }
 }
 
 export const createColumns = (handleDelete: (id: string) => void): ColumnDef<VolunteerListItem>[] => [
   {
-    accessorKey: "name",
     id: "name",
+    accessorFn: (row) =>
+      [row.firstname, row.name, row.surname].filter(Boolean).join(" "),
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         Nom
@@ -41,9 +44,40 @@ export const createColumns = (handleDelete: (id: string) => void): ColumnDef<Vol
     },
   },
   {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span>,
+    accessorKey: "fridayHours",
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Ven.
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const h = row.original.fridayHours
+      if (h === 0) return <span className="text-muted-foreground">—</span>
+      return (
+        <Badge variant={h < 3 ? "destructive" : "secondary"}>
+          {h.toFixed(1)}h
+        </Badge>
+      )
+    },
+  },
+  {
+    accessorKey: "saturdayHours",
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Sam.
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const h = row.original.saturdayHours
+      if (h === 0) return <span className="text-muted-foreground">—</span>
+      return (
+        <Badge variant={h < 3 ? "destructive" : "secondary"}>
+          {h.toFixed(1)}h
+        </Badge>
+      )
+    },
   },
   {
     accessorKey: "phone",

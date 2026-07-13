@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useTransition } from "react"
+import { useCallback, useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, RefreshCw, Users, UserCheck, UserX, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,6 +9,7 @@ import StatsCard from "@/components/stats-card"
 import { DataTable } from "../benevoles/data-table"
 import { createColumns, SectorListItem } from "./columns"
 import { toast } from "sonner"
+import { CreateSectorDialog } from "@/components/admin/sectors/create-sector-dialog"
 
 interface SectorListProps {
   sectors: SectorListItem[]
@@ -17,16 +18,19 @@ interface SectorListProps {
 export function SectorList({ sectors }: SectorListProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [createOpen, setCreateOpen] = useState(false)
 
   const stats = useMemo(() => {
     const totalTimeslots = sectors.reduce((sum, s) => sum + s._count.timeslots, 0)
     const totalAffectations = sectors.reduce((sum, s) => sum + s._count.affectations, 0)
-    const completionRate = totalTimeslots > 0 ? Math.round((totalAffectations / totalTimeslots) * 100) : 0
+    const totalNeeded = sectors.reduce((sum, s) => sum + s.totalNeeded, 0)
+    const completionRate = totalNeeded > 0 ? Math.round((totalAffectations / totalNeeded) * 100) : 0
 
     return {
       totalSectors: sectors.length,
       totalTimeslots,
       totalAffectations,
+      totalNeeded,
       completionRate,
     }
   }, [sectors])
@@ -67,11 +71,29 @@ export function SectorList({ sectors }: SectorListProps) {
           variant="success"
         />
         <StatsCard
-          title="Affectations"
-          value={stats.totalAffectations}
+          title="Effectifs"
+          value={
+            stats.totalAffectations === stats.totalNeeded
+              ? "✓"
+              : stats.totalAffectations < stats.totalNeeded
+                ? `-${stats.totalNeeded - stats.totalAffectations}`
+                : `+${stats.totalAffectations - stats.totalNeeded}`
+          }
           icon={<UserX className="h-5 w-5" />}
-          description="Bénévoles assignés"
-          variant="default"
+          description={
+            stats.totalAffectations === stats.totalNeeded
+              ? "Tous les postes sont pourvus"
+              : stats.totalAffectations < stats.totalNeeded
+                ? `${stats.totalNeeded - stats.totalAffectations} poste${stats.totalNeeded - stats.totalAffectations > 1 ? "s" : ""} à pourvoir`
+                : `${stats.totalAffectations - stats.totalNeeded} bénévole${stats.totalAffectations - stats.totalNeeded > 1 ? "s" : ""} en surplus`
+          }
+          variant={
+            stats.totalAffectations === stats.totalNeeded
+              ? "success"
+              : stats.totalAffectations < stats.totalNeeded
+                ? "destructive"
+                : "warning"
+          }
         />
         <StatsCard
           title="Couverture"
@@ -91,7 +113,7 @@ export function SectorList({ sectors }: SectorListProps) {
                 <RefreshCw className={`h-4 w-4 mr-2 ${isPending ? "animate-spin" : ""}`} />
                 Actualiser
               </Button>
-              <Button>
+              <Button onClick={() => setCreateOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Nouveau secteur
               </Button>
@@ -109,6 +131,7 @@ export function SectorList({ sectors }: SectorListProps) {
           )}
         </CardContent>
       </Card>
+      <CreateSectorDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }

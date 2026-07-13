@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Users, LayoutDashboard, CalendarSync, SquareKanban, Music2, Bell } from "lucide-react"
+import { Users, LayoutDashboard, CalendarSync, SquareKanban, Music2, Bell, InfoIcon, EuroIcon } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -24,17 +24,14 @@ interface SidebarProps {
 
 const AppSidebar = ({ role, isReferent = false, className }: SidebarProps) => {
   const pathname = usePathname() // Get current path
-  const commonLinks = [
-    { href: "/", label: "Lineup", icon: Music2 },
-  ]
 
   const adminLinks = [
-    { href: "/admin/", label: "Dashboard Admin", icon: LayoutDashboard },
+    { href: "/admin", label: "Dashboard Admin", icon: LayoutDashboard },
     { href: "/admin/benevoles", label: "Gestion Bénévoles", icon: Users },
     { href: "/admin/txands", label: "Gestion Txands", icon: CalendarSync },
-    { href: "/admin/events", label: "Gestion Événements", icon: SquareKanban },
-    { href: "/admin/infos", label: "Gestion Infos Pratiques", icon: SquareKanban },
-    { href: "/admin/prices", label: "Gestion Tarifs", icon: SquareKanban },
+    { href: "/admin/events", label: "Gestion Événements", icon: Music2 },
+    { href: "/admin/infos", label: "Gestion Infos Pratiques", icon: InfoIcon },
+    { href: "/admin/prices", label: "Gestion Tarifs", icon: EuroIcon },
     { href: "/admin/notifications", label: "Notifications Push", icon: Bell },
   ]
 
@@ -48,7 +45,7 @@ const AppSidebar = ({ role, isReferent = false, className }: SidebarProps) => {
 
   // ✅ CORRECTED: Admin gets everything, bénévole gets subset
   const buildNavLinks = () => {
-    let links = [...commonLinks]
+    let links = []
 
     if (role === "admin") {
       // ✅ Admins ALWAYS get admin links
@@ -88,10 +85,14 @@ const AppSidebar = ({ role, isReferent = false, className }: SidebarProps) => {
 
   // Function to check if link is active
   const isActive = (href: string) => {
-    if (href === "/") {
-      return pathname === "/"
+    const normalizedHref = href.replace(/\/$/, "") || "/"
+    const normalizedPath = pathname.replace(/\/$/, "") || "/"
+
+    // Exact match for root-level pages
+    if (normalizedHref === "/" || normalizedHref === "/admin") {
+      return normalizedPath === normalizedHref
     }
-    return pathname.startsWith(href)
+    return normalizedPath.startsWith(normalizedHref)
   }
 
   return (

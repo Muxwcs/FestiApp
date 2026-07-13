@@ -388,6 +388,7 @@ export const ModelName = {
   Sector: 'Sector',
   SectorReferent: 'SectorReferent',
   Timeslot: 'Timeslot',
+  TimeslotReferent: 'TimeslotReferent',
   Affectation: 'Affectation',
   Mission: 'Mission',
   MissionAssignment: 'MissionAssignment',
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "sector" | "sectorReferent" | "timeslot" | "affectation" | "mission" | "missionAssignment" | "pushSubscription" | "event" | "price" | "usefulInfo"
+    modelProps: "user" | "sector" | "sectorReferent" | "timeslot" | "timeslotReferent" | "affectation" | "mission" | "missionAssignment" | "pushSubscription" | "event" | "price" | "usefulInfo"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -707,6 +708,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.TimeslotCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.TimeslotCountAggregateOutputType> | number
+        }
+      }
+    }
+    TimeslotReferent: {
+      payload: Prisma.$TimeslotReferentPayload<ExtArgs>
+      fields: Prisma.TimeslotReferentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TimeslotReferentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimeslotReferentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TimeslotReferentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimeslotReferentPayload>
+        }
+        findFirst: {
+          args: Prisma.TimeslotReferentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimeslotReferentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TimeslotReferentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimeslotReferentPayload>
+        }
+        findMany: {
+          args: Prisma.TimeslotReferentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimeslotReferentPayload>[]
+        }
+        create: {
+          args: Prisma.TimeslotReferentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimeslotReferentPayload>
+        }
+        createMany: {
+          args: Prisma.TimeslotReferentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TimeslotReferentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimeslotReferentPayload>[]
+        }
+        delete: {
+          args: Prisma.TimeslotReferentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimeslotReferentPayload>
+        }
+        update: {
+          args: Prisma.TimeslotReferentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimeslotReferentPayload>
+        }
+        deleteMany: {
+          args: Prisma.TimeslotReferentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TimeslotReferentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TimeslotReferentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimeslotReferentPayload>[]
+        }
+        upsert: {
+          args: Prisma.TimeslotReferentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimeslotReferentPayload>
+        }
+        aggregate: {
+          args: Prisma.TimeslotReferentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTimeslotReferent>
+        }
+        groupBy: {
+          args: Prisma.TimeslotReferentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TimeslotReferentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TimeslotReferentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TimeslotReferentCountAggregateOutputType> | number
         }
       }
     }
@@ -1332,6 +1407,15 @@ export const TimeslotScalarFieldEnum = {
 export type TimeslotScalarFieldEnum = (typeof TimeslotScalarFieldEnum)[keyof typeof TimeslotScalarFieldEnum]
 
 
+export const TimeslotReferentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  timeslotId: 'timeslotId'
+} as const
+
+export type TimeslotReferentScalarFieldEnum = (typeof TimeslotReferentScalarFieldEnum)[keyof typeof TimeslotReferentScalarFieldEnum]
+
+
 export const AffectationScalarFieldEnum = {
   id: 'id',
   number: 'number',
@@ -1808,6 +1892,7 @@ export type GlobalOmitConfig = {
   sector?: Prisma.SectorOmit
   sectorReferent?: Prisma.SectorReferentOmit
   timeslot?: Prisma.TimeslotOmit
+  timeslotReferent?: Prisma.TimeslotReferentOmit
   affectation?: Prisma.AffectationOmit
   mission?: Prisma.MissionOmit
   missionAssignment?: Prisma.MissionAssignmentOmit

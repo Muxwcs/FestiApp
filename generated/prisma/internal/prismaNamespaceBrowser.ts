@@ -55,6 +55,7 @@ export const ModelName = {
   Sector: 'Sector',
   SectorReferent: 'SectorReferent',
   Timeslot: 'Timeslot',
+  TimeslotReferent: 'TimeslotReferent',
   Affectation: 'Affectation',
   Mission: 'Mission',
   MissionAssignment: 'MissionAssignment',
@@ -143,6 +144,15 @@ export const TimeslotScalarFieldEnum = {
 } as const
 
 export type TimeslotScalarFieldEnum = (typeof TimeslotScalarFieldEnum)[keyof typeof TimeslotScalarFieldEnum]
+
+
+export const TimeslotReferentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  timeslotId: 'timeslotId'
+} as const
+
+export type TimeslotReferentScalarFieldEnum = (typeof TimeslotReferentScalarFieldEnum)[keyof typeof TimeslotReferentScalarFieldEnum]
 
 
 export const AffectationScalarFieldEnum = {

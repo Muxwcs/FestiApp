@@ -250,6 +250,7 @@ export type TimeslotWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Timeslot"> | Date | string
   sector?: Prisma.XOR<Prisma.SectorScalarRelationFilter, Prisma.SectorWhereInput>
   affectations?: Prisma.AffectationListRelationFilter
+  referents?: Prisma.TimeslotReferentListRelationFilter
 }
 
 export type TimeslotOrderByWithRelationInput = {
@@ -264,6 +265,7 @@ export type TimeslotOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   sector?: Prisma.SectorOrderByWithRelationInput
   affectations?: Prisma.AffectationOrderByRelationAggregateInput
+  referents?: Prisma.TimeslotReferentOrderByRelationAggregateInput
 }
 
 export type TimeslotWhereUniqueInput = Prisma.AtLeast<{
@@ -281,6 +283,7 @@ export type TimeslotWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Timeslot"> | Date | string
   sector?: Prisma.XOR<Prisma.SectorScalarRelationFilter, Prisma.SectorWhereInput>
   affectations?: Prisma.AffectationListRelationFilter
+  referents?: Prisma.TimeslotReferentListRelationFilter
 }, "id">
 
 export type TimeslotOrderByWithAggregationInput = {
@@ -326,6 +329,7 @@ export type TimeslotCreateInput = {
   updatedAt?: Date | string
   sector: Prisma.SectorCreateNestedOneWithoutTimeslotsInput
   affectations?: Prisma.AffectationCreateNestedManyWithoutTimeslotInput
+  referents?: Prisma.TimeslotReferentCreateNestedManyWithoutTimeslotInput
 }
 
 export type TimeslotUncheckedCreateInput = {
@@ -339,6 +343,7 @@ export type TimeslotUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   affectations?: Prisma.AffectationUncheckedCreateNestedManyWithoutTimeslotInput
+  referents?: Prisma.TimeslotReferentUncheckedCreateNestedManyWithoutTimeslotInput
 }
 
 export type TimeslotUpdateInput = {
@@ -352,6 +357,7 @@ export type TimeslotUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sector?: Prisma.SectorUpdateOneRequiredWithoutTimeslotsNestedInput
   affectations?: Prisma.AffectationUpdateManyWithoutTimeslotNestedInput
+  referents?: Prisma.TimeslotReferentUpdateManyWithoutTimeslotNestedInput
 }
 
 export type TimeslotUncheckedUpdateInput = {
@@ -365,6 +371,7 @@ export type TimeslotUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   affectations?: Prisma.AffectationUncheckedUpdateManyWithoutTimeslotNestedInput
+  referents?: Prisma.TimeslotReferentUncheckedUpdateManyWithoutTimeslotNestedInput
 }
 
 export type TimeslotCreateManyInput = {
@@ -503,6 +510,20 @@ export type TimeslotUncheckedUpdateManyWithoutSectorNestedInput = {
   deleteMany?: Prisma.TimeslotScalarWhereInput | Prisma.TimeslotScalarWhereInput[]
 }
 
+export type TimeslotCreateNestedOneWithoutReferentsInput = {
+  create?: Prisma.XOR<Prisma.TimeslotCreateWithoutReferentsInput, Prisma.TimeslotUncheckedCreateWithoutReferentsInput>
+  connectOrCreate?: Prisma.TimeslotCreateOrConnectWithoutReferentsInput
+  connect?: Prisma.TimeslotWhereUniqueInput
+}
+
+export type TimeslotUpdateOneRequiredWithoutReferentsNestedInput = {
+  create?: Prisma.XOR<Prisma.TimeslotCreateWithoutReferentsInput, Prisma.TimeslotUncheckedCreateWithoutReferentsInput>
+  connectOrCreate?: Prisma.TimeslotCreateOrConnectWithoutReferentsInput
+  upsert?: Prisma.TimeslotUpsertWithoutReferentsInput
+  connect?: Prisma.TimeslotWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TimeslotUpdateToOneWithWhereWithoutReferentsInput, Prisma.TimeslotUpdateWithoutReferentsInput>, Prisma.TimeslotUncheckedUpdateWithoutReferentsInput>
+}
+
 export type TimeslotCreateNestedOneWithoutAffectationsInput = {
   create?: Prisma.XOR<Prisma.TimeslotCreateWithoutAffectationsInput, Prisma.TimeslotUncheckedCreateWithoutAffectationsInput>
   connectOrCreate?: Prisma.TimeslotCreateOrConnectWithoutAffectationsInput
@@ -527,6 +548,7 @@ export type TimeslotCreateWithoutSectorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   affectations?: Prisma.AffectationCreateNestedManyWithoutTimeslotInput
+  referents?: Prisma.TimeslotReferentCreateNestedManyWithoutTimeslotInput
 }
 
 export type TimeslotUncheckedCreateWithoutSectorInput = {
@@ -539,6 +561,7 @@ export type TimeslotUncheckedCreateWithoutSectorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   affectations?: Prisma.AffectationUncheckedCreateNestedManyWithoutTimeslotInput
+  referents?: Prisma.TimeslotReferentUncheckedCreateNestedManyWithoutTimeslotInput
 }
 
 export type TimeslotCreateOrConnectWithoutSectorInput = {
@@ -582,6 +605,74 @@ export type TimeslotScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Timeslot"> | Date | string
 }
 
+export type TimeslotCreateWithoutReferentsInput = {
+  id?: string
+  name: string
+  dateStart?: Date | string | null
+  dateEnd?: Date | string | null
+  totalVolunteers?: number
+  details?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sector: Prisma.SectorCreateNestedOneWithoutTimeslotsInput
+  affectations?: Prisma.AffectationCreateNestedManyWithoutTimeslotInput
+}
+
+export type TimeslotUncheckedCreateWithoutReferentsInput = {
+  id?: string
+  name: string
+  dateStart?: Date | string | null
+  dateEnd?: Date | string | null
+  totalVolunteers?: number
+  details?: string | null
+  sectorId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  affectations?: Prisma.AffectationUncheckedCreateNestedManyWithoutTimeslotInput
+}
+
+export type TimeslotCreateOrConnectWithoutReferentsInput = {
+  where: Prisma.TimeslotWhereUniqueInput
+  create: Prisma.XOR<Prisma.TimeslotCreateWithoutReferentsInput, Prisma.TimeslotUncheckedCreateWithoutReferentsInput>
+}
+
+export type TimeslotUpsertWithoutReferentsInput = {
+  update: Prisma.XOR<Prisma.TimeslotUpdateWithoutReferentsInput, Prisma.TimeslotUncheckedUpdateWithoutReferentsInput>
+  create: Prisma.XOR<Prisma.TimeslotCreateWithoutReferentsInput, Prisma.TimeslotUncheckedCreateWithoutReferentsInput>
+  where?: Prisma.TimeslotWhereInput
+}
+
+export type TimeslotUpdateToOneWithWhereWithoutReferentsInput = {
+  where?: Prisma.TimeslotWhereInput
+  data: Prisma.XOR<Prisma.TimeslotUpdateWithoutReferentsInput, Prisma.TimeslotUncheckedUpdateWithoutReferentsInput>
+}
+
+export type TimeslotUpdateWithoutReferentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  dateStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dateEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totalVolunteers?: Prisma.IntFieldUpdateOperationsInput | number
+  details?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sector?: Prisma.SectorUpdateOneRequiredWithoutTimeslotsNestedInput
+  affectations?: Prisma.AffectationUpdateManyWithoutTimeslotNestedInput
+}
+
+export type TimeslotUncheckedUpdateWithoutReferentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  dateStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dateEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totalVolunteers?: Prisma.IntFieldUpdateOperationsInput | number
+  details?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sectorId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  affectations?: Prisma.AffectationUncheckedUpdateManyWithoutTimeslotNestedInput
+}
+
 export type TimeslotCreateWithoutAffectationsInput = {
   id?: string
   name: string
@@ -592,6 +683,7 @@ export type TimeslotCreateWithoutAffectationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sector: Prisma.SectorCreateNestedOneWithoutTimeslotsInput
+  referents?: Prisma.TimeslotReferentCreateNestedManyWithoutTimeslotInput
 }
 
 export type TimeslotUncheckedCreateWithoutAffectationsInput = {
@@ -604,6 +696,7 @@ export type TimeslotUncheckedCreateWithoutAffectationsInput = {
   sectorId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  referents?: Prisma.TimeslotReferentUncheckedCreateNestedManyWithoutTimeslotInput
 }
 
 export type TimeslotCreateOrConnectWithoutAffectationsInput = {
@@ -632,6 +725,7 @@ export type TimeslotUpdateWithoutAffectationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sector?: Prisma.SectorUpdateOneRequiredWithoutTimeslotsNestedInput
+  referents?: Prisma.TimeslotReferentUpdateManyWithoutTimeslotNestedInput
 }
 
 export type TimeslotUncheckedUpdateWithoutAffectationsInput = {
@@ -644,6 +738,7 @@ export type TimeslotUncheckedUpdateWithoutAffectationsInput = {
   sectorId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  referents?: Prisma.TimeslotReferentUncheckedUpdateManyWithoutTimeslotNestedInput
 }
 
 export type TimeslotCreateManySectorInput = {
@@ -667,6 +762,7 @@ export type TimeslotUpdateWithoutSectorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   affectations?: Prisma.AffectationUpdateManyWithoutTimeslotNestedInput
+  referents?: Prisma.TimeslotReferentUpdateManyWithoutTimeslotNestedInput
 }
 
 export type TimeslotUncheckedUpdateWithoutSectorInput = {
@@ -679,6 +775,7 @@ export type TimeslotUncheckedUpdateWithoutSectorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   affectations?: Prisma.AffectationUncheckedUpdateManyWithoutTimeslotNestedInput
+  referents?: Prisma.TimeslotReferentUncheckedUpdateManyWithoutTimeslotNestedInput
 }
 
 export type TimeslotUncheckedUpdateManyWithoutSectorInput = {
@@ -699,10 +796,12 @@ export type TimeslotUncheckedUpdateManyWithoutSectorInput = {
 
 export type TimeslotCountOutputType = {
   affectations: number
+  referents: number
 }
 
 export type TimeslotCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   affectations?: boolean | TimeslotCountOutputTypeCountAffectationsArgs
+  referents?: boolean | TimeslotCountOutputTypeCountReferentsArgs
 }
 
 /**
@@ -722,6 +821,13 @@ export type TimeslotCountOutputTypeCountAffectationsArgs<ExtArgs extends runtime
   where?: Prisma.AffectationWhereInput
 }
 
+/**
+ * TimeslotCountOutputType without action
+ */
+export type TimeslotCountOutputTypeCountReferentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TimeslotReferentWhereInput
+}
+
 
 export type TimeslotSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -735,6 +841,7 @@ export type TimeslotSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   updatedAt?: boolean
   sector?: boolean | Prisma.SectorDefaultArgs<ExtArgs>
   affectations?: boolean | Prisma.Timeslot$affectationsArgs<ExtArgs>
+  referents?: boolean | Prisma.Timeslot$referentsArgs<ExtArgs>
   _count?: boolean | Prisma.TimeslotCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["timeslot"]>
 
@@ -780,6 +887,7 @@ export type TimeslotOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type TimeslotInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sector?: boolean | Prisma.SectorDefaultArgs<ExtArgs>
   affectations?: boolean | Prisma.Timeslot$affectationsArgs<ExtArgs>
+  referents?: boolean | Prisma.Timeslot$referentsArgs<ExtArgs>
   _count?: boolean | Prisma.TimeslotCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TimeslotIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -794,6 +902,7 @@ export type $TimeslotPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     sector: Prisma.$SectorPayload<ExtArgs>
     affectations: Prisma.$AffectationPayload<ExtArgs>[]
+    referents: Prisma.$TimeslotReferentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1201,6 +1310,7 @@ export interface Prisma__TimeslotClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   sector<T extends Prisma.SectorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SectorDefaultArgs<ExtArgs>>): Prisma.Prisma__SectorClient<runtime.Types.Result.GetResult<Prisma.$SectorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   affectations<T extends Prisma.Timeslot$affectationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Timeslot$affectationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AffectationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referents<T extends Prisma.Timeslot$referentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Timeslot$referentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimeslotReferentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1661,6 +1771,30 @@ export type Timeslot$affectationsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.AffectationScalarFieldEnum | Prisma.AffectationScalarFieldEnum[]
+}
+
+/**
+ * Timeslot.referents
+ */
+export type Timeslot$referentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TimeslotReferent
+   */
+  select?: Prisma.TimeslotReferentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TimeslotReferent
+   */
+  omit?: Prisma.TimeslotReferentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TimeslotReferentInclude<ExtArgs> | null
+  where?: Prisma.TimeslotReferentWhereInput
+  orderBy?: Prisma.TimeslotReferentOrderByWithRelationInput | Prisma.TimeslotReferentOrderByWithRelationInput[]
+  cursor?: Prisma.TimeslotReferentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TimeslotReferentScalarFieldEnum | Prisma.TimeslotReferentScalarFieldEnum[]
 }
 
 /**

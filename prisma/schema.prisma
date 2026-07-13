@@ -41,6 +41,7 @@ model User {
   affectations       Affectation[]
   missionAssignments MissionAssignment[]
   referentSectors    SectorReferent[]
+  timeslotReferents  TimeslotReferent[]
   pushSubscriptions  PushSubscription[]
 
   createdAt DateTime @default(now())
@@ -98,11 +99,24 @@ model Timeslot {
   sectorId     String
   sector       Sector        @relation(fields: [sectorId], references: [id], onDelete: Cascade)
   affectations Affectation[]
+  referents    TimeslotReferent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("timeslots")
+}
+
+model TimeslotReferent {
+  id         String @id @default(cuid())
+  userId     String
+  timeslotId String
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timeslot Timeslot @relation(fields: [timeslotId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, timeslotId])
+  @@map("timeslot_referents")
 }
 
 // =============================================================
