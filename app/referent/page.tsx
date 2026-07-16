@@ -11,7 +11,12 @@ const ReferentPage = async () => {
   const sectors = await prisma.sector.findMany({
     where: isAdmin
       ? {}
-      : { referents: { some: { userId: session.user.id } } },
+      : {
+        OR: [
+          { referents: { some: { userId: session.user.id } } },
+          { timeslots: { some: { referents: { some: { userId: session.user.id } } } } },
+        ],
+      },
     orderBy: { name: "asc" },
     select: {
       id: true,
@@ -25,7 +30,7 @@ const ReferentPage = async () => {
   })
 
   return (
-    <div className="p-2 sm:p-6 lg:p-8">
+    <div className="p-0 sm:p-6 lg:p-8">
       <ReferentSectors
         sectors={sectors}
         userName={session.user.name || session.user.email}

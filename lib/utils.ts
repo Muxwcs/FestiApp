@@ -46,3 +46,8 @@ export const getTimeRange = (dateStart?: string, dateEnd?: string) => {
 
   return ""
 }
+
+export const toUTCIso = (local: string) => {
+  if (!local) return null
+  return new Date(local).toISOString()
+}

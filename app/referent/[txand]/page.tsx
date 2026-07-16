@@ -5,7 +5,10 @@ import { ReferentSectorDetail } from "./referent-sector-detail"
 
 const ReferentSectorPage = async ({ params }: { params: Promise<{ txand: string }> }) => {
   const { txand: sectorId } = await params
-  await checkSectorAccess(sectorId)
+  const { session, accessLevel } = await checkSectorAccess(sectorId)
+
+  const canSeeAllTimeslots = accessLevel === "admin" || accessLevel === "sector_referent"
+
 
   const sector = await prisma.sector.findUnique({
     where: { id: sectorId },
@@ -17,6 +20,7 @@ const ReferentSectorPage = async ({ params }: { params: Promise<{ txand: string 
       },
       timeslots: {
         orderBy: { dateStart: "asc" },
+        where: canSeeAllTimeslots ? {} : { referents: { some: { userId: session.user.id! } } },
         include: {
           _count: { select: { affectations: true } },
           affectations: {
@@ -31,7 +35,6 @@ const ReferentSectorPage = async ({ params }: { params: Promise<{ txand: string 
           },
         },
       },
-      _count: { select: { affectations: true } },
     },
   })
 
@@ -59,6 +62,9 @@ const ReferentSectorPage = async ({ params }: { params: Promise<{ txand: string 
 
   const volunteers = Array.from(volunteerMap.values())
 
+  // Recalculate affectations count from visible timeslots only
+  const totalAffectations = sector.timeslots.reduce((sum, ts) => sum + ts._count.affectations, 0)
+
   // Serialize dates
   const serialized = {
     id: sector.id,
@@ -81,7 +87,7 @@ const ReferentSectorPage = async ({ params }: { params: Promise<{ txand: string 
       totalVolunteers: ts.totalVolunteers,
       assignedCount: ts._count.affectations,
     })),
-    totalAffectations: sector._count.affectations,
+    totalAffectations,
     volunteers,
   }
 

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/command"
 
 import { CreateTimeslotDialog } from "@/components/admin/sectors/create-timeslot-dialog"
+import { toUTCIso } from "@/lib/utils"
 
 // ─── Types ──────────────────────────────────────────────
 
@@ -187,8 +188,8 @@ export function SectorDetail({ sector, allUsers }: SectorDetailProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...tsEditData,
-          dateStart: tsEditData.dateStart || null,
-          dateEnd: tsEditData.dateEnd || null,
+          dateStart: toUTCIso(tsEditData.dateStart),
+          dateEnd: toUTCIso(tsEditData.dateEnd),
         }),
       })
       if (!res.ok) throw new Error()

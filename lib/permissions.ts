@@ -39,34 +39,38 @@ export const isAdminOrReferent = async () => {
   return session
 }
 
+// ─── Accès secteur ─────────────────────────────────────────────
+
+export type SectorAccessLevel = "admin" | "sector_referent" | "timeslot_referent"
+
 /**
- * Vérifie si le référent a accès à un secteur spécifique
+ * Détermine le niveau d'accès d'un utilisateur à un secteur.
+ * Nécessite un userId déjà vérifié (pas d'appel auth() interne).
  */
-export const canAccessSector = async (sectorId: string): Promise<boolean> => {
-  const session = await auth()
+export const getSectorAccessLevel = async (
+  userId: string,
+  userRole: string,
+  sectorId: string
+): Promise<SectorAccessLevel | null> => {
+  if (userRole === "ADMIN") return "admin"
 
-  if (!session?.user?.id) {
-    return false
-  }
-
-  // Admin a accès à tout
-  if (session.user.role === "ADMIN") {
-    return true
-  }
-
-  // Vérifier si référent du secteur
-  const referent = await prisma.sectorReferent.findUnique({
-    where: {
-      userId_sectorId: {
-        userId: session.user.id,
-        sectorId,
-      },
-    },
+  const sectorRef = await prisma.sectorReferent.findUnique({
+    where: { userId_sectorId: { userId, sectorId } },
   })
 
-  return !!referent
+  if (sectorRef) return "sector_referent"
+
+  const timeslotRef = await prisma.timeslotReferent.findFirst({
+    where: { userId, timeslot: { sectorId } },
+  })
+
+  return timeslotRef ? "timeslot_referent" : null
 }
 
+/**
+ * Vérifie l'accès au secteur et redirige si non autorisé.
+ * Retourne la session + le niveau d'accès.
+ */
 export const checkSectorAccess = async (sectorId: string) => {
   const session = await auth()
 
@@ -74,13 +78,17 @@ export const checkSectorAccess = async (sectorId: string) => {
     redirect("/login")
   }
 
-  const hasAccess = await canAccessSector(sectorId)
+  const accessLevel = await getSectorAccessLevel(
+    session.user.id,
+    session.user.role as string,
+    sectorId
+  )
 
-  if (!hasAccess) {
+  if (!accessLevel) {
     redirect("/referent?error=unauthorized")
   }
 
-  return session
+  return { session, accessLevel }
 }
 
 /**

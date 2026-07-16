@@ -20,7 +20,7 @@ interface DayStat {
 interface VolunteerListProps {
   volunteers: VolunteerListItem[]
   userName: string | null | undefined
-  dayStats: { friday: DayStat; saturday: DayStat }
+  dayStats: { friday: DayStat; saturday: DayStat; sunday: DayStat }
 }
 
 export function VolunteerList({ volunteers, userName, dayStats }: VolunteerListProps) {
@@ -85,10 +85,11 @@ export function VolunteerList({ volunteers, userName, dayStats }: VolunteerListP
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {([
           { label: "Vendredi 31", stat: dayStats.friday },
           { label: "Samedi 1er", stat: dayStats.saturday },
+          { label: "Dimanche 2", stat: dayStats.sunday },
         ] as const).map(({ label, stat }) => (
           <Card key={label}>
             <CardContent className="pt-6">

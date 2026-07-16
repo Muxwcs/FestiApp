@@ -31,8 +31,9 @@ const VolunteersPage = async () => {
   const FRIDAY_START = new Date("2026-07-31T00:00:00+02:00")
   const FRIDAY_END = new Date("2026-08-01T02:00:00+02:00")
   const SATURDAY_END = new Date("2026-08-02T02:00:00+02:00")
+  const SUNDAY_END = new Date("2026-08-03T02:00:00+02:00")
 
-  const [fridayTimeslots, saturdayTimeslots, adminUsers] = await Promise.all([
+  const [fridayTimeslots, saturdayTimeslots, sundayTimeslots, adminUsers] = await Promise.all([
     prisma.timeslot.findMany({
       where: { dateStart: { gte: FRIDAY_START, lt: FRIDAY_END } },
       select: {
@@ -53,6 +54,16 @@ const VolunteersPage = async () => {
         referents: { select: { userId: true } },
       },
     }),
+    prisma.timeslot.findMany({
+      where: { dateStart: { gte: SATURDAY_END, lt: SUNDAY_END } },
+      select: {
+        sectorId: true,
+        dateStart: true,
+        dateEnd: true,
+        affectations: { select: { volunteerId: true } },
+        referents: { select: { userId: true } },
+      },
+    }),
     prisma.user.findMany({
       where: { role: "ADMIN", isActive: true },
       select: { id: true },
@@ -62,8 +73,9 @@ const VolunteersPage = async () => {
   // Référents des secteurs impliqués chaque jour
   const fridaySectorIds = [...new Set(fridayTimeslots.map((t) => t.sectorId))]
   const saturdaySectorIds = [...new Set(saturdayTimeslots.map((t) => t.sectorId))]
+  const sundaySectorIds = [...new Set(sundayTimeslots.map((t) => t.sectorId))]
 
-  const [fridaySectorRefs, saturdaySectorRefs] = await Promise.all([
+  const [fridaySectorRefs, saturdaySectorRefs, sundaySectorRefs] = await Promise.all([
     fridaySectorIds.length > 0
       ? prisma.sectorReferent.findMany({
         where: { sectorId: { in: fridaySectorIds } },
@@ -73,6 +85,12 @@ const VolunteersPage = async () => {
     saturdaySectorIds.length > 0
       ? prisma.sectorReferent.findMany({
         where: { sectorId: { in: saturdaySectorIds } },
+        select: { userId: true },
+      })
+      : [],
+    sundaySectorIds.length > 0
+      ? prisma.sectorReferent.findMany({
+        where: { sectorId: { in: sundaySectorIds } },
         select: { userId: true },
       })
       : [],
@@ -109,11 +127,11 @@ const VolunteersPage = async () => {
   }
 
   // --- Heures par bénévole par jour ---
-  const volunteerHours = new Map<string, { friday: number; saturday: number }>()
+  const volunteerHours = new Map<string, { friday: number; saturday: number; sunday: number }>()
 
   const addHours = (
     timeslots: typeof fridayTimeslots,
-    day: "friday" | "saturday"
+    day: "friday" | "saturday" | "sunday"
   ) => {
     for (const ts of timeslots) {
       if (!ts.dateStart || !ts.dateEnd) continue
@@ -123,6 +141,7 @@ const VolunteersPage = async () => {
         const cur = volunteerHours.get(aff.volunteerId) || {
           friday: 0,
           saturday: 0,
+          sunday: 0,
         }
         cur[day] += hours
         volunteerHours.set(aff.volunteerId, cur)
@@ -132,20 +151,23 @@ const VolunteersPage = async () => {
 
   addHours(fridayTimeslots, "friday")
   addHours(saturdayTimeslots, "saturday")
+  addHours(sundayTimeslots, "sunday")
 
   const dayStats = {
     friday: collectStats(fridayTimeslots, fridaySectorRefs),
     saturday: collectStats(saturdayTimeslots, saturdaySectorRefs),
+    sunday: collectStats(sundayTimeslots, sundaySectorRefs),
   }
 
   const volunteersWithHours = volunteers.map((v) => ({
     ...v,
     fridayHours: volunteerHours.get(v.id)?.friday ?? 0,
     saturdayHours: volunteerHours.get(v.id)?.saturday ?? 0,
+    sundayHours: volunteerHours.get(v.id)?.sunday ?? 0,
   }))
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <div className="p-0 sm:p-6 lg:p-8">
       <VolunteerList
         volunteers={volunteersWithHours}
         userName={session.user.name}
