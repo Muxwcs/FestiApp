@@ -18,7 +18,7 @@ const AdminDashboardPage = async () => {
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold">Administration</h1>
         <p className="text-muted-foreground">
-          Bienvenue, {session.user.name || session.user.email}
+          Bienvenue, {session.user.surname || session.user.firstname || session.user.email}
         </p>
       </div>
 

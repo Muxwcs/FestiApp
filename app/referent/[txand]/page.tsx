@@ -40,27 +40,38 @@ const ReferentSectorPage = async ({ params }: { params: Promise<{ txand: string 
 
   if (!sector) notFound()
 
-  // Build volunteer list with their timeslot assignments
+  // Build volunteer list with their timeslot assignments + presence
   const volunteerMap = new Map<string, {
     volunteer: typeof sector.timeslots[0]["affectations"][0]["volunteer"]
-    timeslotNames: string[]
+    assignments: {
+      affectationId: string
+      timeslotId: string
+      timeslotName: string
+      presence: "PRESENT" | "ABSENT" | null
+      checkedAt: string | null
+    }[]
   }>()
 
   sector.timeslots.forEach((ts) => {
     ts.affectations.forEach((aff) => {
+      const assignment = {
+        affectationId: aff.id,
+        timeslotId: ts.id,
+        timeslotName: ts.name,
+        presence: aff.presence as "PRESENT" | "ABSENT" | null,
+        checkedAt: aff.checkedAt?.toISOString() ?? null,
+      }
       const existing = volunteerMap.get(aff.volunteer.id)
       if (existing) {
-        existing.timeslotNames.push(ts.name)
+        existing.assignments.push(assignment)
       } else {
         volunteerMap.set(aff.volunteer.id, {
           volunteer: aff.volunteer,
-          timeslotNames: [ts.name],
+          assignments: [assignment],
         })
       }
     })
   })
-
-  const volunteers = Array.from(volunteerMap.values())
 
   // Recalculate affectations count from visible timeslots only
   const totalAffectations = sector.timeslots.reduce((sum, ts) => sum + ts._count.affectations, 0)
@@ -88,7 +99,7 @@ const ReferentSectorPage = async ({ params }: { params: Promise<{ txand: string 
       assignedCount: ts._count.affectations,
     })),
     totalAffectations,
-    volunteers,
+    volunteers: Array.from(volunteerMap.values()),
   }
 
   return (

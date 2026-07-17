@@ -30,6 +30,20 @@ export const formatDate = (dateString?: string) => {
   }
 }
 
+export const formatShortDate = (dateString?: string) => {
+  if (!dateString) return ""
+  try {
+    return new Intl.DateTimeFormat('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(dateString))
+  } catch {
+    return dateString
+  }
+}
+
 export const getTimeRange = (dateStart?: string, dateEnd?: string) => {
   if (!dateStart && !dateEnd) return ""
 

@@ -7,13 +7,18 @@ declare module "next-auth" {
       id: string
       role: Role
       isReferent: boolean
+      firstname: string | null
+      surname: string | null
     } & DefaultSession["user"]
   }
 
   interface User {
     role?: Role
     isReferent?: boolean
+    firstname?: string | null
+    surname?: string | null
   }
+
 }
 
 declare module "next-auth/jwt" {
@@ -21,6 +26,8 @@ declare module "next-auth/jwt" {
     id: string
     role: Role
     isReferent: boolean
+    firstname: string | null
+    surname: string | null
   }
 }
 

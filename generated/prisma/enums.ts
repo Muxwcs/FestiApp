@@ -26,6 +26,14 @@ export const AffectationStatus = {
 export type AffectationStatus = (typeof AffectationStatus)[keyof typeof AffectationStatus]
 
 
+export const Presence = {
+  PRESENT: 'PRESENT',
+  ABSENT: 'ABSENT'
+} as const
+
+export type Presence = (typeof Presence)[keyof typeof Presence]
+
+
 export const MissionPriority = {
   HAUTE: 'HAUTE',
   MOYENNE: 'MOYENNE',

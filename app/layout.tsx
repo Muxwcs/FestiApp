@@ -7,7 +7,7 @@ import { ServiceWorkerRegister } from "@/components/pwa/sw-register"
 import { SplashScreen } from "@/components/pwa/splash-screen"
 
 export const metadata: Metadata = {
-  title: "Festiapp",
+  title: "FestiApp",
   description: "Application de gestion d'événements",
   icons: {
     icon: "/favicon.ico",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Festiapp",
+    title: "FestiApp",
     startupImage: "/icon-512x512.png",
   },
 }
@@ -39,7 +39,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <meta name="theme-color" content="#022a35" media="(prefers-color-scheme: dark)" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Festiapp" />
+        <meta name="apple-mobile-web-app-title" content="FestiApp" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <link rel="apple-touch-icon" sizes="512x512" href="/icon-512x512.png" />
         <meta name="mobile-web-app-capable" content="yes" />

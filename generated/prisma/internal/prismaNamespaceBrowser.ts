@@ -162,6 +162,9 @@ export const AffectationScalarFieldEnum = {
   volunteerId: 'volunteerId',
   timeslotId: 'timeslotId',
   sectorId: 'sectorId',
+  presence: 'presence',
+  checkedAt: 'checkedAt',
+  checkedBy: 'checkedBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -179,6 +182,7 @@ export const MissionScalarFieldEnum = {
   priority: 'priority',
   status: 'status',
   humanResources: 'humanResources',
+  responsibleId: 'responsibleId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

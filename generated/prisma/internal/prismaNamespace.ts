@@ -1423,6 +1423,9 @@ export const AffectationScalarFieldEnum = {
   volunteerId: 'volunteerId',
   timeslotId: 'timeslotId',
   sectorId: 'sectorId',
+  presence: 'presence',
+  checkedAt: 'checkedAt',
+  checkedBy: 'checkedBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1440,6 +1443,7 @@ export const MissionScalarFieldEnum = {
   priority: 'priority',
   status: 'status',
   humanResources: 'humanResources',
+  responsibleId: 'responsibleId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1650,6 +1654,20 @@ export type EnumAffectationStatusFieldRefInput<$PrismaModel> = FieldRefInputType
  * Reference to a field of type 'AffectationStatus[]'
  */
 export type ListEnumAffectationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AffectationStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Presence'
+ */
+export type EnumPresenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Presence'>
+    
+
+
+/**
+ * Reference to a field of type 'Presence[]'
+ */
+export type ListEnumPresenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Presence[]'>
     
 
 

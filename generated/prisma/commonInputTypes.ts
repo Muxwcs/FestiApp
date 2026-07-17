@@ -199,6 +199,13 @@ export type EnumAffectationStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAffectationStatusFilter<$PrismaModel> | $Enums.AffectationStatus
 }
 
+export type EnumPresenceNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.Presence | Prisma.EnumPresenceFieldRefInput<$PrismaModel> | null
+  in?: $Enums.Presence[] | Prisma.ListEnumPresenceFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.Presence[] | Prisma.ListEnumPresenceFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPresenceNullableFilter<$PrismaModel> | $Enums.Presence | null
+}
+
 export type EnumAffectationStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.AffectationStatus | Prisma.EnumAffectationStatusFieldRefInput<$PrismaModel>
   in?: $Enums.AffectationStatus[] | Prisma.ListEnumAffectationStatusFieldRefInput<$PrismaModel>
@@ -207,6 +214,16 @@ export type EnumAffectationStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAffectationStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAffectationStatusFilter<$PrismaModel>
+}
+
+export type EnumPresenceNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Presence | Prisma.EnumPresenceFieldRefInput<$PrismaModel> | null
+  in?: $Enums.Presence[] | Prisma.ListEnumPresenceFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.Presence[] | Prisma.ListEnumPresenceFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPresenceNullableWithAggregatesFilter<$PrismaModel> | $Enums.Presence | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPresenceNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPresenceNullableFilter<$PrismaModel>
 }
 
 export type EnumMissionPriorityFilter<$PrismaModel = never> = {
@@ -655,6 +672,13 @@ export type NestedEnumAffectationStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAffectationStatusFilter<$PrismaModel> | $Enums.AffectationStatus
 }
 
+export type NestedEnumPresenceNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.Presence | Prisma.EnumPresenceFieldRefInput<$PrismaModel> | null
+  in?: $Enums.Presence[] | Prisma.ListEnumPresenceFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.Presence[] | Prisma.ListEnumPresenceFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPresenceNullableFilter<$PrismaModel> | $Enums.Presence | null
+}
+
 export type NestedEnumAffectationStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.AffectationStatus | Prisma.EnumAffectationStatusFieldRefInput<$PrismaModel>
   in?: $Enums.AffectationStatus[] | Prisma.ListEnumAffectationStatusFieldRefInput<$PrismaModel>
@@ -663,6 +687,16 @@ export type NestedEnumAffectationStatusWithAggregatesFilter<$PrismaModel = never
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAffectationStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAffectationStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPresenceNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Presence | Prisma.EnumPresenceFieldRefInput<$PrismaModel> | null
+  in?: $Enums.Presence[] | Prisma.ListEnumPresenceFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.Presence[] | Prisma.ListEnumPresenceFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPresenceNullableWithAggregatesFilter<$PrismaModel> | $Enums.Presence | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPresenceNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPresenceNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumMissionPriorityFilter<$PrismaModel = never> = {

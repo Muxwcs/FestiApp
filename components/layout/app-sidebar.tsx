@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Users, LayoutDashboard, CalendarSync, SquareKanban, Music2, Bell, InfoIcon, EuroIcon } from "lucide-react"
+import { Users, LayoutDashboard, CalendarSync, SquareKanban, Music2, Bell, InfoIcon, EuroIcon, ListTodo } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -33,6 +33,7 @@ const AppSidebar = ({ role, isReferent = false, className }: SidebarProps) => {
     { href: "/admin/infos", label: "Gestion Infos Pratiques", icon: InfoIcon },
     { href: "/admin/prices", label: "Gestion Tarifs", icon: EuroIcon },
     { href: "/admin/notifications", label: "Notifications Push", icon: Bell },
+    { href: "/admin/missions", label: "Gestion Missions", icon: ListTodo },
   ]
 
   const benevoleLinks = [

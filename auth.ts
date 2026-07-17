@@ -102,7 +102,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return {
           id: user.id,
           email: user.email,
-          name: user.name ?? user.firstname,
+          name: user.name,
+          firstname: user.firstname ?? null,
+          surname: user.surname ?? null,
           role: user.role,
           isReferent: user.isReferent || user.referentSectors.length > 0,
         }
@@ -115,6 +117,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id
         token.role = user.role as Role
         token.isReferent = user.isReferent as boolean
+        token.firstname = user.firstname ?? null
+        token.surname = user.surname ?? null
+
       }
       return token
     },
@@ -123,6 +128,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string
         session.user.role = token.role as Role
         session.user.isReferent = token.isReferent as boolean
+        session.user.firstname = token.firstname as string | null
+        session.user.surname = token.surname as string | null
+
       }
       return session
     },

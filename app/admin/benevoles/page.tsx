@@ -170,7 +170,7 @@ const VolunteersPage = async () => {
     <div className="p-0 sm:p-6 lg:p-8">
       <VolunteerList
         volunteers={volunteersWithHours}
-        userName={session.user.name}
+        userName={session.user.surname || session.user.firstname || session.user.email}
         dayStats={dayStats}
       />
     </div>

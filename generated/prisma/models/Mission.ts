@@ -44,6 +44,7 @@ export type MissionMinAggregateOutputType = {
   priority: $Enums.MissionPriority | null
   status: $Enums.MissionStatus | null
   humanResources: number | null
+  responsibleId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -58,6 +59,7 @@ export type MissionMaxAggregateOutputType = {
   priority: $Enums.MissionPriority | null
   status: $Enums.MissionStatus | null
   humanResources: number | null
+  responsibleId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -72,6 +74,7 @@ export type MissionCountAggregateOutputType = {
   priority: number
   status: number
   humanResources: number
+  responsibleId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -96,6 +99,7 @@ export type MissionMinAggregateInputType = {
   priority?: true
   status?: true
   humanResources?: true
+  responsibleId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -110,6 +114,7 @@ export type MissionMaxAggregateInputType = {
   priority?: true
   status?: true
   humanResources?: true
+  responsibleId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -124,6 +129,7 @@ export type MissionCountAggregateInputType = {
   priority?: true
   status?: true
   humanResources?: true
+  responsibleId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -225,6 +231,7 @@ export type MissionGroupByOutputType = {
   priority: $Enums.MissionPriority
   status: $Enums.MissionStatus
   humanResources: number
+  responsibleId: string | null
   createdAt: Date
   updatedAt: Date
   _count: MissionCountAggregateOutputType | null
@@ -262,8 +269,10 @@ export type MissionWhereInput = {
   priority?: Prisma.EnumMissionPriorityFilter<"Mission"> | $Enums.MissionPriority
   status?: Prisma.EnumMissionStatusFilter<"Mission"> | $Enums.MissionStatus
   humanResources?: Prisma.IntFilter<"Mission"> | number
+  responsibleId?: Prisma.StringNullableFilter<"Mission"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Mission"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Mission"> | Date | string
+  responsible?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   assignments?: Prisma.MissionAssignmentListRelationFilter
 }
 
@@ -277,8 +286,10 @@ export type MissionOrderByWithRelationInput = {
   priority?: Prisma.SortOrder
   status?: Prisma.SortOrder
   humanResources?: Prisma.SortOrder
+  responsibleId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  responsible?: Prisma.UserOrderByWithRelationInput
   assignments?: Prisma.MissionAssignmentOrderByRelationAggregateInput
 }
 
@@ -295,8 +306,10 @@ export type MissionWhereUniqueInput = Prisma.AtLeast<{
   priority?: Prisma.EnumMissionPriorityFilter<"Mission"> | $Enums.MissionPriority
   status?: Prisma.EnumMissionStatusFilter<"Mission"> | $Enums.MissionStatus
   humanResources?: Prisma.IntFilter<"Mission"> | number
+  responsibleId?: Prisma.StringNullableFilter<"Mission"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Mission"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Mission"> | Date | string
+  responsible?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   assignments?: Prisma.MissionAssignmentListRelationFilter
 }, "id">
 
@@ -310,6 +323,7 @@ export type MissionOrderByWithAggregationInput = {
   priority?: Prisma.SortOrder
   status?: Prisma.SortOrder
   humanResources?: Prisma.SortOrder
+  responsibleId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.MissionCountOrderByAggregateInput
@@ -332,6 +346,7 @@ export type MissionScalarWhereWithAggregatesInput = {
   priority?: Prisma.EnumMissionPriorityWithAggregatesFilter<"Mission"> | $Enums.MissionPriority
   status?: Prisma.EnumMissionStatusWithAggregatesFilter<"Mission"> | $Enums.MissionStatus
   humanResources?: Prisma.IntWithAggregatesFilter<"Mission"> | number
+  responsibleId?: Prisma.StringNullableWithAggregatesFilter<"Mission"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Mission"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Mission"> | Date | string
 }
@@ -348,6 +363,7 @@ export type MissionCreateInput = {
   humanResources?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  responsible?: Prisma.UserCreateNestedOneWithoutResponsibleMissionsInput
   assignments?: Prisma.MissionAssignmentCreateNestedManyWithoutMissionInput
 }
 
@@ -361,6 +377,7 @@ export type MissionUncheckedCreateInput = {
   priority?: $Enums.MissionPriority
   status?: $Enums.MissionStatus
   humanResources?: number
+  responsibleId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   assignments?: Prisma.MissionAssignmentUncheckedCreateNestedManyWithoutMissionInput
@@ -378,6 +395,7 @@ export type MissionUpdateInput = {
   humanResources?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  responsible?: Prisma.UserUpdateOneWithoutResponsibleMissionsNestedInput
   assignments?: Prisma.MissionAssignmentUpdateManyWithoutMissionNestedInput
 }
 
@@ -391,6 +409,7 @@ export type MissionUncheckedUpdateInput = {
   priority?: Prisma.EnumMissionPriorityFieldUpdateOperationsInput | $Enums.MissionPriority
   status?: Prisma.EnumMissionStatusFieldUpdateOperationsInput | $Enums.MissionStatus
   humanResources?: Prisma.IntFieldUpdateOperationsInput | number
+  responsibleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignments?: Prisma.MissionAssignmentUncheckedUpdateManyWithoutMissionNestedInput
@@ -406,6 +425,7 @@ export type MissionCreateManyInput = {
   priority?: $Enums.MissionPriority
   status?: $Enums.MissionStatus
   humanResources?: number
+  responsibleId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -434,8 +454,19 @@ export type MissionUncheckedUpdateManyInput = {
   priority?: Prisma.EnumMissionPriorityFieldUpdateOperationsInput | $Enums.MissionPriority
   status?: Prisma.EnumMissionStatusFieldUpdateOperationsInput | $Enums.MissionStatus
   humanResources?: Prisma.IntFieldUpdateOperationsInput | number
+  responsibleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MissionListRelationFilter = {
+  every?: Prisma.MissionWhereInput
+  some?: Prisma.MissionWhereInput
+  none?: Prisma.MissionWhereInput
+}
+
+export type MissionOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type MissionCountOrderByAggregateInput = {
@@ -448,6 +479,7 @@ export type MissionCountOrderByAggregateInput = {
   priority?: Prisma.SortOrder
   status?: Prisma.SortOrder
   humanResources?: Prisma.SortOrder
+  responsibleId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -466,6 +498,7 @@ export type MissionMaxOrderByAggregateInput = {
   priority?: Prisma.SortOrder
   status?: Prisma.SortOrder
   humanResources?: Prisma.SortOrder
+  responsibleId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -480,6 +513,7 @@ export type MissionMinOrderByAggregateInput = {
   priority?: Prisma.SortOrder
   status?: Prisma.SortOrder
   humanResources?: Prisma.SortOrder
+  responsibleId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -491,6 +525,48 @@ export type MissionSumOrderByAggregateInput = {
 export type MissionScalarRelationFilter = {
   is?: Prisma.MissionWhereInput
   isNot?: Prisma.MissionWhereInput
+}
+
+export type MissionCreateNestedManyWithoutResponsibleInput = {
+  create?: Prisma.XOR<Prisma.MissionCreateWithoutResponsibleInput, Prisma.MissionUncheckedCreateWithoutResponsibleInput> | Prisma.MissionCreateWithoutResponsibleInput[] | Prisma.MissionUncheckedCreateWithoutResponsibleInput[]
+  connectOrCreate?: Prisma.MissionCreateOrConnectWithoutResponsibleInput | Prisma.MissionCreateOrConnectWithoutResponsibleInput[]
+  createMany?: Prisma.MissionCreateManyResponsibleInputEnvelope
+  connect?: Prisma.MissionWhereUniqueInput | Prisma.MissionWhereUniqueInput[]
+}
+
+export type MissionUncheckedCreateNestedManyWithoutResponsibleInput = {
+  create?: Prisma.XOR<Prisma.MissionCreateWithoutResponsibleInput, Prisma.MissionUncheckedCreateWithoutResponsibleInput> | Prisma.MissionCreateWithoutResponsibleInput[] | Prisma.MissionUncheckedCreateWithoutResponsibleInput[]
+  connectOrCreate?: Prisma.MissionCreateOrConnectWithoutResponsibleInput | Prisma.MissionCreateOrConnectWithoutResponsibleInput[]
+  createMany?: Prisma.MissionCreateManyResponsibleInputEnvelope
+  connect?: Prisma.MissionWhereUniqueInput | Prisma.MissionWhereUniqueInput[]
+}
+
+export type MissionUpdateManyWithoutResponsibleNestedInput = {
+  create?: Prisma.XOR<Prisma.MissionCreateWithoutResponsibleInput, Prisma.MissionUncheckedCreateWithoutResponsibleInput> | Prisma.MissionCreateWithoutResponsibleInput[] | Prisma.MissionUncheckedCreateWithoutResponsibleInput[]
+  connectOrCreate?: Prisma.MissionCreateOrConnectWithoutResponsibleInput | Prisma.MissionCreateOrConnectWithoutResponsibleInput[]
+  upsert?: Prisma.MissionUpsertWithWhereUniqueWithoutResponsibleInput | Prisma.MissionUpsertWithWhereUniqueWithoutResponsibleInput[]
+  createMany?: Prisma.MissionCreateManyResponsibleInputEnvelope
+  set?: Prisma.MissionWhereUniqueInput | Prisma.MissionWhereUniqueInput[]
+  disconnect?: Prisma.MissionWhereUniqueInput | Prisma.MissionWhereUniqueInput[]
+  delete?: Prisma.MissionWhereUniqueInput | Prisma.MissionWhereUniqueInput[]
+  connect?: Prisma.MissionWhereUniqueInput | Prisma.MissionWhereUniqueInput[]
+  update?: Prisma.MissionUpdateWithWhereUniqueWithoutResponsibleInput | Prisma.MissionUpdateWithWhereUniqueWithoutResponsibleInput[]
+  updateMany?: Prisma.MissionUpdateManyWithWhereWithoutResponsibleInput | Prisma.MissionUpdateManyWithWhereWithoutResponsibleInput[]
+  deleteMany?: Prisma.MissionScalarWhereInput | Prisma.MissionScalarWhereInput[]
+}
+
+export type MissionUncheckedUpdateManyWithoutResponsibleNestedInput = {
+  create?: Prisma.XOR<Prisma.MissionCreateWithoutResponsibleInput, Prisma.MissionUncheckedCreateWithoutResponsibleInput> | Prisma.MissionCreateWithoutResponsibleInput[] | Prisma.MissionUncheckedCreateWithoutResponsibleInput[]
+  connectOrCreate?: Prisma.MissionCreateOrConnectWithoutResponsibleInput | Prisma.MissionCreateOrConnectWithoutResponsibleInput[]
+  upsert?: Prisma.MissionUpsertWithWhereUniqueWithoutResponsibleInput | Prisma.MissionUpsertWithWhereUniqueWithoutResponsibleInput[]
+  createMany?: Prisma.MissionCreateManyResponsibleInputEnvelope
+  set?: Prisma.MissionWhereUniqueInput | Prisma.MissionWhereUniqueInput[]
+  disconnect?: Prisma.MissionWhereUniqueInput | Prisma.MissionWhereUniqueInput[]
+  delete?: Prisma.MissionWhereUniqueInput | Prisma.MissionWhereUniqueInput[]
+  connect?: Prisma.MissionWhereUniqueInput | Prisma.MissionWhereUniqueInput[]
+  update?: Prisma.MissionUpdateWithWhereUniqueWithoutResponsibleInput | Prisma.MissionUpdateWithWhereUniqueWithoutResponsibleInput[]
+  updateMany?: Prisma.MissionUpdateManyWithWhereWithoutResponsibleInput | Prisma.MissionUpdateManyWithWhereWithoutResponsibleInput[]
+  deleteMany?: Prisma.MissionScalarWhereInput | Prisma.MissionScalarWhereInput[]
 }
 
 export type EnumMissionPriorityFieldUpdateOperationsInput = {
@@ -515,6 +591,80 @@ export type MissionUpdateOneRequiredWithoutAssignmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MissionUpdateToOneWithWhereWithoutAssignmentsInput, Prisma.MissionUpdateWithoutAssignmentsInput>, Prisma.MissionUncheckedUpdateWithoutAssignmentsInput>
 }
 
+export type MissionCreateWithoutResponsibleInput = {
+  id?: string
+  name: string
+  description?: string | null
+  dateStart: Date | string
+  dateEnd: Date | string
+  place?: string | null
+  priority?: $Enums.MissionPriority
+  status?: $Enums.MissionStatus
+  humanResources?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  assignments?: Prisma.MissionAssignmentCreateNestedManyWithoutMissionInput
+}
+
+export type MissionUncheckedCreateWithoutResponsibleInput = {
+  id?: string
+  name: string
+  description?: string | null
+  dateStart: Date | string
+  dateEnd: Date | string
+  place?: string | null
+  priority?: $Enums.MissionPriority
+  status?: $Enums.MissionStatus
+  humanResources?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  assignments?: Prisma.MissionAssignmentUncheckedCreateNestedManyWithoutMissionInput
+}
+
+export type MissionCreateOrConnectWithoutResponsibleInput = {
+  where: Prisma.MissionWhereUniqueInput
+  create: Prisma.XOR<Prisma.MissionCreateWithoutResponsibleInput, Prisma.MissionUncheckedCreateWithoutResponsibleInput>
+}
+
+export type MissionCreateManyResponsibleInputEnvelope = {
+  data: Prisma.MissionCreateManyResponsibleInput | Prisma.MissionCreateManyResponsibleInput[]
+  skipDuplicates?: boolean
+}
+
+export type MissionUpsertWithWhereUniqueWithoutResponsibleInput = {
+  where: Prisma.MissionWhereUniqueInput
+  update: Prisma.XOR<Prisma.MissionUpdateWithoutResponsibleInput, Prisma.MissionUncheckedUpdateWithoutResponsibleInput>
+  create: Prisma.XOR<Prisma.MissionCreateWithoutResponsibleInput, Prisma.MissionUncheckedCreateWithoutResponsibleInput>
+}
+
+export type MissionUpdateWithWhereUniqueWithoutResponsibleInput = {
+  where: Prisma.MissionWhereUniqueInput
+  data: Prisma.XOR<Prisma.MissionUpdateWithoutResponsibleInput, Prisma.MissionUncheckedUpdateWithoutResponsibleInput>
+}
+
+export type MissionUpdateManyWithWhereWithoutResponsibleInput = {
+  where: Prisma.MissionScalarWhereInput
+  data: Prisma.XOR<Prisma.MissionUpdateManyMutationInput, Prisma.MissionUncheckedUpdateManyWithoutResponsibleInput>
+}
+
+export type MissionScalarWhereInput = {
+  AND?: Prisma.MissionScalarWhereInput | Prisma.MissionScalarWhereInput[]
+  OR?: Prisma.MissionScalarWhereInput[]
+  NOT?: Prisma.MissionScalarWhereInput | Prisma.MissionScalarWhereInput[]
+  id?: Prisma.StringFilter<"Mission"> | string
+  name?: Prisma.StringFilter<"Mission"> | string
+  description?: Prisma.StringNullableFilter<"Mission"> | string | null
+  dateStart?: Prisma.DateTimeFilter<"Mission"> | Date | string
+  dateEnd?: Prisma.DateTimeFilter<"Mission"> | Date | string
+  place?: Prisma.StringNullableFilter<"Mission"> | string | null
+  priority?: Prisma.EnumMissionPriorityFilter<"Mission"> | $Enums.MissionPriority
+  status?: Prisma.EnumMissionStatusFilter<"Mission"> | $Enums.MissionStatus
+  humanResources?: Prisma.IntFilter<"Mission"> | number
+  responsibleId?: Prisma.StringNullableFilter<"Mission"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Mission"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Mission"> | Date | string
+}
+
 export type MissionCreateWithoutAssignmentsInput = {
   id?: string
   name: string
@@ -527,6 +677,7 @@ export type MissionCreateWithoutAssignmentsInput = {
   humanResources?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  responsible?: Prisma.UserCreateNestedOneWithoutResponsibleMissionsInput
 }
 
 export type MissionUncheckedCreateWithoutAssignmentsInput = {
@@ -539,6 +690,7 @@ export type MissionUncheckedCreateWithoutAssignmentsInput = {
   priority?: $Enums.MissionPriority
   status?: $Enums.MissionStatus
   humanResources?: number
+  responsibleId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -571,9 +723,69 @@ export type MissionUpdateWithoutAssignmentsInput = {
   humanResources?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  responsible?: Prisma.UserUpdateOneWithoutResponsibleMissionsNestedInput
 }
 
 export type MissionUncheckedUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  place?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumMissionPriorityFieldUpdateOperationsInput | $Enums.MissionPriority
+  status?: Prisma.EnumMissionStatusFieldUpdateOperationsInput | $Enums.MissionStatus
+  humanResources?: Prisma.IntFieldUpdateOperationsInput | number
+  responsibleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MissionCreateManyResponsibleInput = {
+  id?: string
+  name: string
+  description?: string | null
+  dateStart: Date | string
+  dateEnd: Date | string
+  place?: string | null
+  priority?: $Enums.MissionPriority
+  status?: $Enums.MissionStatus
+  humanResources?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MissionUpdateWithoutResponsibleInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  place?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumMissionPriorityFieldUpdateOperationsInput | $Enums.MissionPriority
+  status?: Prisma.EnumMissionStatusFieldUpdateOperationsInput | $Enums.MissionStatus
+  humanResources?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignments?: Prisma.MissionAssignmentUpdateManyWithoutMissionNestedInput
+}
+
+export type MissionUncheckedUpdateWithoutResponsibleInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  place?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumMissionPriorityFieldUpdateOperationsInput | $Enums.MissionPriority
+  status?: Prisma.EnumMissionStatusFieldUpdateOperationsInput | $Enums.MissionStatus
+  humanResources?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignments?: Prisma.MissionAssignmentUncheckedUpdateManyWithoutMissionNestedInput
+}
+
+export type MissionUncheckedUpdateManyWithoutResponsibleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -628,8 +840,10 @@ export type MissionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   priority?: boolean
   status?: boolean
   humanResources?: boolean
+  responsibleId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  responsible?: boolean | Prisma.Mission$responsibleArgs<ExtArgs>
   assignments?: boolean | Prisma.Mission$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.MissionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["mission"]>
@@ -644,8 +858,10 @@ export type MissionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   priority?: boolean
   status?: boolean
   humanResources?: boolean
+  responsibleId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  responsible?: boolean | Prisma.Mission$responsibleArgs<ExtArgs>
 }, ExtArgs["result"]["mission"]>
 
 export type MissionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -658,8 +874,10 @@ export type MissionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   priority?: boolean
   status?: boolean
   humanResources?: boolean
+  responsibleId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  responsible?: boolean | Prisma.Mission$responsibleArgs<ExtArgs>
 }, ExtArgs["result"]["mission"]>
 
 export type MissionSelectScalar = {
@@ -672,21 +890,28 @@ export type MissionSelectScalar = {
   priority?: boolean
   status?: boolean
   humanResources?: boolean
+  responsibleId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type MissionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "dateStart" | "dateEnd" | "place" | "priority" | "status" | "humanResources" | "createdAt" | "updatedAt", ExtArgs["result"]["mission"]>
+export type MissionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "dateStart" | "dateEnd" | "place" | "priority" | "status" | "humanResources" | "responsibleId" | "createdAt" | "updatedAt", ExtArgs["result"]["mission"]>
 export type MissionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  responsible?: boolean | Prisma.Mission$responsibleArgs<ExtArgs>
   assignments?: boolean | Prisma.Mission$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.MissionCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type MissionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type MissionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type MissionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  responsible?: boolean | Prisma.Mission$responsibleArgs<ExtArgs>
+}
+export type MissionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  responsible?: boolean | Prisma.Mission$responsibleArgs<ExtArgs>
+}
 
 export type $MissionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Mission"
   objects: {
+    responsible: Prisma.$UserPayload<ExtArgs> | null
     assignments: Prisma.$MissionAssignmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -699,6 +924,7 @@ export type $MissionPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     priority: $Enums.MissionPriority
     status: $Enums.MissionStatus
     humanResources: number
+    responsibleId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["mission"]>
@@ -1095,6 +1321,7 @@ readonly fields: MissionFieldRefs;
  */
 export interface Prisma__MissionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  responsible<T extends Prisma.Mission$responsibleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Mission$responsibleArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   assignments<T extends Prisma.Mission$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Mission$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MissionAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1134,6 +1361,7 @@ export interface MissionFieldRefs {
   readonly priority: Prisma.FieldRef<"Mission", 'MissionPriority'>
   readonly status: Prisma.FieldRef<"Mission", 'MissionStatus'>
   readonly humanResources: Prisma.FieldRef<"Mission", 'Int'>
+  readonly responsibleId: Prisma.FieldRef<"Mission", 'String'>
   readonly createdAt: Prisma.FieldRef<"Mission", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Mission", 'DateTime'>
 }
@@ -1390,6 +1618,10 @@ export type MissionCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    */
   data: Prisma.MissionCreateManyInput | Prisma.MissionCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MissionIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1460,6 +1692,10 @@ export type MissionUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many Missions to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MissionIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1526,6 +1762,25 @@ export type MissionDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Missions to delete.
    */
   limit?: number
+}
+
+/**
+ * Mission.responsible
+ */
+export type Mission$responsibleArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

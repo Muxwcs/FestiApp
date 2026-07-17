@@ -3,7 +3,7 @@
 import { useState, useTransition, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Edit, Save, X, Trash2, Plus, Search, UserMinus } from "lucide-react"
+import { ArrowLeft, Edit, Save, X, Trash2, Plus, UserMinus } from "lucide-react"
 import { toast } from "sonner"
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -14,13 +14,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import {
-  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
-} from "@/components/ui/command"
 
 import { CreateTimeslotDialog } from "@/components/admin/sectors/create-timeslot-dialog"
 import { toUTCIso } from "@/lib/utils"
+import { UserCombobox } from "@/components/admin/user-combobox"
 
 // ─── Types ──────────────────────────────────────────────
 
@@ -75,63 +72,6 @@ interface SectorDetailProps {
   allUsers: SimpleUser[]
 }
 
-// ─── User Search Combobox ───────────────────────────────
-
-function UserCombobox({
-  users,
-  excludeIds,
-  onSelect,
-  label,
-}: {
-  users: SimpleUser[]
-  excludeIds: string[]
-  onSelect: (userId: string) => void
-  label?: string
-}) {
-  const [open, setOpen] = useState(false)
-  const filtered = users.filter((u) => !excludeIds.includes(u.id))
-
-  const displayName = (u: SimpleUser) => {
-    if (u.surname) return `${u.surname} (${[u.firstname, u.name].filter(Boolean).join(" ")})`
-    return [u.firstname, u.name].filter(Boolean).join(" ") || u.email
-  }
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Search className="h-3 w-3" />
-          {label || "Ajouter un référent"}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-64 p-0" align="start">
-        <Command>
-          <CommandInput placeholder="Rechercher..." />
-          <CommandList>
-            <CommandEmpty>Aucun utilisateur trouvé</CommandEmpty>
-            <CommandGroup>
-              {filtered.map((u) => (
-                <CommandItem
-                  key={u.id}
-                  value={`${u.firstname} ${u.name} ${u.surname} ${u.email}`}
-                  onSelect={() => {
-                    onSelect(u.id)
-                    setOpen(false)
-                  }}
-                >
-                  <div>
-                    <p className="text-sm font-medium">{displayName(u)}</p>
-                    <p className="text-xs text-muted-foreground">{u.email}</p>
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  )
-}
 
 // ─── Main Component ─────────────────────────────────────
 

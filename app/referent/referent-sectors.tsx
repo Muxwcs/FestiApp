@@ -44,7 +44,7 @@ export function ReferentSectors({ sectors, userName }: ReferentSectorsProps) {
 
       {/* Stats Cards */}
       {sectors.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatsCard
             title="Mes secteurs"
             value={stats.totalSectors}

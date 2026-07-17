@@ -341,6 +341,7 @@ export type UserWhereInput = {
   referentSectors?: Prisma.SectorReferentListRelationFilter
   timeslotReferents?: Prisma.TimeslotReferentListRelationFilter
   pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter
+  responsibleMissions?: Prisma.MissionListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -370,6 +371,7 @@ export type UserOrderByWithRelationInput = {
   referentSectors?: Prisma.SectorReferentOrderByRelationAggregateInput
   timeslotReferents?: Prisma.TimeslotReferentOrderByRelationAggregateInput
   pushSubscriptions?: Prisma.PushSubscriptionOrderByRelationAggregateInput
+  responsibleMissions?: Prisma.MissionOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -402,6 +404,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   referentSectors?: Prisma.SectorReferentListRelationFilter
   timeslotReferents?: Prisma.TimeslotReferentListRelationFilter
   pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter
+  responsibleMissions?: Prisma.MissionListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -487,6 +490,7 @@ export type UserCreateInput = {
   referentSectors?: Prisma.SectorReferentCreateNestedManyWithoutUserInput
   timeslotReferents?: Prisma.TimeslotReferentCreateNestedManyWithoutUserInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -516,6 +520,7 @@ export type UserUncheckedCreateInput = {
   referentSectors?: Prisma.SectorReferentUncheckedCreateNestedManyWithoutUserInput
   timeslotReferents?: Prisma.TimeslotReferentUncheckedCreateNestedManyWithoutUserInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionUncheckedCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserUpdateInput = {
@@ -545,6 +550,7 @@ export type UserUpdateInput = {
   referentSectors?: Prisma.SectorReferentUpdateManyWithoutUserNestedInput
   timeslotReferents?: Prisma.TimeslotReferentUpdateManyWithoutUserNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUpdateManyWithoutResponsibleNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -574,6 +580,7 @@ export type UserUncheckedUpdateInput = {
   referentSectors?: Prisma.SectorReferentUncheckedUpdateManyWithoutUserNestedInput
   timeslotReferents?: Prisma.TimeslotReferentUncheckedUpdateManyWithoutUserNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUncheckedUpdateManyWithoutResponsibleNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -834,6 +841,22 @@ export type UserUpdateOneRequiredWithoutAffectationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAffectationsInput, Prisma.UserUpdateWithoutAffectationsInput>, Prisma.UserUncheckedUpdateWithoutAffectationsInput>
 }
 
+export type UserCreateNestedOneWithoutResponsibleMissionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutResponsibleMissionsInput, Prisma.UserUncheckedCreateWithoutResponsibleMissionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutResponsibleMissionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutResponsibleMissionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutResponsibleMissionsInput, Prisma.UserUncheckedCreateWithoutResponsibleMissionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutResponsibleMissionsInput
+  upsert?: Prisma.UserUpsertWithoutResponsibleMissionsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutResponsibleMissionsInput, Prisma.UserUpdateWithoutResponsibleMissionsInput>, Prisma.UserUncheckedUpdateWithoutResponsibleMissionsInput>
+}
+
 export type UserCreateNestedOneWithoutMissionAssignmentsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutMissionAssignmentsInput, Prisma.UserUncheckedCreateWithoutMissionAssignmentsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutMissionAssignmentsInput
@@ -890,6 +913,7 @@ export type UserCreateWithoutReferentSectorsInput = {
   missionAssignments?: Prisma.MissionAssignmentCreateNestedManyWithoutUserInput
   timeslotReferents?: Prisma.TimeslotReferentCreateNestedManyWithoutUserInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserUncheckedCreateWithoutReferentSectorsInput = {
@@ -918,6 +942,7 @@ export type UserUncheckedCreateWithoutReferentSectorsInput = {
   missionAssignments?: Prisma.MissionAssignmentUncheckedCreateNestedManyWithoutUserInput
   timeslotReferents?: Prisma.TimeslotReferentUncheckedCreateNestedManyWithoutUserInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionUncheckedCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserCreateOrConnectWithoutReferentSectorsInput = {
@@ -962,6 +987,7 @@ export type UserUpdateWithoutReferentSectorsInput = {
   missionAssignments?: Prisma.MissionAssignmentUpdateManyWithoutUserNestedInput
   timeslotReferents?: Prisma.TimeslotReferentUpdateManyWithoutUserNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUpdateManyWithoutResponsibleNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReferentSectorsInput = {
@@ -990,6 +1016,7 @@ export type UserUncheckedUpdateWithoutReferentSectorsInput = {
   missionAssignments?: Prisma.MissionAssignmentUncheckedUpdateManyWithoutUserNestedInput
   timeslotReferents?: Prisma.TimeslotReferentUncheckedUpdateManyWithoutUserNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUncheckedUpdateManyWithoutResponsibleNestedInput
 }
 
 export type UserCreateWithoutTimeslotReferentsInput = {
@@ -1018,6 +1045,7 @@ export type UserCreateWithoutTimeslotReferentsInput = {
   missionAssignments?: Prisma.MissionAssignmentCreateNestedManyWithoutUserInput
   referentSectors?: Prisma.SectorReferentCreateNestedManyWithoutUserInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserUncheckedCreateWithoutTimeslotReferentsInput = {
@@ -1046,6 +1074,7 @@ export type UserUncheckedCreateWithoutTimeslotReferentsInput = {
   missionAssignments?: Prisma.MissionAssignmentUncheckedCreateNestedManyWithoutUserInput
   referentSectors?: Prisma.SectorReferentUncheckedCreateNestedManyWithoutUserInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionUncheckedCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserCreateOrConnectWithoutTimeslotReferentsInput = {
@@ -1090,6 +1119,7 @@ export type UserUpdateWithoutTimeslotReferentsInput = {
   missionAssignments?: Prisma.MissionAssignmentUpdateManyWithoutUserNestedInput
   referentSectors?: Prisma.SectorReferentUpdateManyWithoutUserNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUpdateManyWithoutResponsibleNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTimeslotReferentsInput = {
@@ -1118,6 +1148,7 @@ export type UserUncheckedUpdateWithoutTimeslotReferentsInput = {
   missionAssignments?: Prisma.MissionAssignmentUncheckedUpdateManyWithoutUserNestedInput
   referentSectors?: Prisma.SectorReferentUncheckedUpdateManyWithoutUserNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUncheckedUpdateManyWithoutResponsibleNestedInput
 }
 
 export type UserCreateWithoutAffectationsInput = {
@@ -1146,6 +1177,7 @@ export type UserCreateWithoutAffectationsInput = {
   referentSectors?: Prisma.SectorReferentCreateNestedManyWithoutUserInput
   timeslotReferents?: Prisma.TimeslotReferentCreateNestedManyWithoutUserInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserUncheckedCreateWithoutAffectationsInput = {
@@ -1174,6 +1206,7 @@ export type UserUncheckedCreateWithoutAffectationsInput = {
   referentSectors?: Prisma.SectorReferentUncheckedCreateNestedManyWithoutUserInput
   timeslotReferents?: Prisma.TimeslotReferentUncheckedCreateNestedManyWithoutUserInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionUncheckedCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserCreateOrConnectWithoutAffectationsInput = {
@@ -1218,6 +1251,7 @@ export type UserUpdateWithoutAffectationsInput = {
   referentSectors?: Prisma.SectorReferentUpdateManyWithoutUserNestedInput
   timeslotReferents?: Prisma.TimeslotReferentUpdateManyWithoutUserNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUpdateManyWithoutResponsibleNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAffectationsInput = {
@@ -1242,6 +1276,139 @@ export type UserUncheckedUpdateWithoutAffectationsInput = {
   lastLoginIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  missionAssignments?: Prisma.MissionAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  referentSectors?: Prisma.SectorReferentUncheckedUpdateManyWithoutUserNestedInput
+  timeslotReferents?: Prisma.TimeslotReferentUncheckedUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUncheckedUpdateManyWithoutResponsibleNestedInput
+}
+
+export type UserCreateWithoutResponsibleMissionsInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  firstname?: string | null
+  surname?: string | null
+  phone?: string | null
+  role?: $Enums.Role
+  isReferent?: boolean
+  isActive?: boolean
+  status?: string | null
+  avatar?: string | null
+  notes?: string | null
+  skills?: Prisma.UserCreateskillsInput | string[]
+  availability?: Prisma.UserCreateavailabilityInput | string[]
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIp?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  affectations?: Prisma.AffectationCreateNestedManyWithoutVolunteerInput
+  missionAssignments?: Prisma.MissionAssignmentCreateNestedManyWithoutUserInput
+  referentSectors?: Prisma.SectorReferentCreateNestedManyWithoutUserInput
+  timeslotReferents?: Prisma.TimeslotReferentCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutResponsibleMissionsInput = {
+  id?: string
+  email: string
+  password: string
+  name?: string | null
+  firstname?: string | null
+  surname?: string | null
+  phone?: string | null
+  role?: $Enums.Role
+  isReferent?: boolean
+  isActive?: boolean
+  status?: string | null
+  avatar?: string | null
+  notes?: string | null
+  skills?: Prisma.UserCreateskillsInput | string[]
+  availability?: Prisma.UserCreateavailabilityInput | string[]
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIp?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  affectations?: Prisma.AffectationUncheckedCreateNestedManyWithoutVolunteerInput
+  missionAssignments?: Prisma.MissionAssignmentUncheckedCreateNestedManyWithoutUserInput
+  referentSectors?: Prisma.SectorReferentUncheckedCreateNestedManyWithoutUserInput
+  timeslotReferents?: Prisma.TimeslotReferentUncheckedCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutResponsibleMissionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutResponsibleMissionsInput, Prisma.UserUncheckedCreateWithoutResponsibleMissionsInput>
+}
+
+export type UserUpsertWithoutResponsibleMissionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutResponsibleMissionsInput, Prisma.UserUncheckedUpdateWithoutResponsibleMissionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutResponsibleMissionsInput, Prisma.UserUncheckedCreateWithoutResponsibleMissionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutResponsibleMissionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutResponsibleMissionsInput, Prisma.UserUncheckedUpdateWithoutResponsibleMissionsInput>
+}
+
+export type UserUpdateWithoutResponsibleMissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isReferent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  skills?: Prisma.UserUpdateskillsInput | string[]
+  availability?: Prisma.UserUpdateavailabilityInput | string[]
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  affectations?: Prisma.AffectationUpdateManyWithoutVolunteerNestedInput
+  missionAssignments?: Prisma.MissionAssignmentUpdateManyWithoutUserNestedInput
+  referentSectors?: Prisma.SectorReferentUpdateManyWithoutUserNestedInput
+  timeslotReferents?: Prisma.TimeslotReferentUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutResponsibleMissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isReferent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  skills?: Prisma.UserUpdateskillsInput | string[]
+  availability?: Prisma.UserUpdateavailabilityInput | string[]
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  affectations?: Prisma.AffectationUncheckedUpdateManyWithoutVolunteerNestedInput
   missionAssignments?: Prisma.MissionAssignmentUncheckedUpdateManyWithoutUserNestedInput
   referentSectors?: Prisma.SectorReferentUncheckedUpdateManyWithoutUserNestedInput
   timeslotReferents?: Prisma.TimeslotReferentUncheckedUpdateManyWithoutUserNestedInput
@@ -1274,6 +1441,7 @@ export type UserCreateWithoutMissionAssignmentsInput = {
   referentSectors?: Prisma.SectorReferentCreateNestedManyWithoutUserInput
   timeslotReferents?: Prisma.TimeslotReferentCreateNestedManyWithoutUserInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserUncheckedCreateWithoutMissionAssignmentsInput = {
@@ -1302,6 +1470,7 @@ export type UserUncheckedCreateWithoutMissionAssignmentsInput = {
   referentSectors?: Prisma.SectorReferentUncheckedCreateNestedManyWithoutUserInput
   timeslotReferents?: Prisma.TimeslotReferentUncheckedCreateNestedManyWithoutUserInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionUncheckedCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserCreateOrConnectWithoutMissionAssignmentsInput = {
@@ -1346,6 +1515,7 @@ export type UserUpdateWithoutMissionAssignmentsInput = {
   referentSectors?: Prisma.SectorReferentUpdateManyWithoutUserNestedInput
   timeslotReferents?: Prisma.TimeslotReferentUpdateManyWithoutUserNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUpdateManyWithoutResponsibleNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMissionAssignmentsInput = {
@@ -1374,6 +1544,7 @@ export type UserUncheckedUpdateWithoutMissionAssignmentsInput = {
   referentSectors?: Prisma.SectorReferentUncheckedUpdateManyWithoutUserNestedInput
   timeslotReferents?: Prisma.TimeslotReferentUncheckedUpdateManyWithoutUserNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUncheckedUpdateManyWithoutResponsibleNestedInput
 }
 
 export type UserCreateWithoutPushSubscriptionsInput = {
@@ -1402,6 +1573,7 @@ export type UserCreateWithoutPushSubscriptionsInput = {
   missionAssignments?: Prisma.MissionAssignmentCreateNestedManyWithoutUserInput
   referentSectors?: Prisma.SectorReferentCreateNestedManyWithoutUserInput
   timeslotReferents?: Prisma.TimeslotReferentCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
@@ -1430,6 +1602,7 @@ export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
   missionAssignments?: Prisma.MissionAssignmentUncheckedCreateNestedManyWithoutUserInput
   referentSectors?: Prisma.SectorReferentUncheckedCreateNestedManyWithoutUserInput
   timeslotReferents?: Prisma.TimeslotReferentUncheckedCreateNestedManyWithoutUserInput
+  responsibleMissions?: Prisma.MissionUncheckedCreateNestedManyWithoutResponsibleInput
 }
 
 export type UserCreateOrConnectWithoutPushSubscriptionsInput = {
@@ -1474,6 +1647,7 @@ export type UserUpdateWithoutPushSubscriptionsInput = {
   missionAssignments?: Prisma.MissionAssignmentUpdateManyWithoutUserNestedInput
   referentSectors?: Prisma.SectorReferentUpdateManyWithoutUserNestedInput
   timeslotReferents?: Prisma.TimeslotReferentUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUpdateManyWithoutResponsibleNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
@@ -1502,6 +1676,7 @@ export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
   missionAssignments?: Prisma.MissionAssignmentUncheckedUpdateManyWithoutUserNestedInput
   referentSectors?: Prisma.SectorReferentUncheckedUpdateManyWithoutUserNestedInput
   timeslotReferents?: Prisma.TimeslotReferentUncheckedUpdateManyWithoutUserNestedInput
+  responsibleMissions?: Prisma.MissionUncheckedUpdateManyWithoutResponsibleNestedInput
 }
 
 
@@ -1515,6 +1690,7 @@ export type UserCountOutputType = {
   referentSectors: number
   timeslotReferents: number
   pushSubscriptions: number
+  responsibleMissions: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1523,6 +1699,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   referentSectors?: boolean | UserCountOutputTypeCountReferentSectorsArgs
   timeslotReferents?: boolean | UserCountOutputTypeCountTimeslotReferentsArgs
   pushSubscriptions?: boolean | UserCountOutputTypeCountPushSubscriptionsArgs
+  responsibleMissions?: boolean | UserCountOutputTypeCountResponsibleMissionsArgs
 }
 
 /**
@@ -1570,6 +1747,13 @@ export type UserCountOutputTypeCountPushSubscriptionsArgs<ExtArgs extends runtim
   where?: Prisma.PushSubscriptionWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountResponsibleMissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MissionWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1598,6 +1782,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   referentSectors?: boolean | Prisma.User$referentSectorsArgs<ExtArgs>
   timeslotReferents?: boolean | Prisma.User$timeslotReferentsArgs<ExtArgs>
   pushSubscriptions?: boolean | Prisma.User$pushSubscriptionsArgs<ExtArgs>
+  responsibleMissions?: boolean | Prisma.User$responsibleMissionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1680,6 +1865,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   referentSectors?: boolean | Prisma.User$referentSectorsArgs<ExtArgs>
   timeslotReferents?: boolean | Prisma.User$timeslotReferentsArgs<ExtArgs>
   pushSubscriptions?: boolean | Prisma.User$pushSubscriptionsArgs<ExtArgs>
+  responsibleMissions?: boolean | Prisma.User$responsibleMissionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1693,6 +1879,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     referentSectors: Prisma.$SectorReferentPayload<ExtArgs>[]
     timeslotReferents: Prisma.$TimeslotReferentPayload<ExtArgs>[]
     pushSubscriptions: Prisma.$PushSubscriptionPayload<ExtArgs>[]
+    responsibleMissions: Prisma.$MissionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2115,6 +2302,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   referentSectors<T extends Prisma.User$referentSectorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referentSectorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SectorReferentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   timeslotReferents<T extends Prisma.User$timeslotReferentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$timeslotReferentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimeslotReferentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pushSubscriptions<T extends Prisma.User$pushSubscriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pushSubscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PushSubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  responsibleMissions<T extends Prisma.User$responsibleMissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$responsibleMissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2675,6 +2863,30 @@ export type User$pushSubscriptionsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.PushSubscriptionScalarFieldEnum | Prisma.PushSubscriptionScalarFieldEnum[]
+}
+
+/**
+ * User.responsibleMissions
+ */
+export type User$responsibleMissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Mission
+   */
+  select?: Prisma.MissionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Mission
+   */
+  omit?: Prisma.MissionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MissionInclude<ExtArgs> | null
+  where?: Prisma.MissionWhereInput
+  orderBy?: Prisma.MissionOrderByWithRelationInput | Prisma.MissionOrderByWithRelationInput[]
+  cursor?: Prisma.MissionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MissionScalarFieldEnum | Prisma.MissionScalarFieldEnum[]
 }
 
 /**

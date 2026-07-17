@@ -105,6 +105,8 @@ export const getCurrentUser = async () => {
     id: session.user.id,
     email: session.user.email,
     name: session.user.name,
+    firstname: session.user.firstname ?? null,
+    surname: session.user.surname ?? null,
     role: session.user.role as Role,
     isAdmin: session.user.role === "ADMIN",
     isReferent: session.user.isReferent,

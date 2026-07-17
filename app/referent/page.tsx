@@ -33,7 +33,7 @@ const ReferentPage = async () => {
     <div className="p-0 sm:p-6 lg:p-8">
       <ReferentSectors
         sectors={sectors}
-        userName={session.user.name || session.user.email}
+        userName={session.user.surname || session.user.firstname || session.user.email}
       />
     </div>
   )

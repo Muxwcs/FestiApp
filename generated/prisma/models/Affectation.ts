@@ -41,6 +41,9 @@ export type AffectationMinAggregateOutputType = {
   volunteerId: string | null
   timeslotId: string | null
   sectorId: string | null
+  presence: $Enums.Presence | null
+  checkedAt: Date | null
+  checkedBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -52,6 +55,9 @@ export type AffectationMaxAggregateOutputType = {
   volunteerId: string | null
   timeslotId: string | null
   sectorId: string | null
+  presence: $Enums.Presence | null
+  checkedAt: Date | null
+  checkedBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -63,6 +69,9 @@ export type AffectationCountAggregateOutputType = {
   volunteerId: number
   timeslotId: number
   sectorId: number
+  presence: number
+  checkedAt: number
+  checkedBy: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -84,6 +93,9 @@ export type AffectationMinAggregateInputType = {
   volunteerId?: true
   timeslotId?: true
   sectorId?: true
+  presence?: true
+  checkedAt?: true
+  checkedBy?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -95,6 +107,9 @@ export type AffectationMaxAggregateInputType = {
   volunteerId?: true
   timeslotId?: true
   sectorId?: true
+  presence?: true
+  checkedAt?: true
+  checkedBy?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +121,9 @@ export type AffectationCountAggregateInputType = {
   volunteerId?: true
   timeslotId?: true
   sectorId?: true
+  presence?: true
+  checkedAt?: true
+  checkedBy?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -204,6 +222,9 @@ export type AffectationGroupByOutputType = {
   volunteerId: string
   timeslotId: string
   sectorId: string
+  presence: $Enums.Presence | null
+  checkedAt: Date | null
+  checkedBy: string | null
   createdAt: Date
   updatedAt: Date
   _count: AffectationCountAggregateOutputType | null
@@ -238,6 +259,9 @@ export type AffectationWhereInput = {
   volunteerId?: Prisma.StringFilter<"Affectation"> | string
   timeslotId?: Prisma.StringFilter<"Affectation"> | string
   sectorId?: Prisma.StringFilter<"Affectation"> | string
+  presence?: Prisma.EnumPresenceNullableFilter<"Affectation"> | $Enums.Presence | null
+  checkedAt?: Prisma.DateTimeNullableFilter<"Affectation"> | Date | string | null
+  checkedBy?: Prisma.StringNullableFilter<"Affectation"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Affectation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Affectation"> | Date | string
   volunteer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -252,6 +276,9 @@ export type AffectationOrderByWithRelationInput = {
   volunteerId?: Prisma.SortOrder
   timeslotId?: Prisma.SortOrder
   sectorId?: Prisma.SortOrder
+  presence?: Prisma.SortOrderInput | Prisma.SortOrder
+  checkedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  checkedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   volunteer?: Prisma.UserOrderByWithRelationInput
@@ -270,6 +297,9 @@ export type AffectationWhereUniqueInput = Prisma.AtLeast<{
   volunteerId?: Prisma.StringFilter<"Affectation"> | string
   timeslotId?: Prisma.StringFilter<"Affectation"> | string
   sectorId?: Prisma.StringFilter<"Affectation"> | string
+  presence?: Prisma.EnumPresenceNullableFilter<"Affectation"> | $Enums.Presence | null
+  checkedAt?: Prisma.DateTimeNullableFilter<"Affectation"> | Date | string | null
+  checkedBy?: Prisma.StringNullableFilter<"Affectation"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Affectation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Affectation"> | Date | string
   volunteer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -284,6 +314,9 @@ export type AffectationOrderByWithAggregationInput = {
   volunteerId?: Prisma.SortOrder
   timeslotId?: Prisma.SortOrder
   sectorId?: Prisma.SortOrder
+  presence?: Prisma.SortOrderInput | Prisma.SortOrder
+  checkedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  checkedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.AffectationCountOrderByAggregateInput
@@ -303,6 +336,9 @@ export type AffectationScalarWhereWithAggregatesInput = {
   volunteerId?: Prisma.StringWithAggregatesFilter<"Affectation"> | string
   timeslotId?: Prisma.StringWithAggregatesFilter<"Affectation"> | string
   sectorId?: Prisma.StringWithAggregatesFilter<"Affectation"> | string
+  presence?: Prisma.EnumPresenceNullableWithAggregatesFilter<"Affectation"> | $Enums.Presence | null
+  checkedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Affectation"> | Date | string | null
+  checkedBy?: Prisma.StringNullableWithAggregatesFilter<"Affectation"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Affectation"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Affectation"> | Date | string
 }
@@ -311,6 +347,9 @@ export type AffectationCreateInput = {
   id?: string
   number?: number
   status?: $Enums.AffectationStatus
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   volunteer: Prisma.UserCreateNestedOneWithoutAffectationsInput
@@ -325,6 +364,9 @@ export type AffectationUncheckedCreateInput = {
   volunteerId: string
   timeslotId: string
   sectorId: string
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -333,6 +375,9 @@ export type AffectationUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   number?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumAffectationStatusFieldUpdateOperationsInput | $Enums.AffectationStatus
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   volunteer?: Prisma.UserUpdateOneRequiredWithoutAffectationsNestedInput
@@ -347,6 +392,9 @@ export type AffectationUncheckedUpdateInput = {
   volunteerId?: Prisma.StringFieldUpdateOperationsInput | string
   timeslotId?: Prisma.StringFieldUpdateOperationsInput | string
   sectorId?: Prisma.StringFieldUpdateOperationsInput | string
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -358,6 +406,9 @@ export type AffectationCreateManyInput = {
   volunteerId: string
   timeslotId: string
   sectorId: string
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -366,6 +417,9 @@ export type AffectationUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   number?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumAffectationStatusFieldUpdateOperationsInput | $Enums.AffectationStatus
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -377,6 +431,9 @@ export type AffectationUncheckedUpdateManyInput = {
   volunteerId?: Prisma.StringFieldUpdateOperationsInput | string
   timeslotId?: Prisma.StringFieldUpdateOperationsInput | string
   sectorId?: Prisma.StringFieldUpdateOperationsInput | string
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -403,6 +460,9 @@ export type AffectationCountOrderByAggregateInput = {
   volunteerId?: Prisma.SortOrder
   timeslotId?: Prisma.SortOrder
   sectorId?: Prisma.SortOrder
+  presence?: Prisma.SortOrder
+  checkedAt?: Prisma.SortOrder
+  checkedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -418,6 +478,9 @@ export type AffectationMaxOrderByAggregateInput = {
   volunteerId?: Prisma.SortOrder
   timeslotId?: Prisma.SortOrder
   sectorId?: Prisma.SortOrder
+  presence?: Prisma.SortOrder
+  checkedAt?: Prisma.SortOrder
+  checkedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -429,6 +492,9 @@ export type AffectationMinOrderByAggregateInput = {
   volunteerId?: Prisma.SortOrder
   timeslotId?: Prisma.SortOrder
   sectorId?: Prisma.SortOrder
+  presence?: Prisma.SortOrder
+  checkedAt?: Prisma.SortOrder
+  checkedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -567,10 +633,17 @@ export type EnumAffectationStatusFieldUpdateOperationsInput = {
   set?: $Enums.AffectationStatus
 }
 
+export type NullableEnumPresenceFieldUpdateOperationsInput = {
+  set?: $Enums.Presence | null
+}
+
 export type AffectationCreateWithoutVolunteerInput = {
   id?: string
   number?: number
   status?: $Enums.AffectationStatus
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   timeslot: Prisma.TimeslotCreateNestedOneWithoutAffectationsInput
@@ -583,6 +656,9 @@ export type AffectationUncheckedCreateWithoutVolunteerInput = {
   status?: $Enums.AffectationStatus
   timeslotId: string
   sectorId: string
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -623,6 +699,9 @@ export type AffectationScalarWhereInput = {
   volunteerId?: Prisma.StringFilter<"Affectation"> | string
   timeslotId?: Prisma.StringFilter<"Affectation"> | string
   sectorId?: Prisma.StringFilter<"Affectation"> | string
+  presence?: Prisma.EnumPresenceNullableFilter<"Affectation"> | $Enums.Presence | null
+  checkedAt?: Prisma.DateTimeNullableFilter<"Affectation"> | Date | string | null
+  checkedBy?: Prisma.StringNullableFilter<"Affectation"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Affectation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Affectation"> | Date | string
 }
@@ -631,6 +710,9 @@ export type AffectationCreateWithoutSectorInput = {
   id?: string
   number?: number
   status?: $Enums.AffectationStatus
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   volunteer: Prisma.UserCreateNestedOneWithoutAffectationsInput
@@ -643,6 +725,9 @@ export type AffectationUncheckedCreateWithoutSectorInput = {
   status?: $Enums.AffectationStatus
   volunteerId: string
   timeslotId: string
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -677,6 +762,9 @@ export type AffectationCreateWithoutTimeslotInput = {
   id?: string
   number?: number
   status?: $Enums.AffectationStatus
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   volunteer: Prisma.UserCreateNestedOneWithoutAffectationsInput
@@ -689,6 +777,9 @@ export type AffectationUncheckedCreateWithoutTimeslotInput = {
   status?: $Enums.AffectationStatus
   volunteerId: string
   sectorId: string
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -725,6 +816,9 @@ export type AffectationCreateManyVolunteerInput = {
   status?: $Enums.AffectationStatus
   timeslotId: string
   sectorId: string
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -733,6 +827,9 @@ export type AffectationUpdateWithoutVolunteerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   number?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumAffectationStatusFieldUpdateOperationsInput | $Enums.AffectationStatus
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeslot?: Prisma.TimeslotUpdateOneRequiredWithoutAffectationsNestedInput
@@ -745,6 +842,9 @@ export type AffectationUncheckedUpdateWithoutVolunteerInput = {
   status?: Prisma.EnumAffectationStatusFieldUpdateOperationsInput | $Enums.AffectationStatus
   timeslotId?: Prisma.StringFieldUpdateOperationsInput | string
   sectorId?: Prisma.StringFieldUpdateOperationsInput | string
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -755,6 +855,9 @@ export type AffectationUncheckedUpdateManyWithoutVolunteerInput = {
   status?: Prisma.EnumAffectationStatusFieldUpdateOperationsInput | $Enums.AffectationStatus
   timeslotId?: Prisma.StringFieldUpdateOperationsInput | string
   sectorId?: Prisma.StringFieldUpdateOperationsInput | string
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -765,6 +868,9 @@ export type AffectationCreateManySectorInput = {
   status?: $Enums.AffectationStatus
   volunteerId: string
   timeslotId: string
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -773,6 +879,9 @@ export type AffectationUpdateWithoutSectorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   number?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumAffectationStatusFieldUpdateOperationsInput | $Enums.AffectationStatus
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   volunteer?: Prisma.UserUpdateOneRequiredWithoutAffectationsNestedInput
@@ -785,6 +894,9 @@ export type AffectationUncheckedUpdateWithoutSectorInput = {
   status?: Prisma.EnumAffectationStatusFieldUpdateOperationsInput | $Enums.AffectationStatus
   volunteerId?: Prisma.StringFieldUpdateOperationsInput | string
   timeslotId?: Prisma.StringFieldUpdateOperationsInput | string
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -795,6 +907,9 @@ export type AffectationUncheckedUpdateManyWithoutSectorInput = {
   status?: Prisma.EnumAffectationStatusFieldUpdateOperationsInput | $Enums.AffectationStatus
   volunteerId?: Prisma.StringFieldUpdateOperationsInput | string
   timeslotId?: Prisma.StringFieldUpdateOperationsInput | string
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -805,6 +920,9 @@ export type AffectationCreateManyTimeslotInput = {
   status?: $Enums.AffectationStatus
   volunteerId: string
   sectorId: string
+  presence?: $Enums.Presence | null
+  checkedAt?: Date | string | null
+  checkedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -813,6 +931,9 @@ export type AffectationUpdateWithoutTimeslotInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   number?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumAffectationStatusFieldUpdateOperationsInput | $Enums.AffectationStatus
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   volunteer?: Prisma.UserUpdateOneRequiredWithoutAffectationsNestedInput
@@ -825,6 +946,9 @@ export type AffectationUncheckedUpdateWithoutTimeslotInput = {
   status?: Prisma.EnumAffectationStatusFieldUpdateOperationsInput | $Enums.AffectationStatus
   volunteerId?: Prisma.StringFieldUpdateOperationsInput | string
   sectorId?: Prisma.StringFieldUpdateOperationsInput | string
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -835,6 +959,9 @@ export type AffectationUncheckedUpdateManyWithoutTimeslotInput = {
   status?: Prisma.EnumAffectationStatusFieldUpdateOperationsInput | $Enums.AffectationStatus
   volunteerId?: Prisma.StringFieldUpdateOperationsInput | string
   sectorId?: Prisma.StringFieldUpdateOperationsInput | string
+  presence?: Prisma.NullableEnumPresenceFieldUpdateOperationsInput | $Enums.Presence | null
+  checkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -848,6 +975,9 @@ export type AffectationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   volunteerId?: boolean
   timeslotId?: boolean
   sectorId?: boolean
+  presence?: boolean
+  checkedAt?: boolean
+  checkedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   volunteer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -862,6 +992,9 @@ export type AffectationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   volunteerId?: boolean
   timeslotId?: boolean
   sectorId?: boolean
+  presence?: boolean
+  checkedAt?: boolean
+  checkedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   volunteer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -876,6 +1009,9 @@ export type AffectationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   volunteerId?: boolean
   timeslotId?: boolean
   sectorId?: boolean
+  presence?: boolean
+  checkedAt?: boolean
+  checkedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   volunteer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -890,11 +1026,14 @@ export type AffectationSelectScalar = {
   volunteerId?: boolean
   timeslotId?: boolean
   sectorId?: boolean
+  presence?: boolean
+  checkedAt?: boolean
+  checkedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AffectationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "number" | "status" | "volunteerId" | "timeslotId" | "sectorId" | "createdAt" | "updatedAt", ExtArgs["result"]["affectation"]>
+export type AffectationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "number" | "status" | "volunteerId" | "timeslotId" | "sectorId" | "presence" | "checkedAt" | "checkedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["affectation"]>
 export type AffectationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   volunteer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   timeslot?: boolean | Prisma.TimeslotDefaultArgs<ExtArgs>
@@ -925,6 +1064,9 @@ export type $AffectationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     volunteerId: string
     timeslotId: string
     sectorId: string
+    presence: $Enums.Presence | null
+    checkedAt: Date | null
+    checkedBy: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["affectation"]>
@@ -1359,6 +1501,9 @@ export interface AffectationFieldRefs {
   readonly volunteerId: Prisma.FieldRef<"Affectation", 'String'>
   readonly timeslotId: Prisma.FieldRef<"Affectation", 'String'>
   readonly sectorId: Prisma.FieldRef<"Affectation", 'String'>
+  readonly presence: Prisma.FieldRef<"Affectation", 'Presence'>
+  readonly checkedAt: Prisma.FieldRef<"Affectation", 'DateTime'>
+  readonly checkedBy: Prisma.FieldRef<"Affectation", 'String'>
   readonly createdAt: Prisma.FieldRef<"Affectation", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Affectation", 'DateTime'>
 }

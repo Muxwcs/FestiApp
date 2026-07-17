@@ -43,6 +43,7 @@ model User {
   referentSectors    SectorReferent[]
   timeslotReferents  TimeslotReferent[]
   pushSubscriptions  PushSubscription[]
+  responsibleMissions Mission[] @relation("MissionResponsible")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -129,6 +130,11 @@ enum AffectationStatus {
   REFUSE
 }
 
+enum Presence {
+  PRESENT
+  ABSENT
+}
+
 model Affectation {
   id     String            @id @default(cuid())
   number Int               @default(autoincrement())
@@ -137,6 +143,11 @@ model Affectation {
   volunteerId String
   timeslotId  String
   sectorId    String
+
+  // Pointage
+  presence    Presence?
+  checkedAt   DateTime?
+  checkedBy   String?
 
   volunteer User     @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
   timeslot  Timeslot @relation(fields: [timeslotId], references: [id], onDelete: Cascade)
@@ -175,6 +186,8 @@ model Mission {
   priority       MissionPriority @default(MOYENNE)
   status         MissionStatus   @default(A_FAIRE)
   humanResources Int             @default(0)
+  responsibleId  String?
+  responsible    User?           @relation("MissionResponsible", fields: [responsibleId], references: [id], onDelete: SetNull)
 
   assignments MissionAssignment[]
 
