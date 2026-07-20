@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Users, LayoutDashboard, CalendarSync, SquareKanban, Music2, Bell, InfoIcon, EuroIcon, ListTodo } from "lucide-react"
+import { Users, LayoutDashboard, CalendarSync, SquareKanban, Music2, Bell, InfoIcon, EuroIcon, ListTodo, Users2Icon } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -36,6 +36,10 @@ const AppSidebar = ({ role, isReferent = false, className }: SidebarProps) => {
     { href: "/admin/missions", label: "Gestion Missions", icon: ListTodo },
   ]
 
+  const commonLinks = [
+    { href: "/", label: "Partie Public", icon: Users2Icon },
+  ]
+
   const benevoleLinks = [
     { href: "/dashboard", label: "Mon Dashboard", icon: SquareKanban },
   ]
@@ -46,7 +50,7 @@ const AppSidebar = ({ role, isReferent = false, className }: SidebarProps) => {
 
   // ✅ CORRECTED: Admin gets everything, bénévole gets subset
   const buildNavLinks = () => {
-    let links = []
+    let links = [...commonLinks]
 
     if (role === "admin") {
       // ✅ Admins ALWAYS get admin links

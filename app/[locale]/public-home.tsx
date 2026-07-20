@@ -76,10 +76,29 @@ export function PublicHomePage({ locale }: Props) {
       </section>
 
       {/* Footer */}
-      <footer className="px-4 py-12 text-center">
+      <footer className="px-4 py-12 text-center space-y-2">
         <p className="text-xs text-white/30">
-          © {new Date().getFullYear()} Festilasai — {t("footer.rights")}
+          <span>
+            © {new Date().getFullYear()} Festilasai — {t("footer.rights")}
+          </span>
+          <span className="mx-1">
+            {"| "}{t("footer.madeBy")}{" "}
+            <a
+              href="https://www.brutdecom.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-white/40 transition-colors"
+            >
+              BrutdeCom
+            </a>
+          </span>
         </p>
+        <Link
+          href={"/login"}
+          className="inline-block text-[10px] text-white/15 hover:text-white/30 transition-colors mt-2"
+        >
+          {t("footer.staff")}
+        </Link>
       </footer>
 
       <BottomNav locale={locale} />

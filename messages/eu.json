@@ -58,7 +58,20 @@
     "currency": "€"
   },
   "info": {
-    "title": "Informazio praktikoak"
+    "title": "Informazio praktikoak",
+    "festivalMap": "Festibalaren plana",
+    "festivalMapHint": "Klikatu eta arrastatu planaren posizioa aldatzeko",
+    "generalLegend": {
+      "scenes": "Eszenatokien kokapena",
+      "bars": "Ostatuak",
+      "restauration": "Jatetxea",
+      "wc": "Komunak",
+      "txartel": "Txartelak / Baso",
+      "merch": "Merch",
+      "entrees": "Sarrera",
+      "village": "Herrikoa",
+      "skate": "Skate"
+    }
   },
   "notifications": {
     "title": "Jarrai ezazu informatua!",
@@ -75,6 +88,8 @@
     "back": "Itzuli"
   },
   "footer": {
-    "rights": "Eskubide guztiak erreserbatuak"
+    "rights": "Eskubide guztiak erreserbatuak",
+    "madeBy": "Egina",
+    "staff": "Langileentzako gunea"
   }
 }

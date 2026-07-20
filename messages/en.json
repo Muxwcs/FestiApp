@@ -58,7 +58,20 @@
     "currency": "€"
   },
   "info": {
-    "title": "Practical Information"
+    "title": "Practical Information",
+    "festivalMap": "Festival map",
+    "festivalMapHint": "Click and drag to move the map",
+    "generalLegend": {
+      "scenes": "Stages",
+      "bars": "Bars",
+      "restauration": "Food",
+      "wc": "WC",
+      "txartel": "Txartels / Baso",
+      "merch": "Merch",
+      "entrees": "Entries",
+      "village": "Village",
+      "skate": "Skate"
+    }
   },
   "notifications": {
     "title": "Stay informed!",
@@ -75,6 +88,8 @@
     "back": "Back"
   },
   "footer": {
-    "rights": "All rights reserved"
+    "rights": "All rights reserved",
+    "madeBy": "Designed by",
+    "staff": "Staff area"
   }
 }

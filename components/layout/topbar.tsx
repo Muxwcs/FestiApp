@@ -1,6 +1,6 @@
 "use client"
 
-import { Bell, LogOut, User } from "lucide-react"
+import { LogOut, User } from "lucide-react"
 import {
   Avatar,
   AvatarFallback,
@@ -18,6 +18,7 @@ import { SidebarTrigger } from "../ui/sidebar"
 import { DarkModeToggle } from "../darkmode-toggle"
 import { signOut } from "next-auth/react"
 import { useCurrentUser } from "@/hooks/use-current-user"
+import NotificationBell from "./notification-bell"
 
 export default function Topbar() {
   const { user } = useCurrentUser()
@@ -44,9 +45,7 @@ export default function Topbar() {
         <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
       </div>
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Bell className="h-5 w-5" />
-        </Button>
+        <NotificationBell />
         <DarkModeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
