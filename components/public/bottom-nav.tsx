@@ -2,12 +2,13 @@
 
 import { useTranslations } from "next-intl"
 import { usePathname } from "next/navigation"
-import { Music, Tag, Info, Menu } from "lucide-react"
+import { Music, Tag, Info, Menu, ExternalLink, X } from "lucide-react"
 import { useState } from "react"
 import { type Locale } from "@/lib/i18n/types"
 import Link from "next/link"
 import Image from "next/image"
 import { NotificationToggle } from "../pwa/notification-prompt"
+import { InAppBrowser } from "./in-app-browser"
 
 interface BottomNavProps {
   locale: Locale
@@ -58,30 +59,66 @@ export function BottomNav({ locale }: BottomNavProps) {
     <>
       {/* Menu overlay */}
       {showMenu && (
-        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm p-2" onClick={() => setShowMenu(false)}>
+        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm" onClick={() => setShowMenu(false)}>
           <div
-            className="absolute top-4 left-1/2 -translate-x-1/2 w-11/12 rounded-2xl bg-flDarkBlue border border-white/10 p-2 shadow-2xl animate-in slide-in-from-bottom-4 duration-300"
+            className="absolute top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-sm rounded-2xl bg-flDarkBlue border border-white/10 shadow-2xl animate-in slide-in-from-bottom-4 duration-300 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-sm font-semibold text-white mb-2 text-center">
-              {t("nav.menu")}
-            </h2>
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+              <h2 className="text-sm font-semibold text-white">{t("nav.menu")}</h2>
+              <button
+                onClick={() => setShowMenu(false)}
+                className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-            <div className="my-2 border-t border-white/10"></div>
-            <h3 className="text-sm font-semibold text-white/90 mb-2">
-              {t("notifications.title")}
-            </h3>
-            <p className="text-xs text-white/80 mb-2">
-              {t("notifications.description")}
-            </p>
-            <NotificationToggle />
+            {/* Notifications */}
+            <div className="px-4 py-3 border-t border-white/5">
+              <div className="flex flex-col items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-semibold text-white/90">{t("notifications.title")}</h3>
+                  <p className="text-[11px] text-white/50 mt-0.5">{t("notifications.description")}</p>
+                </div>
+                <NotificationToggle />
+              </div>
+            </div>
+
+            {/* Liens */}
+            <div className="border-t border-white/5">
+              <InAppBrowser
+                url={t("menu.detailsVillageLink")}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:bg-white/5 hover:text-white transition-colors"
+              >
+                <ExternalLink className="w-4 h-4 shrink-0 text-white/30" />
+                {t("menu.detailsVillage")}
+              </InAppBrowser>
+
+              <InAppBrowser
+                url={t("menu.PartenairesLink")}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:bg-white/5 hover:text-white transition-colors border-t border-white/5"
+              >
+                <ExternalLink className="w-4 h-4 shrink-0 text-white/30" />
+                {t("menu.Partenaires")}
+              </InAppBrowser>
+
+              <InAppBrowser
+                url={t("menu.ContactLink")}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:bg-white/5 hover:text-white transition-colors border-t border-white/5"
+              >
+                <ExternalLink className="w-4 h-4 shrink-0 text-white/30" />
+                {t("menu.Contact")}
+              </InAppBrowser>
+            </div>
           </div>
         </div>
       )}
 
       {/* Bottom navigation with center notch */}
       <nav className="fixed bottom-0 left-0 right-0 z-50">
-        <div className="relative max-w-lg mx-auto">
+        <div className="relative max-w-md mx-auto">
           {/* Center logo button - raised above the bar */}
           <Link
             href={`/${locale}`}

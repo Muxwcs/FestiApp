@@ -7,6 +7,14 @@
     "menu": "Menu",
     "login": "Connexion"
   },
+  "menu": {
+    "detailsVillage": "Détails du village",
+    "detailsVillageLink": "https://festilasai.com/village-lasai/",
+    "Partenaires": "Partenaires",
+    "PartenairesLink": "https://festilasai.com/partenaires/",
+    "Contact": "Contact",
+    "ContactLink": "https://festilasai.com/contact/"
+  },
   "hero": {
     "title": "Festival",
     "subtitle": "31 Juillet & 1er Août",
@@ -22,7 +30,8 @@
       "ANIMATION": "Animations",
       "INFO": "Informations",
       "SKATE": "Skate",
-      "STREET_ART": "Street Art"
+      "STREET_ART": "Street Art",
+      "favorites": "Favoris"
     }
   },
   "enums": {
@@ -60,7 +69,10 @@
   "info": {
     "title": "Infos pratiques",
     "festivalMap": "Plan du festival",
+    "villageMap": "Plan du village",
     "festivalMapHint": "Cliquez et faites glisser pour déplacer le plan",
+    "faq": "FAQ",
+    "access": "Accès",
     "generalLegend": {
       "scenes": "Scènes",
       "bars": "Bars",

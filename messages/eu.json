@@ -7,6 +7,14 @@
     "menu": "Menua",
     "login": "Konexioa"
   },
+  "menu": {
+    "detailsVillage": "Herrixkaren xehetasunak",
+    "detailsVillageLink": "https://festilasai.com/eus/herri-lasai/",
+    "Partenaires": "Bazkideak",
+    "PartenairesLink": "https://festilasai.com/eus/bazkideak/",
+    "Contact": "Kontaktua",
+    "ContactLink": "https://festilasai.com/eus/kontaktua/"
+  },
   "hero": {
     "title": "Festibala",
     "subtitle": "Uztailak 31 & Agorrilak 1",
@@ -22,7 +30,8 @@
       "ANIMATION": "Animazioak",
       "INFO": "Informazioak",
       "SKATE": "Skate",
-      "STREET_ART": "Street Art"
+      "STREET_ART": "Street Art",
+      "favorites": "Gustukoenak"
     }
   },
   "enums": {
@@ -34,7 +43,7 @@
       "HANDIA": "Handia",
       "TTIKIA": "Ttikia",
       "CASTLE": "Château",
-      "VILLAGE": "Herrikoa",
+      "VILLAGE": "Herrixka",
       "FESTIVAL": "Festibala"
     },
     "priceCategory": {
@@ -59,8 +68,11 @@
   },
   "info": {
     "title": "Informazio praktikoak",
-    "festivalMap": "Festibalaren plana",
+    "festivalMap": "Festibalaren planoa",
+    "villageMap": "Herrixkako planoa",
     "festivalMapHint": "Klikatu eta arrastatu planaren posizioa aldatzeko",
+    "faq": "FAQ",
+    "access": "Sarbidea",
     "generalLegend": {
       "scenes": "Eszenatokien kokapena",
       "bars": "Ostatuak",
@@ -69,7 +81,7 @@
       "txartel": "Txartelak / Baso",
       "merch": "Merch",
       "entrees": "Sarrera",
-      "village": "Herrikoa",
+      "village": "Herrixka",
       "skate": "Skate"
     }
   },

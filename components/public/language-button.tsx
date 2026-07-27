@@ -26,7 +26,7 @@ const LanguageButton = ({ locale }: LanguageButtonProps) => {
     <>
       <button
         onClick={() => setShowLangPicker(true)}
-        className="fixed z-50 top-2 right-2 flex gap-1 items-center py-2 px-2 min-w-14 transition-colors"
+        className="fixed z-50 top-1 right-2 flex gap-1 items-center py-2 px-2 min-w-14 transition-colors"
       >
         <Globe className="h-5 w-5 text-white/50" strokeWidth={1.5} />
         <span className="text-[10px] font-medium tracking-wide uppercase text-white/50">

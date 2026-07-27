@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data:",
               "connect-src 'self' https://*.push.services.mozilla.com https://fcm.googleapis.com https://updates.push.services.mozilla.com wss://*.push.services.mozilla.com",
               "worker-src 'self'",
-              "frame-src 'none'",
+              "frame-src 'self' https://festilasai.com",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",

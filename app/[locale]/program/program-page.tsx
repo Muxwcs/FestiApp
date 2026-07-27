@@ -121,7 +121,7 @@ export function ProgramPage({ locale, events }: Props) {
                 }`}
             >
               <Heart className={`h-3 w-3 ${showFavoritesOnly ? "fill-current" : ""}`} />
-              Favoris ({favorites.length})
+              {t("program.categories.favorites")} ({favorites.length})
             </button>
           )}
           {(["CONCERT", "ANIMATION", "INFO", "SKATE", "STREET_ART"] as EventCategory[]).map((cat) => (
