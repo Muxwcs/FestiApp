@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-const CACHE_NAME = "festiapp-v2";
+const CACHE_NAME = "festiapp-v3";
 
 const STATIC_ASSETS = [
   "/icon-192x192.png",
