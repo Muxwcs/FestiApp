@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { t as translate, type Locale } from "@/lib/i18n/types"
+import { type Locale } from "@/lib/i18n/types"
 import Header from "@/components/public/header"
 import { MapViewer } from "@/components/public/infos/map-viewer"
 import {
@@ -155,7 +155,7 @@ export function InfoPage({ locale, _infos }: Props) {
           className="rounded-2xl bg-flDarkBlue/50 border border-white/5 backdrop-blur-xl overflow-hidden mt-4 w-full flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:bg-white/5 hover:text-white transition-colors"
         >
           <ExternalLink className="w-4 h-4 shrink-0 text-white/30" />
-          {translate("info.detailsInfos", locale)}
+          {t("info.detailsInfos")}
         </InAppBrowser>
       </div>
     </div>
