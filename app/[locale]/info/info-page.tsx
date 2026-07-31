@@ -10,6 +10,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { InAppBrowser } from "@/components/public/in-app-browser"
+import { ExternalLink } from "lucide-react"
 
 interface InfoItem {
   id: string
@@ -21,10 +23,10 @@ interface InfoItem {
 
 interface Props {
   locale: Locale
-  infos: InfoItem[]
+  _infos: InfoItem[]
 }
 
-export function InfoPage({ locale, infos }: Props) {
+export function InfoPage({ locale, _infos }: Props) {
   const t = useTranslations()
 
   const generalMapLegend = [
@@ -111,7 +113,7 @@ export function InfoPage({ locale, infos }: Props) {
           </AccordionItem>
 
           {/* === FAQ === */}
-          {infos.length > 0 && (
+          {/* {infos.length > 0 && (
             <AccordionItem
               value="faq"
               className="rounded-2xl bg-flDarkBlue/50 border border-white/5 backdrop-blur-xl overflow-hidden"
@@ -146,8 +148,15 @@ export function InfoPage({ locale, infos }: Props) {
                 </Accordion>
               </AccordionContent>
             </AccordionItem>
-          )}
+          )} */}
         </Accordion>
+        <InAppBrowser
+          url="https://festilasai.com/infos-utiles/"
+          className="rounded-2xl bg-flDarkBlue/50 border border-white/5 backdrop-blur-xl overflow-hidden mt-4 w-full flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:bg-white/5 hover:text-white transition-colors"
+        >
+          <ExternalLink className="w-4 h-4 shrink-0 text-white/30" />
+          {translate("info.detailsInfos", locale)}
+        </InAppBrowser>
       </div>
     </div>
   )

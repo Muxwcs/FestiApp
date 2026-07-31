@@ -22,5 +22,5 @@ export default async function Page({
     updatedAt: i.updatedAt.toISOString(),
   }))
 
-  return <InfoPage locale={locale as Locale} infos={serialized} />
+  return <InfoPage locale={locale as Locale} _infos={serialized} />
 }
